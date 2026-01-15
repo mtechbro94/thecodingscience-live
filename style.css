@@ -1,0 +1,321 @@
+
+#bg-img{
+    height: 100vh;
+    width: 100vw;
+    object-fit: cover;
+    filter: brightness(0.6);
+    /* position: absolute; */
+    top: 0;
+    left: 0;
+    z-index: -1;
+}
+.weak { 
+    color: red; 
+    font-weight: bold; 
+}
+.strong { 
+            color: green; 
+            font-weight: bold;
+}
+.invalid { 
+    color: red; 
+    font-weight: bold;
+ }
+        .valid { 
+            color: green;
+             font-weight: bold; 
+            }
+nav .navbar-nav li .nav-link{
+    color: white !important;
+}
+.navbar-brand{
+    color: white !important;
+}
+.navbar-text a{
+    color: white !important;
+}
+
+.navbar-scrolled{
+    background-color: black;
+}
+
+.main{
+    color: white;
+    position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.main h1{
+    letter-spacing: 8px;
+    margin-bottom: 20px;
+    position: relative;
+    animation: anime-heading 3s 1;
+}
+.block{
+    animation: scrolleffect linear;
+    animation-timeline: view();
+    animation-range: entry 0;
+}
+@keyframes scrolleffect {
+    from{
+        opacity: 0;
+        scale: 0.5;
+    }
+    to{
+        opacity: 1;
+        scale: 1;
+    }
+}
+@keyframes anime-heading{
+    0%{
+        background-color: black;
+        margin-bottom: -40px;
+    }
+    35%{
+        background-color: black;
+        letter-spacing: 12px;
+        margin-bottom:-40px ;
+    }
+    85%{
+        
+        background-color: black;
+        letter-spacing: 8px;
+        margin-bottom: -40px;
+    }
+}
+.container-1{
+    position: relative;
+    top: -120px;
+    max-width: 900px !important;
+    border: 4px solid green;
+    padding: 10px;
+    /* box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px; */
+}
+.card-2 {
+    background-color: green !important;
+    color: white !important;
+}
+.card-2 p{
+    color: white !important;
+}
+.dropdown-item a{
+    color: black !important;
+}
+.container-2{
+    background-image: url("https://cdn.pixabay.com/photo/2025/02/22/08/35/mountain-9423779_1280.jpg");
+    height: 250px;
+    background-size: cover;
+    background-attachment: fixed;
+}
+.content-2{
+    color: white;
+    position: absolute;
+    margin: 100px;
+
+}
+
+.container-4{
+    margin-top: 100px;
+}
+.container-4 h1{
+    margin: 50px 0;
+}
+.container-4 .carousel img{
+    height: 400px !important;
+}
+.icon-1{
+    font-size: 35px;
+    border: 2px solid black;
+    padding: 20px 25px;
+    border-radius: 50%;
+    position: absolute;
+    transform: translate(130px, -55px);
+    background-color: white;
+}
+.content-3{
+    margin-top: 45px;
+}
+.content-3 span{
+    width: 1.8em;
+    height: 1.8em;
+}
+.container-4 h1{
+    border-bottom: 2px solid green;
+    padding-bottom: 10px;
+}
+.carousel-control-prev-icon,
+.carousel-control-next-icon{
+    filter: invert(100%);
+}
+footer hr{
+    width: 60px; background-color: white; height: 4px;
+}
+.footer-social a {
+    text-decoration: none !important;
+}
+@media screen and (max-width: 430px) {
+    @keyframes anime-heading{
+        0%{
+            background-color: black;
+            margin-bottom: -40px;
+        }
+        35%{
+            background-color: black;
+            letter-spacing: 12px;
+            margin-bottom:-40px ;
+        }
+        85%{
+            
+            background-color: black;
+            letter-spacing: 8px;
+            margin-bottom: -40px;
+        }
+    }
+    .bg-img{
+        width: 430px !important;
+    }
+    .main button{
+        width: 100% !important;
+    }
+    .container-1{
+        position: relative;
+        width: 420px !important;
+    }
+    .card-groud{
+        width:420px !important;
+    }
+    .card{
+        width: 420px !important;
+    }
+    .navbar{
+        background-color: white;
+        position: fixed;
+    }
+    .navbar-brand{
+        color: black !important ;
+    }
+    nav .navbar-nav li .nav-link{
+        color: black !important;
+    }
+    .content-2{
+        margin: 60px;
+        font-size: 10px !important;
+    }
+    
+}
+/*services*/
+.products-header {
+    position: relative;
+    text-align: center;
+    background-color: transparent; /* or your preferred light background */
+    padding: 60px 20px 40px; /* add top space */
+}
+
+.products-header h1 {
+    font-size: 3rem;
+    font-family: 'Georgia', serif;
+    color: #2d2d2d;
+    position: relative;
+    z-index: 2;
+    animation: anime5 both;
+    animation-timeline: view();
+}
+@keyframes anime5 {
+    from{
+        opacity: 0;
+
+    }
+}
+.slider{
+    position: relative;
+    width:100% ;
+    height: 530px;
+    overflow: hidden;
+}
+
+.item{
+    position: absolute;
+    width: 300px;
+    height: 470px;
+    text-align: justify;
+    background-color: #fff;
+    border-radius:20px ;
+    padding: 20px;
+    transition: 0.5s;
+    left: calc(50% - 180px);
+    top: 0;
+}
+.item>img{
+    position: relative;
+    width: 300px;
+    height: 470px;
+    text-align: justify;
+    background-color: #fff;
+    border-radius:20px ;
+}
+
+#next,#prev{
+    position: absolute;
+    top: 40%;
+    color: #fff;
+    background-color:rgb(75, 217, 103);
+    border: none;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    font-size: xxx-large;
+    font-family: monospace;
+    font-weight: bold;
+    left: 50px;
+}
+#next{
+    left: unset;
+    right:50px ;
+}
+.item-content-one{
+    background-color: rgb(75, 217, 103);
+    color: white;
+    position: relative;
+    top: -130px;
+    left: -30vh;
+    padding: 20px;
+    border-radius: 20px;
+    animation: anime8 2s 1;
+}
+@keyframes anime8 {
+    from{
+        opacity: 0;
+        left: 0vh;
+    }
+    to{
+        opacity: 1;
+        left: -30vh;
+    }
+}
+.item-content-two{
+    background-color: rgb(75, 217, 103);
+    color: white;
+    position: relative;
+    top: -630px;
+    left: 30vh;
+    padding: 20px;
+    border-radius: 20px;
+    animation: anime9 2s 1;
+}
+@keyframes anime9{
+    from{
+        opacity: 0;
+        left: 0vh;
+    }
+    to{
+        opacity: 1;
+        left: 30vh;
+    }
+}
+.item-content1,.item-content2{
+    display: none;
+}
+@media  screen and (max-width:348px){
+    
+}

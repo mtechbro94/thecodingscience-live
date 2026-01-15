@@ -1,0 +1,5 @@
+{
+    "require": {
+        "paytm/paytm-pg": "^0.0.9"
+    }
+}
