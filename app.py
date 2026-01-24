@@ -284,16 +284,39 @@ def init_db_on_startup():
 
 
 # Initialize database on startup
+db_initialized = False
+
+@app.before_request
+def init_db_if_needed():
+    """Lazy initialization of database on first request"""
+    global db_initialized
+    if not db_initialized:
+        try:
+            init_db_on_startup()
+            db_initialized = True
+            print("✓ Database initialized successfully on first request", file=sys.stdout, flush=True)
+        except Exception as e:
+            print(f"✗ ERROR during database initialization: {e}", file=sys.stderr, flush=True)
+            traceback.print_exc(file=sys.stderr)
+
+# Also try to initialize at startup but don't block if it fails
 try:
     init_db_on_startup()
-    print("✓ Database initialized successfully", file=sys.stdout, flush=True)
+    db_initialized = True
+    print("✓ Database initialized successfully at startup", file=sys.stdout, flush=True)
 except Exception as e:
-    print(f"✗ CRITICAL ERROR during database initialization: {e}", file=sys.stderr, flush=True)
-    traceback.print_exc(file=sys.stderr)
+    print(f"⚠ Database initialization deferred to first request: {e}", file=sys.stderr, flush=True)
 
 
+
+# App startup complete message
+print("=" * 50, file=sys.stdout, flush=True)
+print("✓ FLASK APP INITIALIZATION COMPLETE", file=sys.stdout, flush=True)
+print("✓ Ready to handle requests", file=sys.stdout, flush=True)
+print("=" * 50, file=sys.stdout, flush=True)
 
 # ==================== CUSTOM DECORATORS ====================
+
 
 def admin_required(f):
     """Decorator to require admin role"""
