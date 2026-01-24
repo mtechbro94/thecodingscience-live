@@ -5,6 +5,11 @@ WSGI entry point for production servers (Gunicorn, uWSGI, etc.)
 import os
 import sys
 import traceback
+
+# Ensure unbuffered output for better logging visibility
+sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
+sys.stderr = os.fdopen(sys.stderr.fileno(), 'w', 0)
+
 from dotenv import load_dotenv
 
 # Load environment variables
