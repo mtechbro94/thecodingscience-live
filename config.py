@@ -69,7 +69,7 @@ class ProductionConfig(Config):
     TESTING = False
     SQLALCHEMY_DATABASE_URI = os.getenv(
         'DATABASE_URL',
-        'sqlite:///coding_science.db'
+        'sqlite:////tmp/coding_science.db'
     )
     
     # Enforce production security
