@@ -4,26 +4,34 @@ School of Technology and AI Innovations
 Production-ready with User Management, Authentication, and Admin Panel
 """
 
+import sys
+import traceback
+
 # ==================== IMPORTS ====================
-from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
-from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug.exceptions import BadRequest
-from datetime import datetime, timedelta
-import os
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-import segno
-from io import BytesIO
-import base64
-import uuid
-import logging
-import logging.handlers
-from dotenv import load_dotenv
-from functools import wraps
-import re
+try:
+    from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
+    from flask_sqlalchemy import SQLAlchemy
+    from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+    from werkzeug.security import generate_password_hash, check_password_hash
+    from werkzeug.exceptions import BadRequest
+    from datetime import datetime, timedelta
+    import os
+    import smtplib
+    from email.mime.text import MIMEText
+    from email.mime.multipart import MIMEMultipart
+    import segno
+    from io import BytesIO
+    import base64
+    import uuid
+    import logging
+    import logging.handlers
+    from dotenv import load_dotenv
+    from functools import wraps
+    import re
+except Exception as e:
+    print(f"✗ CRITICAL ERROR during imports: {e}", file=sys.stderr, flush=True)
+    traceback.print_exc(file=sys.stderr)
+    raise
 
 # ==================== CONFIGURATION & SETUP ====================
 load_dotenv()
@@ -35,15 +43,24 @@ logger.setLevel(logging.DEBUG)
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 
 # Load configuration first
-from config import get_config
-app.config.from_object(get_config())
+try:
+    from config import get_config
+    app.config.from_object(get_config())
+    print("✓ Configuration loaded successfully", file=sys.stdout, flush=True)
+except Exception as e:
+    print(f"✗ ERROR loading config: {e}", file=sys.stderr, flush=True)
+    traceback.print_exc(file=sys.stderr)
+    raise
 
 # Add Whitenoise for serving static files in production
 try:
     from whitenoise import WhiteNoise
     app.wsgi_app = WhiteNoise(app.wsgi_app, root='static')
+    print("✓ WhiteNoise initialized successfully", file=sys.stdout, flush=True)
 except Exception as e:
+    print(f"⚠ WhiteNoise initialization failed: {e}", file=sys.stderr, flush=True)
     logger.warning(f"WhiteNoise initialization failed: {e}")
+
 
 # Security: Enable HTTPS only in production (disabled for Railway)
 # if not app.debug:
@@ -262,10 +279,18 @@ def init_db_on_startup():
                 logger.info(f"✓ Seeded {len(courses)} courses")
         except Exception as e:
             logger.error(f"Error initializing database: {str(e)}")
+            print(f"✗ Database init error: {str(e)}", file=sys.stderr, flush=True)
+            traceback.print_exc(file=sys.stderr)
 
 
 # Initialize database on startup
-init_db_on_startup()
+try:
+    init_db_on_startup()
+    print("✓ Database initialized successfully", file=sys.stdout, flush=True)
+except Exception as e:
+    print(f"✗ CRITICAL ERROR during database initialization: {e}", file=sys.stderr, flush=True)
+    traceback.print_exc(file=sys.stderr)
+
 
 
 # ==================== CUSTOM DECORATORS ====================
