@@ -1,0 +1,408 @@
+{% extends "base.html" %}
+
+{% block title %}Courses - {{ site_name }}{% endblock %}
+
+{% block content %}
+<section class="py-5 section-muted" style="margin-top: 80px;">
+    <div class="container">
+        <h1 class="mb-4">Our Courses</h1>
+        <p class="lead">Choose from our comprehensive range of technology courses designed to transform your career.</p>
+        
+        <!-- Static filter tags (visual only) -->
+        <div class="mb-4">
+            <span class="badge rounded-pill text-bg-primary me-2">Foundational</span>
+            <span class="badge rounded-pill text-bg-secondary me-2">Intermediate</span>
+            <span class="badge rounded-pill text-bg-light border me-2">Web Development</span>
+            <span class="badge rounded-pill text-bg-light border me-2">Python</span>
+            <span class="badge rounded-pill text-bg-light border">Data & AI</span>
+        </div>
+        <div class="row mt-5">
+            {% if courses.items %}
+                {% for course in courses.items %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm course-card">
+                        {% if course.image %}
+                        <img src="{{ url_for('static', filename='images/' + course.image) }}" alt="{{ course.name }}" class="card-img-top course-image">
+                        {% endif %}
+                        <div class="card-body">
+                            <span class="course-badge">{{ course.level }}</span>
+                            <h5 class="card-title mt-2">
+                                <a href="{{ url_for('course_detail', id=course.id) }}" class="text-decoration-none text-dark">
+                                    {{ course.name }}
+                                </a>
+                            </h5>
+                            <p class="card-text">{{ course.description }}</p>
+                            <div class="course-meta">
+                                <small><i class="fas fa-clock"></i> {{ course.duration }}</small><br>
+                                <small><i class="fas fa-rupee-sign"></i> ₹{{ course.price }}</small>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <a href="{{ url_for('course_detail', id=course.id) }}" class="btn btn-outline-primary btn-sm w-100 mb-2">
+                                <i class="fas fa-info-circle"></i> View Details
+                            </a>
+                            <button class="btn btn-primary btn-sm w-100 enroll-btn" 
+                                    data-course-id="{{ course.id }}" 
+                                    data-course-name="{{ course.name }}" 
+                                    data-course-price="{{ course.price }}">
+                                <i class="fas fa-shopping-cart"></i> Enroll Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12">
+                    <p class="text-center text-muted">No courses available at the moment.</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Pagination -->
+        {% if courses.pages > 1 %}
+        <nav class="mt-5">
+            <ul class="pagination justify-content-center">
+                {% if courses.has_prev %}
+                    <li class="page-item"><a class="page-link" href="?page={{ courses.prev_num }}">Previous</a></li>
+                {% endif %}
+                
+                {% for page_num in courses.iter_pages() %}
+                    {% if page_num %}
+                        {% if page_num == courses.page %}
+                            <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a></li>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+                
+                {% if courses.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ courses.next_num }}">Next</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Enroll Modal -->
+<div class="modal fade" id="enrollModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Enroll in Course</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="enrollForm">
+                <div class="modal-body">
+                    <input type="hidden" id="courseId">
+                    <input type="hidden" id="courseName">
+                    <input type="hidden" id="coursePrice">
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-book"></i> Selected Course</label>
+                        <input type="text" class="form-control" id="courseDisplay" disabled style="background-color: #e7f3ff; border-color: #0066cc;">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" class="form-control" name="name" value="{{ current_user.name }}" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="email" value="{{ current_user.email }}" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Phone</label>
+                        <input type="tel" class="form-control" name="phone" value="{{ current_user.phone }}" readonly>
+                    </div>
+                    
+                    <div class="alert alert-info" role="alert">
+                        <i class="fas fa-mobile-alt"></i> <strong>Payment Method:</strong> UPI/QR Code
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-mobile-alt"></i> Proceed to UPI Payment
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- UPI Payment Modal -->
+<div class="modal fade" id="upiPaymentModal" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">UPI Payment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <h6 id="upiCourseDisplay" class="mb-3"></h6>
+                <p class="text-muted mb-3">Scan QR Code or Enter UPI ID to Pay</p>
+                
+                <!-- QR Code -->
+                <div class="mb-3">
+                    <img id="qrCodeImage" src="" alt="QR Code" style="max-width: 250px; border: 2px solid #ddd; padding: 10px; border-radius: 8px;">
+                </div>
+                
+                <!-- UPI ID -->
+                <div class="mb-3">
+                    <label class="form-label">Choose UPI ID:</label>
+                    <select id="upiIdSelector" class="form-select mb-2"></select>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="upiIdDisplay" readonly>
+                        <button class="btn btn-outline-secondary" type="button" onclick="copyUPI()">Copy</button>
+                    </div>
+                    <small class="text-muted d-block mt-2">Payee: The Coding Science</small>
+                </div>
+                
+                <!-- Transaction ID -->
+                <div class="mb-3">
+                    <small class="text-muted">
+                        Transaction ID: <strong id="transactionIdDisplay"></strong>
+                    </small>
+                </div>
+                
+                <!-- Payment Confirmation -->
+                <div class="mb-3 p-3" style="background-color: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="paymentConfirm">
+                        <label class="form-check-label" for="paymentConfirm">
+                            <small><strong>I confirm that I have completed the payment via UPI</strong></small>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info" role="alert">
+                    <small><strong>Important:</strong> Payment must be completed before verification. Your registration will be pending until we verify the payment.</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" id="verifyPaymentBtn" onclick="verifyUPIPayment()" disabled>
+                    <i class="fas fa-check"></i> Verify Payment
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Check if user is authenticated
+const isAuthenticated = {{ 'true' if current_user.is_authenticated else 'false' }};
+
+// Store enrollment data
+let enrollmentData = {};
+
+// Handle Enroll Now button clicks
+document.querySelectorAll('.enroll-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        if (!isAuthenticated) {
+            // Redirect to login with "next" parameter to return to course enrollment
+            const courseId = this.getAttribute('data-course-id');
+            const courseName = this.getAttribute('data-course-name');
+            window.location.href = `/login?next=/courses#course-${courseId}`;
+            return;
+        }
+        
+        // If authenticated, show enrollment modal
+        const courseId = this.getAttribute('data-course-id');
+        const courseName = this.getAttribute('data-course-name');
+        const coursePrice = this.getAttribute('data-course-price');
+        
+        document.getElementById('courseId').value = courseId;
+        document.getElementById('courseName').value = courseName;
+        document.getElementById('coursePrice').value = coursePrice;
+        document.getElementById('courseDisplay').value = courseName + ' - ₹' + coursePrice;
+        
+        enrollmentData = {
+            courseId: courseId,
+            courseName: courseName,
+            coursePrice: coursePrice
+        };
+        
+        const enrollModal = new bootstrap.Modal(document.getElementById('enrollModal'));
+        enrollModal.show();
+    });
+});
+
+// Capture course data when modal opens
+document.getElementById('enrollModal').addEventListener('show.bs.modal', function(event) {
+    const button = event.relatedTarget;
+    const courseId = parseInt(button.getAttribute('data-course-id'));
+    const courseName = button.getAttribute('data-course-name');
+    const coursePrice = parseFloat(button.getAttribute('data-course-price'));
+    
+    document.getElementById('courseId').value = courseId;
+    document.getElementById('courseName').value = courseName;
+    document.getElementById('coursePrice').value = coursePrice;
+    document.getElementById('courseDisplay').value = courseName + ' - ₹' + coursePrice;
+
+    enrollmentData = {
+        courseId: courseId,
+        courseName: courseName,
+        coursePrice: coursePrice
+    };
+    
+    console.log('Enrollment data set:', enrollmentData);
+});
+
+document.getElementById('enrollForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const name = this.elements['name'].value;
+    const email = this.elements['email'].value;
+    const phone = this.elements['phone'].value;
+    
+    enrollmentData.name = name;
+    enrollmentData.email = email;
+    enrollmentData.phone = phone;
+    
+    initiateUPIPayment();
+});
+
+function initiateUPIPayment() {
+    console.log('Initiating UPI payment for course:', enrollmentData.courseId);
+    
+    if (!enrollmentData.courseId) {
+        alert('Error: Course not selected properly. Please refresh and try again.');
+        return;
+    }
+    
+    fetch(`/upi-payment/${enrollmentData.courseId}`)
+        .then(r => {
+            console.log('Response status:', r.status);
+            console.log('Content-Type:', r.headers.get('content-type'));
+            if (!r.ok) {
+                throw new Error(`HTTP ${r.status}`);
+            }
+            return r.json();
+        })
+        .then(d => {
+            console.log('UPI data received:', d);
+            if (d.status === 'success') {
+                // Store UPI data for verification
+                enrollmentData.transactionId = d.transaction_id;
+                
+                // Display QR code modal
+                document.getElementById('qrCodeImage').src = d.qr_code;
+                document.getElementById('upiIdDisplay').value = d.upi_id;
+                document.getElementById('transactionIdDisplay').innerText = d.transaction_id;
+                document.getElementById('upiCourseDisplay').innerText = d.course_name + ' - ₹' + d.amount;
+                
+                // Populate UPI selector
+                const selector = document.getElementById('upiIdSelector');
+                selector.innerHTML = '';
+                (d.upi_options || []).forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt.id;
+                    option.textContent = `${opt.label} (${opt.id})`;
+                    if (opt.id === d.upi_id) option.selected = true;
+                    selector.appendChild(option);
+                });
+                selector.addEventListener('change', function() {
+                    updateUPIQr(this.value);
+                });
+                
+                // Close enrollment modal and open UPI modal
+                bootstrap.Modal.getInstance(document.getElementById('enrollModal')).hide();
+                const upiModal = new bootstrap.Modal(document.getElementById('upiPaymentModal'));
+                upiModal.show();
+                
+                // Reset payment confirmation checkbox and verify button
+                document.getElementById('paymentConfirm').checked = false;
+                document.getElementById('verifyPaymentBtn').disabled = true;
+                
+                // Add listener to payment confirmation checkbox
+                document.getElementById('paymentConfirm').addEventListener('change', function() {
+                    document.getElementById('verifyPaymentBtn').disabled = !this.checked;
+                });
+            } else {
+                const msg = d.message || 'Payment setup error.';
+                const details = d.details ? `\nDetails: ${d.details}` : '';
+                console.error('Server error:', d);
+                alert(`${msg}${details}`);
+            }
+        })
+        .catch(async (e) => {
+            console.error('Fetch error:', e);
+            try {
+                const text = await fetch(`/upi-payment/${enrollmentData.courseId}`).then(r => r.text());
+                console.error('Response text:', text.substring(0, 500));
+            } catch(err) {
+                console.error('Could not fetch error details:', err);
+            }
+            alert('Payment setup error. Please open browser console (F12) and share the error, or try refreshing the page.');
+        });
+}
+
+function updateUPIQr(upiId) {
+    fetch(`/upi-payment/${enrollmentData.courseId}?upi_id=${encodeURIComponent(upiId)}`)
+        .then(r => r.json())
+        .then(d => {
+            if (d.status === 'success') {
+                document.getElementById('qrCodeImage').src = d.qr_code;
+                document.getElementById('upiIdDisplay').value = d.upi_id;
+                document.getElementById('transactionIdDisplay').innerText = d.transaction_id;
+            }
+        })
+        .catch(e => alert('Error: ' + e));
+}
+
+function copyUPI() {
+    const upiText = document.getElementById('upiIdDisplay').value;
+    navigator.clipboard.writeText(upiText).then(() => {
+        alert('UPI ID copied to clipboard!');
+    });
+}
+
+function verifyUPIPayment() {
+    // Check if payment confirmation checkbox is checked
+    if (!document.getElementById('paymentConfirm').checked) {
+        alert('⚠️ Please confirm that you have completed the payment before proceeding.');
+        return;
+    }
+    
+    // Validate that transaction ID exists
+    if (!enrollmentData.transactionId) {
+        alert('⚠️ Transaction ID missing. Please refresh and try again.');
+        return;
+    }
+    
+    alert('✓ Payment verification initiated!\n\nYour enrollment status is now PENDING.\nOur team will verify your payment within 2 hours and send you a confirmation email with course access details.');
+    
+    // Register student with UPI payment as PENDING
+    registerStudent(enrollmentData.courseId, enrollmentData.transactionId, 'upi');
+}
+
+function registerStudent(courseId, paymentId, method) {
+    const formData = new FormData();
+    formData.append('name', enrollmentData.name);
+    formData.append('email', enrollmentData.email);
+    formData.append('phone', enrollmentData.phone);
+    formData.append('payment_id', paymentId);
+    formData.append('amount', enrollmentData.coursePrice);
+    formData.append('payment_method', method);
+    
+    fetch(`/enroll/${courseId}`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(r => r.json())
+    .then(d => {
+        alert(d.message);
+        if (d.status === 'success') {
+            document.getElementById('enrollForm').reset();
+            if (document.getElementById('upiPaymentModal').classList.contains('show')) {
+                bootstrap.Modal.getInstance(document.getElementById('upiPaymentModal')).hide();
+            }
+        }
+    })
+    .catch(e => alert('Error: ' + e));
+}
+</script>
+{% endblock %}

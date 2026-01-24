@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Login - {{ site_name }}{% endblock %}
+
+{% block content %}
+<section class="py-5" style="margin-top: 100px;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                <div class="card shadow">
+                    <div class="card-body p-5">
+                        <h2 class="card-title mb-4 text-center">Welcome Back</h2>
+                        <p class="text-muted text-center mb-4">Sign in to access your dashboard</p>
+                        
+                        {% if error %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endif %}
+                        
+                        <form method="POST" action="{{ url_for('login') }}">
+                            <input type="hidden" name="next" value="{{ request.args.get('next', '/dashboard') }}">
+                            <div class="mb-3">
+                                <label class="form-label"><i class="fas fa-envelope"></i> Email Address</label>
+                                <input type="email" class="form-control" name="email" required placeholder="your@email.com" autofocus>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="form-label"><i class="fas fa-lock"></i> Password</label>
+                                <input type="password" class="form-control" name="password" required placeholder="Enter your password">
+                            </div>
+                            
+                            <div class="form-check mb-4">
+                                <input class="form-check-input" type="checkbox" name="remember" id="rememberMe">
+                                <label class="form-check-label" for="rememberMe">
+                                    Remember me
+                                </label>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary w-100 mb-3">
+                                <i class="fas fa-sign-in-alt"></i> Sign In
+                            </button>
+                        </form>
+                        
+                        <hr>
+                        
+                        <p class="text-center">
+                            Don't have an account? 
+                            <a href="{{ url_for('register') }}" class="text-primary fw-bold">Register Now</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - {{ site_name }}{% endblock %}
+
+{% block content %}
+<section class="py-5" style="margin-top: 100px;">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h1><i class="fas fa-tachometer-alt"></i> My Dashboard</h1>
+                <p class="text-muted">Welcome back, <strong>{{ current_user.name }}</strong>!</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <a href="{{ url_for('courses') }}" class="btn btn-primary">
+                    <i class="fas fa-book"></i> Browse Courses
+                </a>
+                <a href="{{ url_for('logout') }}" class="btn btn-secondary">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="stat-card primary">
+                    <div>
+                        <div class="stat-card-label">Total Enrollments</div>
+                        <div class="stat-card-value">{{ enrollments.total + pending_enrollments|length }}</div>
+                    </div>
+                    <div class="stat-card-icon">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stat-card success">
+                    <div>
+                        <div class="stat-card-label">Completed</div>
+                        <div class="stat-card-value">{{ enrollments.total }}</div>
+                    </div>
+                    <div class="stat-card-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stat-card warning">
+                    <div>
+                        <div class="stat-card-label">Pending</div>
+                        <div class="stat-card-value">{{ pending_enrollments|length }}</div>
+                    </div>
+                    <div class="stat-card-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stat-card info">
+                    <div>
+                        <div class="stat-card-label">Primary Email</div>
+                        <div class="stat-card-value" style="font-size: 1rem;">{{ current_user.email }}</div>
+                    </div>
+                    <div class="stat-card-icon">
+                        <i class="fas fa-envelope-open-text"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enrolled Courses -->
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-list"></i> My Enrolled Courses</h5>
+            </div>
+            <div class="card-body">
+                {% if enrollments.total > 0 %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Course Name</th>
+                                <th>Price Paid</th>
+                                <th>Payment Method</th>
+                                <th>Status</th>
+                                <th>Enrolled Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for enrollment in enrollments %}
+                            <tr>
+                                <td>
+                                    <strong>{{ enrollment.course.name }}</strong>
+                                </td>
+                                <td>₹{{ enrollment.amount_paid }}</td>
+                                <td>
+                                    {% if enrollment.payment_method == 'upi' %}
+                                    <span class="badge bg-info">UPI</span>
+                                    {% else %}
+                                    <span class="badge bg-success">{{ enrollment.payment_method|upper }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if enrollment.status == 'completed' %}
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check"></i> Completed
+                                    </span>
+                                    {% elif enrollment.status == 'pending' %}
+                                    <span class="badge bg-warning">
+                                        <i class="fas fa-clock"></i> Pending Verification
+                                    </span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">{{ enrollment.status|capitalize }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ enrollment.enrolled_at.strftime('%d %b %Y') }}</td>
+                                <td>
+                                    <a href="{{ url_for('home') }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-book-open"></i> Start Course
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle"></i> You haven't enrolled in any courses yet!
+                    <a href="{{ url_for('courses') }}" class="alert-link">Browse our courses</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Profile Section -->
+        <div class="card shadow mt-4">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0"><i class="fas fa-user-circle"></i> Profile Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Name:</strong> {{ current_user.name }}</p>
+                        <p><strong>Email:</strong> {{ current_user.email }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Phone:</strong> {{ current_user.phone }}</p>
+                        <p><strong>Member Since:</strong> {{ current_user.created_at.strftime('%d %B %Y') }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

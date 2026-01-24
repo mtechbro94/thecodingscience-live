@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}About - {{ site_name }}{% endblock %}
+
+{% block content %}
+<section class="py-5" style="margin-top: 80px;">
+    <div class="container">
+        <h1 class="mb-4">About {{ site_name }}</h1>
+
+        <!-- Story Section -->
+        <div class="row align-items-center mb-5">
+            <div class="col-lg-6 mb-4">
+                <h2>Our Story</h2>
+                <p>{{ site_name }} was founded with a vision to transform tech education. We recognized the gap between
+                    traditional academic learning and industry requirements.</p>
+                <p>Today, we're a leading tech training institute with thousands of successful graduates working at top
+                    tech companies worldwide.</p>
+                <p>Our mission is simple: empower individuals with cutting-edge skills and turn their passion for
+                    technology into thriving careers.</p>
+            </div>
+            <div class="col-lg-6">
+                <div class="card bg-primary text-white">
+                    <div class="card-body p-5 text-center">
+                        <h3 class="mb-4">Our Impact</h3>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <h4>{{ stats.students }}+</h4>
+                                <p class="mb-0">Students Trained</p>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <h4>{{ stats.placement_rate }}%</h4>
+                                <p class="mb-0">Placement Rate</p>
+                            </div>
+                            <div class="col-6">
+                                <h4>{{ stats.partners }}+</h4>
+                                <p class="mb-0">Industry Partners</p>
+                            </div>
+                            <div class="col-6">
+                                <h4>{{ stats.trainers }}+</h4>
+                                <p class="mb-0">Expert Trainers</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Values Section -->
+        <h2 class="text-center mb-5">Our Core Values</h2>
+        <div class="row mb-5">
+            {% for value in values %}
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="value-box">
+                    <i class="fas {{ value.icon }} fa-3x text-primary mb-3"></i>
+                    <h4>{{ value.title }}</h4>
+                    <p>{{ value.desc }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Team Section -->
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <h2 class="text-center mb-4">Meet Our Team</h2>
+                <p class="text-center lead mb-5">
+                    The visionary leaders behind The Coding Science, dedicated to transforming tech education.
+                </p>
+                <div class="row justify-content-center">
+                    <div class="col-md-4 text-center mb-4">
+                        <div class="card team-card h-100">
+                            <div class="card-body p-4">
+                                <img src="{{ url_for('static', filename='images/aaqib_Photo.JPG') }}"
+                                    alt="Aaqib Rashid Mir" class="team-photo rounded-circle mb-3"
+                                    style="object-position: center 50%;">
+                                <h5 class="team-name">Aaqib Rashid Mir</h5>
+                                <p class="team-role text-primary mb-1">Founder & CEO</p>
+                                <p class="small text-muted">(Director)</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center mb-4">
+                        <div class="card team-card h-100">
+                            <div class="card-body p-4">
+                                <img src="{{ url_for('static', filename='images/jaffar-photo.JPG') }}"
+                                    alt="Jaffar Hameed Bhat" class="team-photo rounded-circle mb-3">
+                                <h5 class="team-name">Jaffar Hameed Bhat</h5>
+                                <p class="team-role text-success mb-1">Co-Founder & COO</p>
+                                <p class="small text-muted">(Director)</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center mb-4">
+                        <div class="card team-card h-100">
+                            <div class="card-body p-4">
+                                <img src="{{ url_for('static', filename='images/Ubaid-photo.JPG') }}" alt="Ubaid Ashraf"
+                                    class="team-photo rounded-circle mb-3" style="object-position: center 20%;">
+                                <h5 class="team-name">Ubaid Ashraf</h5>
+                                <p class="team-role text-info mb-1">Advisor & CTO</p>
+                                <p class="small text-muted">(Share Holder)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- CTA Section -->
+        <div class="row mt-5">
+            <div class="col-lg-8 mx-auto text-center">
+                <h3>Ready to Join Us?</h3>
+                <p class="lead mb-4">Take the first step towards your tech career transformation.</p>
+                <a href="/courses" class="btn btn-primary btn-lg me-2">View Courses</a>
+                <a href="/contact" class="btn btn-outline-primary btn-lg">Contact Us</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

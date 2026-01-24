@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+
+{% block title %}{{ course.name }} - {{ site_name }}{% endblock %}
+
+{% block content %}
+<section class="py-5" style="margin-top: 80px;">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                {% if course.image %}
+                <img src="{{ url_for('static', filename='images/' + course.image) }}" 
+                     alt="{{ course.name }}" 
+                     class="img-fluid rounded mb-4 shadow">
+                {% endif %}
+                
+                <h1 class="mb-3">{{ course.name }}</h1>
+                <div class="mb-4">
+                    <span class="badge bg-primary me-2">{{ course.level }}</span>
+                    <span class="badge bg-info me-2"><i class="fas fa-clock"></i> {{ course.duration }}</span>
+                    <span class="badge bg-success"><i class="fas fa-rupee-sign"></i> ₹{{ course.price }}</span>
+                </div>
+                
+                <div class="course-description mb-4">
+                    <h3>About This Course</h3>
+                    <p class="lead">{{ course.description }}</p>
+                </div>
+
+                {% if course.get_curriculum_list() %}
+                <div class="course-curriculum mb-4">
+                    <h3>Course Curriculum</h3>
+                    <div class="accordion" id="curriculumAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingOne">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    <strong>What you will learn</strong>
+                                </button>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#curriculumAccordion">
+                                <div class="accordion-body">
+                                    <ul class="list-group list-group-flush">
+                                        {% for module in course.get_curriculum_list() %}
+                                        <li class="list-group-item">
+                                            <i class="fas fa-book-open text-primary me-2"></i> {{ module }}
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div class="course-features mb-4">
+                    <h3>What You'll Learn</h3>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check-circle text-success me-2"></i> Comprehensive curriculum covering all fundamentals</li>
+                        <li><i class="fas fa-check-circle text-success me-2"></i> Hands-on projects and real-world applications</li>
+                        <li><i class="fas fa-check-circle text-success me-2"></i> Expert guidance and mentorship</li>
+                        <li><i class="fas fa-check-circle text-success me-2"></i> Certificate of completion</li>
+                        <li><i class="fas fa-check-circle text-success me-2"></i> Lifetime access to course materials</li>
+                        <li><i class="fas fa-check-circle text-success me-2"></i> Community support via WhatsApp group</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card shadow-lg sticky-top" style="top: 100px;">
+                    <div class="card-body text-center">
+                        <h3 class="card-title mb-3">Enroll Now</h3>
+                        <div class="mb-3">
+                            <h2 class="text-primary">₹{{ course.price }}</h2>
+                            <small class="text-muted">One-time payment</small>
+                        </div>
+                        
+                        {% if is_enrolled %}
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle"></i> You are enrolled in this course!
+                            </div>
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-success w-100">
+                                <i class="fas fa-tachometer-alt"></i> Go to Dashboard
+                            </a>
+                        {% else %}
+                            {% if current_user.is_authenticated %}
+                                <button class="btn btn-primary btn-lg w-100 enroll-btn" 
+                                        data-course-id="{{ course.id }}" 
+                                        data-course-name="{{ course.name }}" 
+                                        data-course-price="{{ course.price }}">
+                                    <i class="fas fa-shopping-cart"></i> Enroll Now
+                                </button>
+                            {% else %}
+                                <p class="text-muted mb-3">Please log in to enroll</p>
+                                <a href="{{ url_for('login') }}" class="btn btn-primary w-100">
+                                    <i class="fas fa-sign-in-alt"></i> Login to Enroll
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                        
+                        <hr class="my-3">
+                        
+                        <div class="text-start">
+                            <h6 class="mb-3">Course Includes:</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success me-2"></i> {{ course.duration }} of training</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Live sessions</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Assignments & Projects</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Certificate</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Community access</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-5">
+            <div class="col-12">
+                <a href="{{ url_for('courses') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Courses
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Enrollment Modal -->
+<div class="modal fade" id="enrollModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Enroll in Course</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="enrollForm" method="POST" action="{{ url_for('enroll_course', course_id=course.id) }}">
+                <div class="modal-body">
+                    <input type="hidden" name="payment_method" value="upi">
+                    <input type="hidden" id="enrollCourseId" name="course_id" value="{{ course.id }}">
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Course</label>
+                        <input type="text" class="form-control" id="enrollCourseName" value="{{ course.name }}" readonly>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Amount</label>
+                        <input type="text" class="form-control" id="enrollCoursePrice" value="₹{{ course.price }}" readonly>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="name" value="{{ current_user.name if current_user.is_authenticated else '' }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Email <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control" name="email" value="{{ current_user.email if current_user.is_authenticated else '' }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Phone <span class="text-danger">*</span></label>
+                        <input type="tel" class="form-control" name="phone" value="{{ current_user.phone if current_user.is_authenticated else '' }}" required>
+                    </div>
+                    
+                    <div class="alert alert-info" role="alert">
+                        <i class="fas fa-mobile-alt"></i> <strong>Payment Method:</strong> UPI/QR Code
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-mobile-alt"></i> Proceed to UPI Payment
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Open enrollment modal when clicking Enroll button on course detail page
+    document.addEventListener('DOMContentLoaded', function () {
+        const enrollBtn = document.querySelector('.enroll-btn');
+        const enrollModalEl = document.getElementById('enrollModal');
+
+        if (enrollBtn && enrollModalEl) {
+            enrollBtn.addEventListener('click', function () {
+                const courseId = this.dataset.courseId;
+                const courseName = this.dataset.courseName;
+                const coursePrice = this.dataset.coursePrice;
+
+                // Fill modal fields
+                document.getElementById('enrollCourseId').value = courseId;
+                document.getElementById('enrollCourseName').value = courseName;
+                document.getElementById('enrollCoursePrice').value = '₹' + coursePrice;
+
+                const modal = new bootstrap.Modal(enrollModalEl);
+                modal.show();
+            });
+        }
+    });
+
+    // Enrollment form submission
+    document.getElementById('enrollForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        
+        fetch(this.action, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showAlert(data.message, 'success');
+                bootstrap.Modal.getInstance(document.getElementById('enrollModal')).hide();
+                setTimeout(() => window.location.reload(), 2000);
+            } else {
+                showAlert(data.message, 'danger');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('An error occurred. Please try again.', 'danger');
+        });
+    });
+</script>
+{% endblock %}

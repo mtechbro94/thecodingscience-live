@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Panel - {{ site_name }}{% endblock %}
+
+{% block content %}
+<section class="py-5" style="margin-top: 80px;">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h1>
+            <a href="{{ url_for('home') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-home"></i> Back to Site
+            </a>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row mb-5">
+            <div class="col-md-3 mb-4">
+                <div class="card bg-primary text-white shadow">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-subtitle mb-2 text-white-50">Total Students</h6>
+                                <h2 class="mb-0">{{ stats.total_students }}</h2>
+                            </div>
+                            <i class="fas fa-users fa-2x opacity-50"></i>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-primary bg-opacity-75">
+                        <a href="{{ url_for('admin_students') }}" class="text-white text-decoration-none">
+                            View All <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 mb-4">
+                <div class="card bg-success text-white shadow">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-subtitle mb-2 text-white-50">Total Courses</h6>
+                                <h2 class="mb-0">{{ stats.total_courses }}</h2>
+                            </div>
+                            <i class="fas fa-book fa-2x opacity-50"></i>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-success bg-opacity-75">
+                        <a href="{{ url_for('admin_courses') }}" class="text-white text-decoration-none">
+                            Manage <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 mb-4">
+                <div class="card bg-info text-white shadow">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-subtitle mb-2 text-white-50">Total Enrollments</h6>
+                                <h2 class="mb-0">{{ stats.total_enrollments }}</h2>
+                            </div>
+                            <i class="fas fa-graduation-cap fa-2x opacity-50"></i>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-info bg-opacity-75">
+                        <a href="{{ url_for('admin_enrollments') }}" class="text-white text-decoration-none">
+                            View All <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 mb-4">
+                <div class="card bg-warning text-white shadow">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-subtitle mb-2 text-white-50">Pending Verifications</h6>
+                                <h2 class="mb-0">{{ stats.pending_enrollments }}</h2>
+                            </div>
+                            <i class="fas fa-clock fa-2x opacity-50"></i>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-warning bg-opacity-75">
+                        <a href="{{ url_for('admin_enrollments') }}?status=pending"
+                            class="text-white text-decoration-none">
+                            Verify Now <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0"><i class="fas fa-bolt"></i> Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <a href="{{ url_for('admin_students') }}" class="btn btn-outline-primary w-100">
+                                    <i class="fas fa-users"></i> Manage Students
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <a href="{{ url_for('admin_enrollments') }}" class="btn btn-outline-info w-100">
+                                    <i class="fas fa-graduation-cap"></i> View Enrollments
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <a href="{{ url_for('admin_courses') }}" class="btn btn-outline-success w-100">
+                                    <i class="fas fa-book"></i> Manage Courses
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <a href="{{ url_for('admin_messages') }}" class="btn btn-outline-warning w-100">
+                                    <i class="fas fa-envelope"></i> Messages & Apps
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

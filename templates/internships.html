@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Internships - {{ site_name }}{% endblock %}
+
+{% block content %}
+<section class="py-5 section-highlight" style="margin-top: 80px;">
+    <div class="container">
+        <div class="row align-items-center mb-4">
+            <div class="col-lg-7">
+                <h1 class="mb-3">Internship Opportunities</h1>
+                <p class="lead mb-0">Foundational internships at a flat ₹999 — pick your track and gain real project exposure.</p>
+            </div>
+            <div class="col-lg-5 mt-3 mt-lg-0">
+                <ul class="list-unstyled mb-0">
+                    <li><i class="fas fa-check-circle text-success me-2"></i> Work on mentored, real-world projects</li>
+                    <li><i class="fas fa-check-circle text-success me-2"></i> Get internship letter & experience certificate</li>
+                    <li><i class="fas fa-check-circle text-success me-2"></i> Flexible remote-friendly schedules</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="row mt-3">
+            {% for internship in internships %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">{{ internship.role }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">{{ internship.description }}</p>
+                        <hr>
+                        <small class="d-block mb-2"><i class="fas fa-building"></i> <strong>{{ internship.company }}</strong></small>
+                        <small class="d-block mb-2"><i class="fas fa-calendar"></i> <strong>Duration:</strong> {{ internship.duration }}</small>
+                        <small class="d-block mb-2"><i class="fas fa-map-marker-alt"></i> <strong>Location:</strong> {{ internship.location }}</small>
+                        <small class="d-block"><i class="fas fa-rupee-sign"></i> <strong>Price:</strong> ₹{{ internship.stipend }}</small>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <button class="btn btn-success btn-sm w-100" data-bs-toggle="modal" data-bs-target="#applyModal" onclick="setApplyInternship({{ internship.id }}, '{{ internship.role }}')">
+                            Apply Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Apply Modal -->
+<div class="modal fade" id="applyModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Apply for Internship</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="applyForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Position</strong></label>
+                        <input type="text" class="form-control" id="positionInput" disabled style="background-color: #e9ecef; cursor: not-allowed;">
+                        <input type="hidden" id="internshipId">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" class="form-control" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Phone</label>
+                        <input type="tel" class="form-control" name="phone" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Cover Letter</label>
+                        <textarea class="form-control" name="cover_letter" rows="4" placeholder="Tell us why you're interested in this internship..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Submit Application</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    window.setApplyInternship = function(internshipId, role) {
+        document.getElementById('internshipId').value = internshipId;
+        document.getElementById('positionInput').value = role;
+    };
+    
+    document.getElementById('applyForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const internshipId = document.getElementById('internshipId').value;
+        const formData = new FormData(this);
+        
+        fetch(`/apply/${internshipId}`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(r => r.json())
+        .then(d => {
+            alert(d.message);
+            if (d.status === 'success') {
+                document.getElementById('applyForm').reset();
+                document.getElementById('positionInput').value = '';
+                bootstrap.Modal.getInstance(document.getElementById('applyModal')).hide();
+            }
+        })
+        .catch(e => alert('Error: ' + e));
+    });
+});
+</script>
+{% endblock %}

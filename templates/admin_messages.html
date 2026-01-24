@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Panel - Messages - {{ site_name }}{% endblock %}
+
+{% block content %}
+<section class="py-5" style="margin-top: 80px;">
+    <div class="container">
+        <h1 class="mb-4">Admin Panel</h1>
+        <p class="lead mb-5">View all submissions from contact forms, course enrollments, and internship applications.</p>
+        
+        <!-- Tabs -->
+        <ul class="nav nav-tabs mb-4" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab">Contact Messages ({{ messages|length }})</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="enrollments-tab" data-bs-toggle="tab" data-bs-target="#enrollments" type="button" role="tab">Course Enrollments ({{ enrollments|length }})</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="applications-tab" data-bs-toggle="tab" data-bs-target="#applications" type="button" role="tab">Internship Applications ({{ applications|length }})</button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+            <!-- Contact Messages Tab -->
+            <div class="tab-pane fade show active" id="contact" role="tabpanel">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        {% if messages %}
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Phone</th>
+                                            <th>Subject</th>
+                                            <th>Message</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for message in messages|reverse %}
+                                        <tr>
+                                            <td><small>{{ message.created_at[:10] }}</small></td>
+                                            <td>{{ message.name }}</td>
+                                            <td><a href="mailto:{{ message.email }}">{{ message.email }}</a></td>
+                                            <td>{{ message.phone }}</td>
+                                            <td>{{ message.subject }}</td>
+                                            <td><small class="text-muted">{{ message.message[:50] }}...</small></td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="text-center text-muted py-4">No contact messages yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Course Enrollments Tab -->
+            <div class="tab-pane fade" id="enrollments" role="tabpanel">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        {% if enrollments %}
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Phone</th>
+                                            <th>Course</th>
+                                            <th>Method</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for enrollment in enrollments|reverse %}
+                                        <tr>
+                                            <td><small>{{ enrollment.enrolled_at[:10] }}</small></td>
+                                            <td>{{ enrollment.name }}</td>
+                                            <td><a href="mailto:{{ enrollment.email }}">{{ enrollment.email }}</a></td>
+                                            <td>{{ enrollment.phone }}</td>
+                                            <td>{{ enrollment.course_name }}</td>
+                                            <td><span class="badge bg-secondary text-uppercase">{{ enrollment.payment_method or 'razorpay' }}</span></td>
+                                            <td>
+                                                {% if enrollment.status == 'completed' %}
+                                                    <span class="badge bg-success">completed</span>
+                                                {% else %}
+                                                    <span class="badge bg-warning text-dark">pending</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if enrollment.status != 'completed' %}
+                                                    <button class="btn btn-sm btn-outline-success" onclick="verifyEnrollment({{ enrollment.id }})">Verify & Send Email</button>
+                                                {% else %}
+                                                    <button class="btn btn-sm btn-outline-secondary" disabled>Verified</button>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="text-center text-muted py-4">No course enrollments yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Internship Applications Tab -->
+            <div class="tab-pane fade" id="applications" role="tabpanel">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        {% if applications %}
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Phone</th>
+                                            <th>Position</th>
+                                            <th>Cover Letter</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for application in applications|reverse %}
+                                        <tr>
+                                            <td><small>{{ application.applied_at[:10] }}</small></td>
+                                            <td>{{ application.name }}</td>
+                                            <td><a href="mailto:{{ application.email }}">{{ application.email }}</a></td>
+                                            <td>{{ application.phone }}</td>
+                                            <td>{{ application.internship_role }}</td>
+                                            <td><small class="text-muted">{{ application.cover_letter[:50] }}...</small></td>
+                                            <td><span class="badge bg-warning">{{ application.status }}</span></td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="text-center text-muted py-4">No internship applications yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="alert alert-info mt-4" role="alert">
+            <strong>Note:</strong> This admin panel displays in-memory data. Messages are stored while the server is running. If you restart the server, in-memory data will be cleared. Consider implementing database storage for persistent data management.
+        </div>
+    </div>
+</section>
+    <script>
+    function verifyEnrollment(id) {
+        fetch(`/admin/verify-enrollment/${id}`, { method: 'POST' })
+            .then(r => r.json())
+            .then(d => {
+                alert(d.message);
+                if (d.status === 'success') {
+                    location.reload();
+                }
+            })
+            .catch(e => alert('Error: ' + e));
+    }
+    </script>
+{% endblock %}
