@@ -8,7 +8,6 @@ Production-ready with User Management, Authentication, and Admin Panel
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
-from flask_talisman import Talisman
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.exceptions import BadRequest
 from datetime import datetime, timedelta
@@ -28,6 +27,10 @@ import re
 
 # ==================== CONFIGURATION & SETUP ====================
 load_dotenv()
+
+# Configure logging first (before app creation)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 
@@ -75,7 +78,6 @@ handler.setFormatter(logging.Formatter(
     '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 ))
 
-logger = logging.getLogger(__name__)
 logger.setLevel(getattr(logging, app.config.get('LOG_LEVEL', 'INFO')))
 logger.addHandler(handler)
 
