@@ -11,9 +11,12 @@ load_dotenv()
 # Import Flask app
 from app import app
 
-# Ensure static files are served correctly in production
-app.config['STATIC_FOLDER'] = os.path.join(os.path.dirname(__file__), 'static')
-app.config['STATIC_URL_PATH'] = '/static'
+# Configure app for production static file serving
+if not app.debug:
+    # In production, ensure proper static file configuration
+    app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 604800  # 7 days
+    app.config['TEMPLATES_AUTO_RELOAD'] = False
 
 if __name__ == "__main__":
     app.run()
+

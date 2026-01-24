@@ -510,6 +510,16 @@ def inject_config():
     }
 
 
+# ==================== STATIC FILE HANDLERS ====================
+
+@app.after_request
+def add_cache_headers(response):
+    """Add cache headers for static files"""
+    response.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    return response
+
+
 # ==================== PUBLIC ROUTES ====================
 
 @app.route('/')
