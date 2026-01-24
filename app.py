@@ -78,6 +78,62 @@ login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 login_manager.login_message = 'Please log in to access this page.'
 
+# Auto-initialize database on startup
+def init_db_on_startup():
+    """Initialize database and create tables on app startup"""
+    with app.app_context():
+        try:
+            # Create all tables
+            db.create_all()
+            logger.info("✓ Database tables created/verified")
+            
+            # Import here to avoid circular imports
+            from app import Course
+            
+            # Seed initial courses if empty
+            if Course.query.first() is None:
+                logger.info("Seeding initial course data...")
+                courses = [
+                    Course(
+                        name='Web Development Foundations',
+                        description='Learn HTML, CSS, JavaScript, and React',
+                        duration='8 weeks',
+                        level='Beginner',
+                        price=99.99,
+                        image='/static/images/web-dev.jpg'
+                    ),
+                    Course(
+                        name='Computer Science Foundations',
+                        description='Data Structures, Algorithms, and OOP concepts',
+                        duration='10 weeks',
+                        level='Beginner',
+                        price=99.99,
+                        image='/static/images/cs-fundamentals.jpg'
+                    ),
+                    Course(
+                        name='Programming Foundations with Python',
+                        description='Python basics to advanced concepts',
+                        duration='8 weeks',
+                        level='Beginner',
+                        price=79.99,
+                        image='/static/images/python-fundamentals.jpg'
+                    ),
+                    Course(
+                        name='Microsoft Office Automation',
+                        description='Automate Excel, Word, and Outlook with Python',
+                        duration='6 weeks',
+                        level='Intermediate',
+                        price=69.99,
+                        image='/static/images/office-automation.jpg'
+                    ),
+                ]
+                db.session.add_all(courses)
+                db.session.commit()
+                logger.info(f"✓ Seeded {len(courses)} courses")
+        except Exception as e:
+            logger.error(f"Error initializing database: {str(e)}")
+
+
 # ==================== DATABASE MODELS ====================
 
 class User(UserMixin, db.Model):
@@ -197,6 +253,10 @@ class InternshipApplication(db.Model):
 def load_user(user_id):
     """Load user by ID for Flask-Login"""
     return User.query.get(int(user_id))
+
+
+# Initialize database on startup
+init_db_on_startup()
 
 
 # ==================== CUSTOM DECORATORS ====================
