@@ -577,13 +577,25 @@ def inject_config():
 @app.route('/health')
 def health_check():
     """Simple health check endpoint for deployment verification"""
-    return jsonify({'status': 'ok', 'service': 'TheCodingScience'}), 200
+    try:
+        return jsonify({
+            'status': 'ok',
+            'service': 'TheCodingScience',
+            'environment': app.config.get('ENV', 'unknown')
+        }), 200
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 @app.route('/')
 def home():
     """Homepage"""
-    featured_courses = Course.query.limit(4).all()
-    return render_template('index.html', courses=featured_courses)
+    try:
+        featured_courses = Course.query.limit(4).all()
+        return render_template('index.html', courses=featured_courses)
+    except Exception as e:
+        logger.error(f"Error loading home page: {str(e)}")
+        return jsonify({'status': 'error', 'message': 'Unable to load home page'}), 500
+
 
 @app.route('/courses')
 def courses():
