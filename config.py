@@ -67,10 +67,8 @@ class ProductionConfig(Config):
     
     DEBUG = False
     TESTING = False
-    SQLALCHEMY_DATABASE_URI = os.getenv(
-        'DATABASE_URL',
-        'sqlite:////tmp/coding_science.db'
-    )
+    # Force /tmp for Railway - ignore DATABASE_URL env var
+    SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/coding_science.db'
     
     # Enforce production security
     SESSION_COOKIE_SECURE = True
