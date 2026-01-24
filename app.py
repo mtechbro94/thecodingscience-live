@@ -32,12 +32,12 @@ load_dotenv()
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 
 # Add Whitenoise for serving static files in production
-if os.getenv('FLASK_ENV') == 'production' or not app.debug:
-    try:
-        from whitenoise import WhiteNoise
-        app.wsgi_app = WhiteNoise(app.wsgi_app, root=os.path.join(os.path.dirname(__file__), 'static'), prefix='static/')
-    except ImportError:
-        pass  # Whitenoise not installed, Flask will try to serve static files
+try:
+    from whitenoise import WhiteNoise
+    static_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'static'))
+    app.wsgi_app = WhiteNoise(app.wsgi_app, root=static_dir, prefix='static/')
+except ImportError:
+    pass  # Whitenoise not installed
 
 # Load configuration
 from config import get_config
