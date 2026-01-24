@@ -31,6 +31,14 @@ load_dotenv()
 
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 
+# Add Whitenoise for serving static files in production
+if os.getenv('FLASK_ENV') == 'production' or not app.debug:
+    try:
+        from whitenoise import WhiteNoise
+        app.wsgi_app = WhiteNoise(app.wsgi_app, root=os.path.join(os.path.dirname(__file__), 'static'), prefix='static/')
+    except ImportError:
+        pass  # Whitenoise not installed, Flask will try to serve static files
+
 # Load configuration
 from config import get_config
 app.config.from_object(get_config())
@@ -508,16 +516,6 @@ def inject_config():
             'linkedin': os.getenv('LINKEDIN_URL', 'https://www.linkedin.com/company/thecodingscience')
         }
     }
-
-
-# ==================== STATIC FILE HANDLERS ====================
-
-@app.after_request
-def add_cache_headers(response):
-    """Add cache headers for static files"""
-    response.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
-    response.headers['X-Content-Type-Options'] = 'nosniff'
-    return response
 
 
 # ==================== PUBLIC ROUTES ====================
