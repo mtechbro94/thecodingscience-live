@@ -1270,3 +1270,16 @@ h6 {
 p {
     text-wrap: pretty;
 }
+
+/* Alert Messages - Always visible above navbar */
+.alert {
+    position: relative;
+    z-index: 1001;
+    margin-bottom: 1rem;
+}
+
+/* Form page alerts to appear above navbar */
+section[style*="margin-top: 100px"] .alert {
+    margin-top: -80px;
+    margin-bottom: 20px;
+}
