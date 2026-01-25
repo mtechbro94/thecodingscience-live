@@ -55,8 +55,9 @@ except Exception as e:
 # Add Whitenoise for serving static files in production
 try:
     from whitenoise import WhiteNoise
-    app.wsgi_app = WhiteNoise(app.wsgi_app, root='static')
-    print("✓ WhiteNoise initialized successfully", file=sys.stdout, flush=True)
+    static_dir = os.path.join(os.path.dirname(__file__), 'static')
+    app.wsgi_app = WhiteNoise(app.wsgi_app, root=static_dir, max_age=31536000)
+    print(f"✓ WhiteNoise initialized successfully with static dir: {static_dir}", file=sys.stdout, flush=True)
 except Exception as e:
     print(f"⚠ WhiteNoise initialization failed: {e}", file=sys.stderr, flush=True)
     logger.warning(f"WhiteNoise initialization failed: {e}")
