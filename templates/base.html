@@ -164,26 +164,40 @@
             <div class="row">
                 <div class="col-md-4 mb-4">
                     <h5>{{ site_name }}</h5>
-                    <p>{{ site_tagline }}. Empowering the next generation of tech professionals.</p>
+                    <p><strong>About Us:</strong> The Coding Science is a technology startup focused on online education, trainings, and internships designed to bridge the gap between academia and industry.</p>
+                    <p class="small text-muted mb-0"><em>Making quality tech education accessible and inclusive for all.</em></p>
                 </div>
                 <div class="col-md-4 mb-4">
-                    <h5>Quick Links</h5>
-                    <ul class="list-unstyled">
+                    <h5>What We Offer</h5>
+                    <ul class="list-unstyled small">
+                        <li class="mb-2">
+                            <i class="fas fa-globe text-primary me-2"></i>
+                            <strong>Online Learning:</strong> Study from anywhere at your own pace
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-language text-primary me-2"></i>
+                            <strong>Regional Languages:</strong> Kashmiri, Hindi, Punjabi & more
+                        </li>
+                        <li>
+                            <i class="fas fa-briefcase text-primary me-2"></i>
+                            <strong>Industry Skills:</strong> Practical, real-world career preparation
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h5>Quick Links & Contact</h5>
+                    <ul class="list-unstyled small mb-3">
                         <li><a href="/" class="text-light text-decoration-none">Home</a></li>
                         <li><a href="/courses" class="text-light text-decoration-none">Courses</a></li>
                         <li><a href="/services" class="text-light text-decoration-none">Live Trainings</a></li>
                         <li><a href="/internships" class="text-light text-decoration-none">Internships</a></li>
                         <li><a href="/contact" class="text-light text-decoration-none">Contact</a></li>
                     </ul>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <h5>Contact Info</h5>
-                    <p>
+                    <p class="small mb-2">
                         <i class="fas fa-envelope me-2"></i> {{ contact_email }}<br>
-                        <i class="fas fa-phone me-2"></i> {{ contact_phone }}<br>
-                        <i class="fas fa-map-marker-alt me-2"></i> {{ contact_location }}
+                        <i class="fas fa-phone me-2"></i> {{ contact_phone }}
                     </p>
-                    <div class="mt-3">
+                    <div class="mt-2">
                         <a href="{{ social_links.facebook }}" class="text-light me-3" target="_blank"><i
                                 class="fab fa-facebook fa-lg"></i></a>
                         <a href="{{ social_links.linkedin }}" class="text-light me-3" target="_blank"><i
