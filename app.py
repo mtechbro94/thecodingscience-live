@@ -312,8 +312,8 @@ def init_db_on_startup():
                 db.session.commit()
                 logger.info("✓ Cleared all course and review data")
                 
-                # Call seed_courses to create all 6 courses
-                seed_courses()
+                # Call seed_courses to create all 6 courses (force=True to bypass the check)
+                seed_courses(force=True)
                 logger.info("✓ Database reseeded with all 6 correct courses")
             else:
                 logger.info(f"✓ Database verified: {course_count} courses with valid images")
@@ -383,9 +383,9 @@ def admin_required(f):
 
 # ==================== SEED DATA FUNCTION ====================
 
-def seed_courses():
+def seed_courses(force=False):
     """Initialize database with course data"""
-    if Course.query.first() is not None:
+    if not force and Course.query.first() is not None:
         return  # Database already seeded
     
     import json
