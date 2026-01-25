@@ -591,7 +591,7 @@ def inject_config():
             'instagram': os.getenv('INSTAGRAM_URL', 'https://www.instagram.com/thecodingscience'),
             'youtube': os.getenv('YOUTUBE_URL', 'https://youtube.com/@thecodingscience-q7z'),
             'facebook': os.getenv('FACEBOOK_URL', 'https://www.facebook.com/share/184mEoARX8/'),
-            'linkedin': os.getenv('LINKEDIN_URL', 'https://www.linkedin.com/company/thecodingscience')
+            'linkedin': os.getenv('LINKEDIN_URL', 'https://www.linkedin.com/company/the-coding-science/')
         }
     }
 

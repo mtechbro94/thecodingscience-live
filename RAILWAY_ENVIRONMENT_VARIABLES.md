@@ -149,7 +149,7 @@ Location: Jammu and Kashmir, India
 Instagram: https://www.instagram.com/thecodingscience
 YouTube: https://youtube.com/@thecodingscience-q7z
 Facebook: https://www.facebook.com/share/184mEoARX8/
-LinkedIn: https://www.linkedin.com/company/thecodingscience
+LinkedIn: https://www.linkedin.com/company/the-coding-science/
 WhatsApp: [Your group invite link]
 ```
 

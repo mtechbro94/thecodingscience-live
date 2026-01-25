@@ -141,7 +141,7 @@ SENDER_PASSWORD=your-app-password
 INSTAGRAM_URL=https://instagram.com/thecodingscience
 YOUTUBE_URL=https://youtube.com/@thecodingscience
 FACEBOOK_URL=https://www.facebook.com/share/184mEoARX8/
-LINKEDIN_URL=https://linkedin.com/company/thecodingscience
+LINKEDIN_URL=https://www.linkedin.com/company/the-coding-science/
 WHATSAPP_GROUP_LINK=https://chat.whatsapp.com/your-link
 
 # UPI Payment
