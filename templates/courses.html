@@ -33,7 +33,7 @@
                             </h5>
                             
                             <!-- Course Rating -->
-                            <div class="mb-2" id="rating-{{ course.id }}">
+                            <div class="mb-1" id="rating-{{ course.id }}">
                                 <div class="star-display"></div>
                             </div>
                             
@@ -44,7 +44,7 @@
                             </div>
                         </div>
                         <div class="card-footer bg-white">
-                            <a href="{{ url_for('course_detail', id=course.id) }}" class="btn btn-outline-primary btn-sm w-100 mb-2">
+                            <a href="{{ url_for('course_detail', id=course.id) }}" class="btn btn-outline-primary btn-sm w-100 mb-1">
                                 <i class="fas fa-info-circle"></i> View Details
                             </a>
                             <button class="btn btn-primary btn-sm w-100 enroll-btn" 
