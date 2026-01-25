@@ -260,19 +260,39 @@ def init_db_on_startup():
             db.create_all()
             logger.info("✓ Database tables created/verified")
             
-            # Check if courses are incomplete (less than 6)
+            # Check if courses are incomplete or duplicated
             course_count = Course.query.count()
-            if course_count < 6:
-                logger.warning(f"⚠️  Database incomplete: {course_count} courses found (expected 6). Reseeding...")
+            
+            # Define what courses should exist
+            required_course_names = {
+                'Web Development Foundations',
+                'Computer Science Foundations',
+                'Microsoft Office Automation and Digital Tools',
+                'AI & Machine Learning Foundations',
+                'Programming Foundations with Python',
+                'Data Science and Analytics',
+            }
+            
+            # Get actual course names in DB
+            actual_courses = {c.name for c in Course.query.all()}
+            
+            # Check if all required courses exist and count matches
+            needs_fix = course_count != 6 or actual_courses != required_course_names
+            
+            if needs_fix:
+                logger.warning(f"⚠️  Database inconsistent: {course_count} courses found, expected 6 unique courses")
+                logger.warning(f"    Expected: {required_course_names}")
+                logger.warning(f"    Found: {actual_courses}")
+                logger.warning(f"    Fixing database...")
                 
                 # Delete all courses and reseed
                 Course.query.delete()
                 db.session.commit()
-                logger.info("Cleared incomplete course data")
+                logger.info("✓ Cleared all course data")
                 
                 # Call seed_courses to create all 6 courses
                 seed_courses()
-                logger.info("✓ Database reseeded with all 6 courses")
+                logger.info("✓ Database reseeded with all 6 correct courses")
             else:
                 # Ensure courses have proper images
                 course_images = {
@@ -281,7 +301,7 @@ def init_db_on_startup():
                     'Microsoft Office Automation and Digital Tools': 'MS.jpg',
                     'AI & Machine Learning Foundations': 'AIML.jpg',
                     'Programming Foundations with Python': 'PFP.jpg',
-                    'Data Science and Analytics': 'DS&A.jpg',
+                    'Data Science and Analytics': 'DSA.jpg',
                 }
                 
                 for course_name, image_name in course_images.items():
@@ -453,7 +473,7 @@ def seed_courses():
             description='Learn data analysis, visualization, and business intelligence with Python, Pandas, and powerful analytics tools.',
             price=499,
             level='Intermediate',
-            image='DS&A.jpg',
+            image='DSA.jpg',
             curriculum=json.dumps([
                 "Module 1: Python for Data Analysis",
                 "Module 2: Data Wrangling with Pandas",
