@@ -1,20 +1,63 @@
 {% extends "base.html" %}
 
-{% block title %}Manage Students - Admin - {{ site_name }}{% endblock %}
+{% block title %}Manage Users - Admin - {{ site_name }}{% endblock %}
 
 {% block content %}
 <section class="py-5" style="margin-top: 80px;">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1><i class="fas fa-users"></i> Manage Students</h1>
+            <h1><i class="fas fa-users"></i> Manage Users</h1>
             <a href="{{ url_for('admin_panel') }}" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left"></i> Back to Dashboard
             </a>
         </div>
-        
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category if category != 'message' else 'info' }} alert-dismissible fade show"
+            role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <!-- Role Filter -->
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h5 class="mb-0">Filter by Role</h5>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <div class="btn-group" role="group">
+                            <a href="{{ url_for('admin_students') }}"
+                                class="btn btn-{{ 'primary' if not role_filter else 'outline-secondary' }}">
+                                All
+                            </a>
+                            <a href="{{ url_for('admin_students', role='student') }}"
+                                class="btn btn-{{ 'primary' if role_filter == 'student' else 'outline-primary' }}">
+                                <i class="fas fa-user-graduate"></i> Students
+                            </a>
+                            <a href="{{ url_for('admin_students', role='trainer') }}"
+                                class="btn btn-{{ 'success' if role_filter == 'trainer' else 'outline-success' }}">
+                                <i class="fas fa-chalkboard-teacher"></i> Trainers
+                            </a>
+                            <a href="{{ url_for('admin_students', role='admin') }}"
+                                class="btn btn-{{ 'danger' if role_filter == 'admin' else 'outline-danger' }}">
+                                <i class="fas fa-user-shield"></i> Admins
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="card shadow">
             <div class="card-header bg-dark text-white">
-                <h5 class="mb-0">All Students ({{ students.total }})</h5>
+                <h5 class="mb-0">All Users ({{ students.total }})</h5>
             </div>
             <div class="card-body">
                 {% if students.items %}
@@ -26,6 +69,7 @@
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Phone</th>
+                                <th>Role</th>
                                 <th>Joined</th>
                                 <th>Actions</th>
                             </tr>
@@ -37,61 +81,99 @@
                                 <td>{{ student.name }}</td>
                                 <td>{{ student.email }}</td>
                                 <td>{{ student.phone or 'N/A' }}</td>
+                                <td>
+                                    <select class="form-select form-select-sm role-select"
+                                        data-user-id="{{ student.id }}" data-current-role="{{ student.role }}"
+                                        style="width: auto; min-width: 110px;" {% if student.id==current_user.id
+                                        %}disabled{% endif %}>
+                                        <option value="student" {% if student.role=='student' %}selected{% endif %}>
+                                            👨‍🎓 Student
+                                        </option>
+                                        <option value="trainer" {% if student.role=='trainer' %}selected{% endif %}>
+                                            👨‍🏫 Trainer
+                                        </option>
+                                        <option value="admin" {% if student.role=='admin' %}selected{% endif %}>
+                                            🛡️ Admin
+                                        </option>
+                                    </select>
+                                    {% if student.id == current_user.id %}
+                                    <small class="text-muted d-block">Cannot change own role</small>
+                                    {% endif %}
+                                </td>
                                 <td>{{ student.created_at.strftime('%Y-%m-%d') }}</td>
                                 <td>
-                                    <a href="{{ url_for('admin_student_detail', user_id=student.id) }}" 
-                                       class="btn btn-sm btn-info">
+                                    <!-- Status Badge -->
+                                    {% if student.role == 'trainer' and not student.is_approved %}
+                                    <span class="badge bg-warning text-dark me-1"><i class="fas fa-clock"></i>
+                                        Pending</span>
+                                    <button class="btn btn-sm btn-success"
+                                        onclick="approveTrainer({{ student.id }}, '{{ student.name }}')">
+                                        <i class="fas fa-check"></i> Approve
+                                    </button>
+                                    {% else %}
+                                    <span class="badge bg-success me-1"><i class="fas fa-check"></i> Active</span>
+                                    {% endif %}
+
+                                    <a href="{{ url_for('admin_student_detail', user_id=student.id) }}"
+                                        class="btn btn-sm btn-info">
                                         <i class="fas fa-eye"></i> View
                                     </a>
-                                    <button class="btn btn-sm btn-danger" 
-                                            onclick="deleteStudent({{ student.id }}, '{{ student.email }}')">
+                                    {% if student.id != current_user.id %}
+                                    <button class="btn btn-sm btn-danger"
+                                        onclick="deleteStudent({{ student.id }}, '{{ student.email }}')">
                                         <i class="fas fa-trash"></i> Delete
                                     </button>
+                                    {% endif %}
                                 </td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
-                
+
                 <!-- Pagination -->
                 {% if students.pages > 1 %}
                 <nav>
                     <ul class="pagination justify-content-center">
                         {% if students.has_prev %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ students.prev_num }}">Previous</a>
+                            <a class="page-link"
+                                href="?page={{ students.prev_num }}{% if role_filter %}&role={{ role_filter }}{% endif %}">Previous</a>
                         </li>
                         {% endif %}
-                        
-                        {% for page_num in students.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
-                            {% if page_num %}
-                                {% if page_num == students.page %}
-                                <li class="page-item active">
-                                    <span class="page-link">{{ page_num }}</span>
-                                </li>
-                                {% else %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
-                                </li>
-                                {% endif %}
-                            {% else %}
-                                <li class="page-item disabled">
-                                    <span class="page-link">...</span>
-                                </li>
-                            {% endif %}
+
+                        {% for page_num in students.iter_pages(left_edge=1, right_edge=1, left_current=2,
+                        right_current=2) %}
+                        {% if page_num %}
+                        {% if page_num == students.page %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ page_num }}</span>
+                        </li>
+                        {% else %}
+                        <li class="page-item">
+                            <a class="page-link"
+                                href="?page={{ page_num }}{% if role_filter %}&role={{ role_filter }}{% endif %}">{{
+                                page_num }}</a>
+                        </li>
+                        {% endif %}
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                        {% endif %}
                         {% endfor %}
-                        
+
                         {% if students.has_next %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ students.next_num }}">Next</a>
+                            <a class="page-link"
+                                href="?page={{ students.next_num }}{% if role_filter %}&role={{ role_filter }}{% endif %}">Next</a>
                         </li>
                         {% endif %}
                     </ul>
                 </nav>
                 {% endif %}
                 {% else %}
-                <p class="text-center text-muted">No students found.</p>
+                <p class="text-center text-muted">No users found.</p>
                 {% endif %}
             </div>
         </div>
@@ -99,29 +181,100 @@
 </section>
 
 <script>
-function deleteStudent(userId, email) {
-    if (!confirm(`Are you sure you want to delete student: ${email}? This action cannot be undone.`)) {
-        return;
-    }
-    
-    fetch(`/admin/student/${userId}/delete`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success' || response.ok) {
-            location.reload();
-        } else {
-            alert(data.message || 'Error deleting student');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while deleting the student');
+    // Handle role change
+    document.querySelectorAll('.role-select').forEach(select => {
+        select.addEventListener('change', function () {
+            const userId = this.dataset.userId;
+            const newRole = this.value;
+            const currentRole = this.dataset.currentRole;
+
+            if (!confirm(`Are you sure you want to change this user's role from "${currentRole}" to "${newRole}"?`)) {
+                this.value = currentRole;
+                return;
+            }
+
+            fetch(`/admin/user/${userId}/role`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ role: newRole })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        this.dataset.currentRole = newRole;
+                        // Show success message
+                        const alertDiv = document.createElement('div');
+                        alertDiv.className = 'alert alert-success alert-dismissible fade show position-fixed';
+                        alertDiv.style.cssText = 'top: 100px; right: 20px; z-index: 9999;';
+                        alertDiv.innerHTML = `
+                    <i class="fas fa-check-circle"></i> ${data.message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                        document.body.appendChild(alertDiv);
+                        setTimeout(() => alertDiv.remove(), 3000);
+                    } else {
+                        window.alert(data.message || 'Error changing role');
+                        this.value = currentRole;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    window.alert('An error occurred while changing the role');
+                    this.value = currentRole;
+                });
+        });
     });
-}
+
+    function deleteStudent(userId, email) {
+        if (!confirm(`Are you sure you want to delete user: ${email}? This action cannot be undone.`)) {
+            return;
+        }
+
+        fetch(`/admin/student/${userId}/delete`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success' || response.ok) {
+                    location.reload();
+                } else {
+                    window.alert(data.message || 'Error deleting user');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                window.alert('An error occurred while deleting the user');
+            });
+    }
+
+    function approveTrainer(userId, name) {
+        if (!confirm(`Approve trainer "${name}"? They will gain full access to the trainer dashboard.`)) {
+            return;
+        }
+
+        fetch(`/admin/trainer/${userId}/approve`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    location.reload();
+                } else {
+                    window.alert(data.message || 'Error approving trainer');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                window.alert('An error occurred while approving the trainer');
+            });
+    }
 </script>
 {% endblock %}

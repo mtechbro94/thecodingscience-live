@@ -110,7 +110,7 @@ login_manager.login_message = 'Please log in to access this page.'
 
 
 class User(UserMixin, db.Model):
-    """User/Student Model"""
+    """User/Student/Trainer Model"""
     __tablename__ = 'users'
     
     id = db.Column(db.Integer, primary_key=True)
@@ -119,10 +119,17 @@ class User(UserMixin, db.Model):
     name = db.Column(db.String(120), nullable=False)
     phone = db.Column(db.String(15), nullable=True)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    is_admin = db.Column(db.Boolean, default=False)
+    role = db.Column(db.String(20), default='student')  # student, trainer, admin
     is_active = db.Column(db.Boolean, default=True)
     reset_token = db.Column(db.String(255), nullable=True)
     reset_token_time = db.Column(db.Integer, nullable=True)
+    
+    # Trainer-specific fields
+    education = db.Column(db.String(255), nullable=True)  # Educational qualification
+    expertise = db.Column(db.String(500), nullable=True)  # Areas of expertise
+    experience = db.Column(db.Integer, nullable=True)      # Years of experience
+    bio = db.Column(db.Text, nullable=True)                # Short biography
+    is_approved = db.Column(db.Boolean, default=True)      # Trainers need approval
     
     # Relationships
     enrollments = db.relationship('Enrollment', backref='student', lazy=True, cascade='all, delete-orphan')
@@ -134,6 +141,26 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         """Verify password against hash"""
         return check_password_hash(self.password_hash, password)
+    
+    @property
+    def is_admin(self):
+        """Check if user is admin (backward compatibility)"""
+        return self.role == 'admin'
+    
+    @property
+    def is_trainer(self):
+        """Check if user is trainer"""
+        return self.role == 'trainer'
+    
+    @property
+    def is_student(self):
+        """Check if user is student"""
+        return self.role == 'student'
+    
+    @property
+    def is_pending_approval(self):
+        """Check if trainer is pending approval"""
+        return self.role == 'trainer' and not self.is_approved
     
     def __repr__(self):
         return f'<User {self.email}>'
@@ -152,6 +179,10 @@ class Course(db.Model):
     image = db.Column(db.String(200), nullable=True)
     curriculum = db.Column(db.Text, nullable=True)  # JSON string of modules
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    
+    # Trainer assignment
+    trainer_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True, index=True)
+    trainer = db.relationship('User', backref=db.backref('assigned_courses', lazy=True))
     
     # Relationships
     enrollments = db.relationship('Enrollment', backref='course', lazy=True, cascade='all, delete-orphan')
@@ -492,6 +523,17 @@ def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated or not current_user.is_admin:
+            flash('You do not have permission to access this page.', 'danger')
+            return redirect(url_for('home'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+def trainer_required(f):
+    """Decorator to require trainer role"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated or not current_user.is_trainer:
             flash('You do not have permission to access this page.', 'danger')
             return redirect(url_for('home'))
         return f(*args, **kwargs)
@@ -1099,7 +1141,7 @@ def contact():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    """User registration route"""
+    """User registration route - handles both student and trainer registration"""
     if current_user.is_authenticated:
         return redirect(url_for('dashboard'))
     
@@ -1109,6 +1151,13 @@ def register():
         phone = request.form.get('phone', '').strip()
         password = request.form.get('password', '')
         confirm_password = request.form.get('confirm_password', '')
+        register_role = request.form.get('register_role', 'student')
+        
+        # Trainer-specific fields
+        education = request.form.get('education', '').strip()
+        expertise = request.form.get('expertise', '').strip()
+        experience = request.form.get('experience', '')
+        bio = request.form.get('bio', '').strip()
         
         # Validation
         if not (name and email and password):
@@ -1123,14 +1172,20 @@ def register():
             flash('Passwords do not match.', 'danger')
             return redirect(url_for('register'))
         
-        if len(password) < 8:
-            flash('Password must be at least 8 characters long.', 'danger')
+        if len(password) < 6:
+            flash('Password must be at least 6 characters long.', 'danger')
             return redirect(url_for('register'))
         
         # Validate phone format (basic validation)
         if phone and not re.match(r'^\+?1?\d{9,15}$', phone):
             flash('Please enter a valid phone number.', 'danger')
             return redirect(url_for('register'))
+        
+        # Trainer-specific validation
+        if register_role == 'trainer':
+            if not (education and expertise and experience):
+                flash('Please fill in all trainer information fields.', 'danger')
+                return redirect(url_for('register'))
         
         # Check if user exists
         if User.query.filter_by(email=email).first():
@@ -1140,13 +1195,32 @@ def register():
         
         try:
             # Create new user
-            user = User(name=name, email=email, phone=phone)
+            user = User(
+                name=name, 
+                email=email, 
+                phone=phone,
+                role=register_role if register_role in ['student', 'trainer'] else 'student'
+            )
             user.set_password(password)
+            
+            # Set trainer-specific fields
+            if register_role == 'trainer':
+                user.education = education
+                user.expertise = expertise
+                user.experience = int(experience) if experience else 0
+                user.bio = bio
+                user.is_approved = False  # Trainers need admin approval
+            
             db.session.add(user)
             db.session.commit()
             
-            logger.info(f'New user registered: {email}')
-            flash('Account created successfully! Please log in.', 'success')
+            logger.info(f'New {register_role} registered: {email}')
+            
+            if register_role == 'trainer':
+                flash('Trainer account created! Your account is pending admin approval.', 'info')
+            else:
+                flash('Account created successfully! Please log in.', 'success')
+            
             next_page = request.args.get('next', '')
             return redirect(url_for('login', next=next_page))
         except Exception as e:
@@ -1160,13 +1234,19 @@ def register():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    """User login route"""
+    """User login route with role-based authentication"""
     if current_user.is_authenticated:
+        # Redirect based on user's role
+        if current_user.is_admin:
+            return redirect(url_for('admin_panel'))
+        elif current_user.is_trainer:
+            return redirect(url_for('trainer_dashboard'))
         return redirect(url_for('dashboard'))
     
     if request.method == 'POST':
         email = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '')
+        selected_role = request.form.get('login_role', 'student')
         
         if not (email and password):
             flash('Please fill in all required fields.', 'danger')
@@ -1180,15 +1260,26 @@ def login():
         user = User.query.filter_by(email=email).first()
         
         if user and user.check_password(password) and user.is_active:
-            login_user(user, remember=request.form.get('remember'))
-            logger.info(f'User logged in: {email}')
+            # Verify role matches
+            if user.role != selected_role:
+                flash(f'This account is registered as a {user.role}. Please select the correct role.', 'warning')
+                return redirect(url_for('login'))
             
-            # Redirect to requested page or dashboard/admin panel
+            login_user(user, remember=request.form.get('remember'))
+            logger.info(f'User logged in: {email} (role: {user.role})')
+            
+            # Redirect to requested page or appropriate dashboard
             next_page = request.args.get('next')
             if next_page and next_page.startswith('/'):
                 return redirect(next_page)
             
-            return redirect(url_for('admin_panel' if user.is_admin else 'dashboard'))
+            # Role-based redirect
+            if user.is_admin:
+                return redirect(url_for('admin_panel'))
+            elif user.is_trainer:
+                return redirect(url_for('trainer_dashboard'))
+            else:
+                return redirect(url_for('dashboard'))
         else:
             flash('Invalid email or password.', 'danger')
             logger.warning(f'Failed login attempt for: {email}')
@@ -1341,6 +1432,41 @@ def dashboard():
     )
 
 
+@app.route('/trainer/dashboard')
+@login_required
+@trainer_required
+def trainer_dashboard():
+    """Trainer dashboard showing assigned courses and students"""
+    # Get only courses assigned to this trainer
+    assigned_courses = Course.query.filter_by(trainer_id=current_user.id).all()
+    
+    # Count total students in trainer's assigned courses
+    if assigned_courses:
+        course_ids = [c.id for c in assigned_courses]
+        total_students = Enrollment.query.filter(
+            Enrollment.course_id.in_(course_ids),
+            Enrollment.status == 'completed'
+        ).count()
+    else:
+        total_students = 0
+    
+    # Count pending reviews for trainer's courses
+    if assigned_courses:
+        pending_reviews = CourseReview.query.filter(
+            CourseReview.course_id.in_(course_ids),
+            CourseReview.is_approved == False
+        ).count()
+    else:
+        pending_reviews = 0
+    
+    return render_template(
+        'trainer_dashboard.html',
+        assigned_courses=assigned_courses,
+        total_students=total_students,
+        pending_reviews=pending_reviews
+    )
+
+
 @app.route('/enroll/<int:course_id>', methods=['POST'])
 @login_required
 def enroll_course(course_id):
@@ -1464,30 +1590,91 @@ def admin_panel():
 @login_required
 @admin_required
 def admin_students():
-    """List all students"""
+    """List all users with optional role filter"""
     page = request.args.get('page', 1, type=int)
+    role_filter = request.args.get('role', None)
     per_page = 10
     
-    # Get all non-admin users
-    students = User.query.filter_by(is_admin=False).paginate(
+    # Build query with optional role filter
+    query = User.query
+    if role_filter and role_filter in ['student', 'trainer', 'admin']:
+        query = query.filter_by(role=role_filter)
+    
+    students = query.order_by(User.created_at.desc()).paginate(
         page=page,
         per_page=per_page
     )
     
-    return render_template('admin_students.html', students=students)
+    return render_template('admin_students.html', students=students, role_filter=role_filter)
+
+
+@app.route('/admin/trainer/<int:user_id>/approve', methods=['POST'])
+@login_required
+@admin_required
+def admin_approve_trainer(user_id):
+    """Approve a pending trainer account"""
+    user = User.query.get_or_404(user_id)
+    
+    if user.role != 'trainer':
+        return jsonify({'status': 'error', 'message': 'User is not a trainer.'}), 400
+    
+    if user.is_approved:
+        return jsonify({'status': 'error', 'message': 'Trainer is already approved.'}), 400
+    
+    try:
+        user.is_approved = True
+        db.session.commit()
+        
+        logger.info(f'Trainer {user.email} approved by admin {current_user.email}')
+        return jsonify({
+            'status': 'success',
+            'message': f'Trainer {user.name} has been approved!'
+        })
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f'Error approving trainer: {str(e)}')
+        return jsonify({'status': 'error', 'message': 'An error occurred while approving the trainer.'}), 500
+
+
+@app.route('/admin/user/<int:user_id>/role', methods=['POST'])
+@login_required
+@admin_required
+def admin_change_user_role(user_id):
+    """Change a user's role"""
+    user = User.query.get_or_404(user_id)
+    
+    # Prevent changing own role
+    if user.id == current_user.id:
+        return jsonify({'status': 'error', 'message': 'Cannot change your own role.'}), 400
+    
+    data = request.get_json()
+    new_role = data.get('role', '')
+    
+    if new_role not in ['student', 'trainer', 'admin']:
+        return jsonify({'status': 'error', 'message': 'Invalid role specified.'}), 400
+    
+    try:
+        old_role = user.role
+        user.role = new_role
+        db.session.commit()
+        
+        logger.info(f'User {user.email} role changed from {old_role} to {new_role} by admin {current_user.email}')
+        return jsonify({
+            'status': 'success', 
+            'message': f'Role changed from {old_role} to {new_role} successfully!'
+        })
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f'Error changing user role: {str(e)}')
+        return jsonify({'status': 'error', 'message': 'An error occurred while changing the role.'}), 500
 
 
 @app.route('/admin/student/<int:user_id>')
 @login_required
 @admin_required
 def admin_student_detail(user_id):
-    """View student details and enrollments"""
+    """View user details and enrollments"""
     student = User.query.get_or_404(user_id)
-    
-    if student.is_admin:
-        flash('Cannot view admin user details.', 'danger')
-        return redirect(url_for('admin_students'))
-    
     enrollments = Enrollment.query.filter_by(user_id=user_id).all()
     
     return render_template('admin_student_detail.html', student=student, enrollments=enrollments)
@@ -1497,24 +1684,25 @@ def admin_student_detail(user_id):
 @login_required
 @admin_required
 def admin_delete_student(user_id):
-    """Delete a student and their enrollments"""
+    """Delete a user and their enrollments"""
     student = User.query.get_or_404(user_id)
     
-    if student.is_admin:
-        return jsonify({'status': 'error', 'message': 'Cannot delete admin users.'}), 400
+    # Prevent deleting self
+    if student.id == current_user.id:
+        return jsonify({'status': 'error', 'message': 'Cannot delete your own account.'}), 400
     
     try:
         email = student.email
         db.session.delete(student)
         db.session.commit()
         
-        logger.info(f'Student deleted by admin: {email}')
-        flash(f'Student {email} has been deleted.', 'success')
+        logger.info(f'User deleted by admin: {email}')
+        flash(f'User {email} has been deleted.', 'success')
         return redirect(url_for('admin_students'))
     except Exception as e:
         db.session.rollback()
-        logger.error(f'Error deleting student: {str(e)}')
-        flash('An error occurred while deleting the student.', 'danger')
+        logger.error(f'Error deleting user: {str(e)}')
+        flash('An error occurred while deleting the user.', 'danger')
         return redirect(url_for('admin_students'))
 
 
@@ -1737,6 +1925,90 @@ def admin_update_application_status(application_id):
             'status': 'error',
             'message': 'An error occurred while updating the application status.'
         }), 500
+
+
+@app.route('/admin/trainers')
+@login_required
+@admin_required
+def admin_trainers():
+    """Manage trainers - approve, view, assign courses"""
+    trainers = User.query.filter_by(role='trainer').order_by(User.created_at.desc()).all()
+    courses = Course.query.all()
+    return render_template('admin_trainers.html', trainers=trainers, courses=courses)
+
+
+@app.route('/admin/trainer/<int:user_id>/courses')
+@login_required
+@admin_required
+def get_trainer_courses(user_id):
+    """Get courses assigned to a trainer"""
+    trainer = User.query.get_or_404(user_id)
+    course_ids = [course.id for course in trainer.assigned_courses]
+    return jsonify({'courses': course_ids})
+
+
+@app.route('/admin/trainer/<int:user_id>/assign-courses', methods=['POST'])
+@login_required
+@admin_required
+def assign_courses_to_trainer(user_id):
+    """Assign multiple courses to a trainer"""
+    trainer = User.query.get_or_404(user_id)
+    
+    if trainer.role != 'trainer':
+        return jsonify({'status': 'error', 'message': 'User is not a trainer.'}), 400
+    
+    data = request.get_json()
+    course_ids = data.get('course_ids', [])
+    
+    try:
+        # First, unassign all courses from this trainer
+        Course.query.filter_by(trainer_id=user_id).update({'trainer_id': None})
+        
+        # Then assign selected courses
+        for course_id in course_ids:
+            course = Course.query.get(course_id)
+            if course:
+                course.trainer_id = user_id
+        
+        db.session.commit()
+        logger.info(f'Courses assigned to trainer {trainer.email}: {course_ids}')
+        return jsonify({
+            'status': 'success',
+            'message': f'{len(course_ids)} course(s) assigned to {trainer.name}'
+        })
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f'Error assigning courses: {str(e)}')
+        return jsonify({'status': 'error', 'message': 'An error occurred.'}), 500
+
+
+@app.route('/admin/course/<int:course_id>/assign-trainer', methods=['POST'])
+@login_required
+@admin_required
+def assign_trainer_to_course(course_id):
+    """Assign a trainer to a course"""
+    course = Course.query.get_or_404(course_id)
+    
+    data = request.get_json()
+    trainer_id = data.get('trainer_id')
+    
+    try:
+        if trainer_id:
+            trainer = User.query.get(trainer_id)
+            if not trainer or trainer.role != 'trainer':
+                return jsonify({'status': 'error', 'message': 'Invalid trainer.'}), 400
+            course.trainer_id = trainer_id
+            message = f'{course.name} assigned to {trainer.name}'
+        else:
+            course.trainer_id = None
+            message = f'{course.name} unassigned'
+        
+        db.session.commit()
+        return jsonify({'status': 'success', 'message': message})
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f'Error assigning trainer to course: {str(e)}')
+        return jsonify({'status': 'error', 'message': 'An error occurred.'}), 500
 
 
 @app.route('/admin/courses')

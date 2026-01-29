@@ -103,7 +103,12 @@
                         <div class="row">
                             <div class="col-md-3 mb-3">
                                 <a href="{{ url_for('admin_students') }}" class="btn btn-outline-primary w-100">
-                                    <i class="fas fa-users"></i> Manage Students
+                                    <i class="fas fa-users"></i> Manage Users
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <a href="{{ url_for('admin_trainers') }}" class="btn btn-outline-success w-100">
+                                    <i class="fas fa-chalkboard-teacher"></i> Manage Trainers
                                 </a>
                             </div>
                             <div class="col-md-3 mb-3">
@@ -112,17 +117,17 @@
                                 </a>
                             </div>
                             <div class="col-md-3 mb-3">
-                                <a href="{{ url_for('admin_courses') }}" class="btn btn-outline-success w-100">
+                                <a href="{{ url_for('admin_courses') }}" class="btn btn-outline-warning w-100">
                                     <i class="fas fa-book"></i> Manage Courses
                                 </a>
                             </div>
                             <div class="col-md-3 mb-3">
-                                <a href="{{ url_for('admin_messages') }}" class="btn btn-outline-warning w-100">
+                                <a href="{{ url_for('admin_messages') }}" class="btn btn-outline-secondary w-100">
                                     <i class="fas fa-envelope"></i> Messages & Apps
                                 </a>
                             </div>
                             <div class="col-md-3 mb-3">
-                                <a href="{{ url_for('admin_reviews') }}" class="btn btn-outline-secondary w-100">
+                                <a href="{{ url_for('admin_reviews') }}" class="btn btn-outline-dark w-100">
                                     <i class="fas fa-star"></i> Moderate Reviews
                                 </a>
                             </div>
