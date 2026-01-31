@@ -231,7 +231,7 @@ FLASK_PORT=5000
 ### Courses (6 courses available)
 - Web Development Foundations (₹499)
 - Computer Science Foundations (₹499)
-- Microsoft Office Automation (₹499)
+- Ethical Hacking and Penetration Testing (₹499)
 - AI & Machine Learning Foundations (₹499)
 - Programming Foundations with Python (₹499)
 - Data Science and Analytics (₹499)

@@ -325,19 +325,19 @@ def seed_courses(force=False):
             ])
         ),
         Course(
-            name='Microsoft Office Automation and Digital Tools',
+            name='Ethical Hacking and Penetration Testing',
             duration='3 Months',
-            description='Master Excel, Word, PowerPoint, and automation workflows to boost productivity across teams.',
+            description='Learn ethical hacking fundamentals, penetration testing methodologies, and cybersecurity techniques from basics to intermediate level.',
             price=499,
             level='Foundational',
-            image='MS.jpg',
+            image='EHP.jpg',
             curriculum=json.dumps([
-                "Module 1: Advanced Excel Formulas & Functions",
-                "Module 2: Data Visualization in Excel",
-                "Module 3: Word Formatting & Mail Merge",
-                "Module 4: PowerPoint Professional Presentations",
-                "Module 5: Outlook & Communication Management",
-                "Module 6: Introduction to Macros & Automation"
+                "Module 1: Introduction to Cybersecurity & Ethical Hacking",
+                "Module 2: Networking Fundamentals & Linux Basics",
+                "Module 3: Reconnaissance & Information Gathering",
+                "Module 4: Vulnerability Scanning & Analysis",
+                "Module 5: Web Application Penetration Testing",
+                "Module 6: Exploitation Techniques & Reporting"
             ])
         ),
         Course(
@@ -415,7 +415,7 @@ def init_db_on_startup():
             required_course_names = {
                 'Web Development Foundations',
                 'Computer Science Foundations',
-                'Microsoft Office Automation and Digital Tools',
+                'Ethical Hacking and Penetration Testing',
                 'AI & Machine Learning Foundations',
                 'Programming Foundations with Python',
                 'Data Science and Analytics',
@@ -425,7 +425,7 @@ def init_db_on_startup():
             valid_images = {
                 'webdev.jpg',
                 'CS.jpg',
-                'MS.jpg',
+                'EHP.jpg',
                 'AIML.jpg',
                 'PFP.jpg',
                 'DSA.jpg',
@@ -738,9 +738,9 @@ def services():
         },
         {
             'id': 3,
-            'title': 'Microsoft Office Automation and Digital Tools',
-            'icon': 'fa-tools',
-            'description': 'Master Excel, Word, PowerPoint, and automation to streamline daily work.',
+            'title': 'Ethical Hacking and Penetration Testing',
+            'icon': 'fa-user-secret',
+            'description': 'Learn ethical hacking, penetration testing, and cybersecurity from basics to intermediate.',
             'duration': '3 Months',
             'price': 499
         },
@@ -1346,8 +1346,16 @@ def forgot_password():
             </html>
             """
             
-            send_email(email, "Password Reset Request - The Coding Science", html_body)
-            logger.info(f'Password reset email sent to: {email}')
+            email_sent = send_email(email, "Password Reset Request - The Coding Science", html_body)
+            if email_sent:
+                logger.info(f'Password reset email sent to: {email}')
+            else:
+                logger.error(f'Failed to send password reset email to: {email}')
+                # Revert the token since email failed
+                user.reset_token = None
+                user.reset_token_time = None
+                db.session.commit()
+                return render_template('forgot_password.html', error='Unable to send email. Please check your email configuration or try again later.')
         
         # Don't reveal whether email exists or not (security best practice)
         return render_template('forgot_password.html', message='If an account exists with that email, you will receive a password reset link shortly.')
