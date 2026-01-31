@@ -1,4 +1,4 @@
-# The Coding Science - Advanced Flask Platform
+# The Coding Science - Advanced Tech Platform
 
 ## 🎓 School of Technology and AI Innovations
 

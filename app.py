@@ -2158,7 +2158,7 @@ def create_admin():
         print(f'User with email {email} already exists!')
         return
     
-    admin = User(name=name, email=email, is_admin=True, is_active=True)
+    admin = User(name=name, email=email, role='admin', is_active=True)
     admin.set_password(password)
     db.session.add(admin)
     db.session.commit()
@@ -2177,11 +2177,11 @@ def init_db():
         admin_email = os.getenv('ADMIN_EMAIL', 'admin@thecodingscience.com')
         admin_password = os.getenv('ADMIN_PASSWORD', 'admin123')
         
-        if not User.query.filter_by(is_admin=True).first():
+        if not User.query.filter_by(role='admin').first():
             admin = User(
                 name='Admin',
                 email=admin_email,
-                is_admin=True,
+                role='admin',
                 is_active=True
             )
             admin.set_password(admin_password)
