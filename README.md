@@ -228,13 +228,16 @@ FLASK_PORT=5000
 
 ## 📊 Current Data
 
-### Courses (6 courses available)
-- Web Development Foundations (₹499)
-- Computer Science Foundations (₹499)
-- Ethical Hacking and Penetration Testing (₹499)
-- AI & Machine Learning Foundations (₹499)
-- Programming Foundations with Python (₹499)
-- Data Science and Analytics (₹499)
+### Courses (9 courses available)
+- Full Stack Development (₹1499)
+- Programming with Python (₹999)
+- Data Science from Scratch (₹1499)
+- Ethical Hacking and Penetration Testing (₹1499)
+- Crash Course in Computer Science (₹499)
+- Machine Learning and AI Foundations (₹999)
+- Data Analytics and BI Tools (₹1499)
+- Android App Development (₹1499)
+- MS Office Automation and AI Tools (₹499)
 
 ### Internships (3 positions)
 - Web Development Intern (₹999)
