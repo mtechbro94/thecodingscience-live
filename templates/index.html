@@ -52,51 +52,51 @@
     </div>
 </section>
 
-<!-- Services Section -->
-<section class="py-5" id="services">
+<!-- Blog Section -->
+<section class="py-5 bg-light" id="blogs">
     <div class="container">
-        <h2 class="text-center mb-5">Our Services</h2>
-        <div class="row">
-            <div class="col-md-6 col-lg-3 mb-4">
-                <div class="card h-100 shadow-sm service-card">
-                    <div class="card-body text-center">
-                        <i class="fas fa-laptop-code fa-3x text-primary mb-3"></i>
-                        <h5 class="card-title">Web Development</h5>
-                        <p class="card-text text-muted small">Full Stack: HTML, CSS, JavaScript, React, Node.js, MySQL
-                        </p>
+        <h2 class="text-center mb-5">Latest from Our Blog</h2>
+        <div class="row justify-content-center">
+            {% for blog in blogs %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm border-0 hover-lift">
+                    <div class="overflow-hidden">
+                        <img src="{{ url_for('static', filename='images/' + blog.image) }}"
+                            class="card-img-top zoom-effect" alt="{{ blog.title }}"
+                            style="height: 220px; object-fit: cover;">
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge bg-light text-primary border rounded-pill px-3 py-1">{{ 'Technology' if
+                                loop.index is odd else 'Career' }}</span>
+                            <small class="text-muted"><i class="fas fa-calendar-alt me-1"></i> {{ blog.date }}</small>
+                        </div>
+                        <h5 class="card-title font-weight-bold mb-3">{{ blog.title }}</h5>
+                        <p class="card-text text-muted mb-4">{{ blog.excerpt }}</p>
+                    </div>
+                    <div class="card-footer bg-white border-0 px-4 pb-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <div
+                                    class="avatar px-2 py-1 bg-primary text-white rounded-circle me-2 font-weight-bold">
+                                    {{ blog.author[0] }}</div>
+                                <small class="text-dark font-weight-bold">{{ blog.author }}</small>
+                            </div>
+                            <a href="/blog/{{ blog.id }}"
+                                class="text-primary text-decoration-none font-weight-bold">Read <i
+                                    class="fas fa-arrow-right ms-1"></i></a>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-3 mb-4">
-                <div class="card h-100 shadow-sm service-card">
-                    <div class="card-body text-center">
-                        <i class="fas fa-brain fa-3x text-success mb-3"></i>
-                        <h5 class="card-title">Python & Data Science</h5>
-                        <p class="card-text text-muted small">Python, Data Analysis, ML, Deep Learning</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-3 mb-4">
-                <div class="card h-100 shadow-sm service-card">
-                    <div class="card-body text-center">
-                        <i class="fas fa-cloud fa-3x text-info mb-3"></i>
-                        <h5 class="card-title">Cloud & DevOps</h5>
-                        <p class="card-text text-muted small">AWS, Docker, Kubernetes, CI/CD</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-3 mb-4">
-                <div class="card h-100 shadow-sm service-card">
-                    <div class="card-body text-center">
-                        <i class="fas fa-robot fa-3x text-danger mb-3"></i>
-                        <h5 class="card-title">AI & Machine Learning</h5>
-                        <p class="card-text text-muted small">Neural Networks, NLP, Computer Vision</p>
-                    </div>
-                </div>
-            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-4">
+            <a href="/blog" class="btn btn-outline-primary btn-lg px-5 rounded-pill shadow-sm">View All Articles</a>
         </div>
     </div>
 </section>
+
 
 <!-- Why Choose Us Section -->
 <section class="py-5 bg-light">
@@ -158,7 +158,8 @@
                 <div class="card h-100 shadow-sm course-card">
                     <div class="card-body">
                         <h5 class="card-title">{{ course.name }}</h5>
-                        <p class="card-text text-muted small">{{ course.description[:100] }}...</p>
+                        <p class="card-text text-muted small">{{ course.summary or course.description[:100] + '...' }}
+                        </p>
                         <div class="course-meta">
                             <small><i class="fas fa-clock"></i> {{ course.duration }}</small><br>
                             <small><i class="fas fa-rupee-sign"></i> ₹{{ course.price }}</small>
@@ -220,7 +221,8 @@
 <section class="py-5 bg-primary">
     <div class="container text-center">
         <h2 class="mb-4 text-light">Ready to Transform Your Career?</h2>
-        <p class="lead mb-4 text-light">Join thousands of students who have successfully launched their tech careers.</p>
+        <p class="lead mb-4 text-light">Join thousands of students who have successfully launched their tech careers.
+        </p>
         <a href="/contact" class="btn btn-light btn-lg">Get in Touch Today</a>
     </div>
 </section>

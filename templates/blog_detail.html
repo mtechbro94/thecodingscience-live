@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}{{ blog.title }} - {{ site_name }}{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="position-relative bg-dark text-white" style="height: 400px; margin-top: 56px;">
+    <img src="{{ url_for('static', filename='images/' + blog.image) }}" alt="{{ blog.title }}"
+        class="w-100 h-100 object-fit-cover opacity-50 position-absolute">
+    <div class="container h-100 position-relative d-flex align-items-center">
+        <div class="col-lg-8">
+            <span class="badge bg-primary mb-2">Technology</span>
+            <h1 class="display-4 fw-bold">{{ blog.title }}</h1>
+            <div class="d-flex align-items-center mt-3">
+                <div class="avatar bg-white text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold me-2"
+                    style="width: 40px; height: 40px;">
+                    {{ blog.author[0] }}
+                </div>
+                <div>
+                    <p class="mb-0 fw-bold">{{ blog.author }}</p>
+                    <small class="text-light opacity-75">{{ blog.date }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Article Content -->
+<div class="container py-5">
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <div class="lead mb-4 font-italic text-muted">
+                {{ blog.excerpt }}
+            </div>
+            <div class="blog-content">
+                {{ blog.content | markdown | safe }}
+            </div>
+
+            <hr class="my-5">
+
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="/blog" class="btn btn-outline-primary"><i class="fas fa-arrow-left me-2"></i> Back to Blog</a>
+                <div class="social-share">
+                    <span class="me-2 text-muted fw-bold">Share:</span>
+                    <a href="#" class="btn btn-sm btn-light text-primary me-1"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="btn btn-sm btn-light text-primary me-1"><i class="fab fa-linkedin"></i></a>
+                    <a href="#" class="btn btn-sm btn-light text-primary"><i class="fab fa-facebook"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4 mt-5 mt-lg-0">
+            <div class="sticky-top" style="top: 100px;">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold mb-3">Newsletter</h5>
+                        <p class="text-muted small mb-3">Subscribe to get the latest tech insights delivered to your
+                            inbox.</p>
+                        <form action="{{ url_for('subscribe') }}" method="POST">
+                            <div class="mb-2">
+                                <input type="email" name="email" class="form-control" placeholder="Enter your email"
+                                    required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Subscribe</button>
+                        </form>
+                    </div>
+                </div>
+
+                <h5 class="fw-bold mb-3">Recent Posts</h5>
+                <div class="list-group list-group-flush border rounded overflow-hidden">
+                    {% for post in recent_posts %}
+                    {% if post.id != blog.id %}
+                    <a href="/blog/{{ post.id }}" class="list-group-item list-group-item-action p-3">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1 text-primary fw-bold">{{ post.title }}</h6>
+                        </div>
+                        <small class="text-muted">{{ post.date }}</small>
+                    </a>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

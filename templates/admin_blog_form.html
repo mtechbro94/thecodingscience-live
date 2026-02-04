@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Edit' if blog else 'New' }} Post - {{ site_name }}{% endblock %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+<style>
+    .CodeMirror {
+        min-height: 700px !important;
+        height: 700px !important;
+        font-size: 18px !important;
+        line-height: 1.6 !important;
+        border-radius: 4px;
+        background-color: #fafafa;
+    }
+
+    .CodeMirror-scroll {
+        min-height: 700px !important;
+    }
+
+    .editor-toolbar {
+        border-radius: 4px 4px 0 0;
+        border-color: #ced4da;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="py-5" style="margin-top: 80px;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1><i class="fas fa-edit"></i> {{ 'Edit' if blog else 'Create New' }} Post</h1>
+                    <a href="{{ url_for('admin_blogs') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+                        <form method="POST" enctype="multipart/form-data">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="mb-3">
+                                        <label for="title" class="form-label fw-bold">Title</label>
+                                        <input type="text" class="form-control form-control-lg" id="title" name="title"
+                                            value="{{ blog.title if blog else '' }}" required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="content" class="form-label fw-bold">Content</label>
+                                        <textarea class="form-control" id="content"
+                                            name="content">{{ blog.content if blog else '' }}</textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card bg-light border-0 mb-4">
+                                        <div class="card-body">
+                                            <h5 class="card-title fw-bold mb-3">Publishing Details</h5>
+
+                                            <div class="mb-3">
+                                                <label for="author" class="form-label">Author Name</label>
+                                                <input type="text" class="form-control" id="author" name="author"
+                                                    value="{{ blog.author if blog else current_user.name }}" required>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label for="image" class="form-label">Featured Image</label>
+                                                <input type="file" class="form-control" id="image" name="image"
+                                                    accept="image/*">
+                                                {% if blog and blog.image %}
+                                                <div class="mt-2">
+                                                    <small class="text-muted">Current:</small>
+                                                    <img src="{{ url_for('static', filename='images/' + blog.image) }}"
+                                                        class="img-fluid rounded mt-1 border" alt="Current Image">
+                                                </div>
+                                                {% endif %}
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label for="excerpt" class="form-label">Excerpt (Small
+                                                    Description)</label>
+                                                <textarea class="form-control" id="excerpt" name="excerpt" rows="4"
+                                                    required>{{ blog.excerpt if blog else '' }}</textarea>
+                                                <small class="text-muted">Displayed on the card view.</small>
+                                            </div>
+
+                                            <div class="form-check form-switch mb-3">
+                                                <input class="form-check-input" type="checkbox" id="is_published"
+                                                    name="is_published" {{ 'checked' if (blog and blog.is_published) or
+                                                    not blog else '' }}>
+                                                <label class="form-check-label" for="is_published">Publish
+                                                    Immediately</label>
+                                            </div>
+
+                                            <hr>
+
+                                            <button type="submit" class="btn btn-primary w-100 btn-lg">
+                                                <i class="fas fa-save"></i> Save Post
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+<script>
+    var simplemde = new SimpleMDE({
+        element: document.getElementById("content"),
+        spellChecker: false,
+        autofocus: true,
+        placeholder: "Write your article here...",
+        forceSync: true,
+        promptURLs: true,
+        toolbar: [
+            "bold", "italic", "heading", "|",
+            "quote", "unordered-list", "ordered-list", "|",
+            "link", "image", "|",
+            "preview", "side-by-side", "fullscreen", "|",
+            "guide"
+        ]
+    });
+</script>
+{% endblock %}

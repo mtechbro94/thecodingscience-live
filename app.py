@@ -28,6 +28,8 @@ try:
     from dotenv import load_dotenv
     from functools import wraps
     import re
+    from content_data import COURSE_SEED_DATA, SERVICES_LIST, INTERNSHIPS_LIST, ABOUT_VALUES, BLOG_POSTS
+    import markdown
 except Exception as e:
     print(f"✗ CRITICAL ERROR during imports: {e}", file=sys.stderr, flush=True)
     traceback.print_exc(file=sys.stderr)
@@ -42,11 +44,16 @@ logger.setLevel(logging.DEBUG)
 
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 
+# Register markdown filter
+@app.template_filter('markdown')
+def render_markdown(text):
+    return markdown.markdown(text)
+
 # Load configuration first
 try:
     from config import get_config
     app.config.from_object(get_config())
-    print("✓ Configuration loaded successfully", file=sys.stdout, flush=True)
+    print("[OK] Configuration loaded successfully", file=sys.stdout, flush=True)
 except Exception as e:
     print(f"✗ ERROR loading config: {e}", file=sys.stderr, flush=True)
     traceback.print_exc(file=sys.stderr)
@@ -57,7 +64,7 @@ try:
     from whitenoise import WhiteNoise
     static_dir = os.path.join(os.path.dirname(__file__), 'static')
     app.wsgi_app = WhiteNoise(app.wsgi_app, root=static_dir, max_age=31536000)
-    print(f"✓ WhiteNoise initialized successfully with static dir: {static_dir}", file=sys.stdout, flush=True)
+    print(f"[OK] WhiteNoise initialized successfully with static dir: {static_dir}", file=sys.stdout, flush=True)
 except Exception as e:
     print(f"⚠ WhiteNoise initialization failed: {e}", file=sys.stderr, flush=True)
     logger.warning(f"WhiteNoise initialization failed: {e}")
@@ -173,6 +180,7 @@ class Course(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text, nullable=True)
+    summary = db.Column(db.String(200), nullable=True)  # Short summary for course cards
     duration = db.Column(db.String(50), nullable=True)
     price = db.Column(db.Float, nullable=False)
     level = db.Column(db.String(50), nullable=True)
@@ -274,6 +282,37 @@ class CourseReview(db.Model):
         return f'<CourseReview {self.user.email} -> {self.course.name} ({self.rating} stars)>'
 
 
+class Blog(db.Model):
+    """Blog Model"""
+    __tablename__ = 'blogs'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    slug = db.Column(db.String(200), unique=True, nullable=False)
+    excerpt = db.Column(db.String(500), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    image = db.Column(db.String(200), nullable=True)
+    author = db.Column(db.String(100), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    is_published = db.Column(db.Boolean, default=True)
+    
+    def __repr__(self):
+        return f'<Blog {self.title}>'
+
+
+class NewsletterSubscriber(db.Model):
+    """Newsletter Subscriber Model"""
+    __tablename__ = 'newsletter_subscribers'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    subscribed_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    is_active = db.Column(db.Boolean, default=True)
+    
+    def __repr__(self):
+        return f'<NewsletterSubscriber {self.email}>'
+
+
 # ==================== FLASK-LOGIN HELPER ====================
 
 @login_manager.user_loader
@@ -291,110 +330,26 @@ def seed_courses(force=False):
     
     import json
     
-    courses = [
-        Course(
-            name='Web Development Foundations',
-            duration='3 Months',
-            description='Build a solid base in HTML, CSS, JavaScript, and responsive design to launch your web career.',
-            price=499,
-            level='Foundational',
-            image='webdev.jpg',
-            curriculum=json.dumps([
-                "Module 1: HTML5 & Semantic Web",
-                "Module 2: CSS3 Styling & Flexbox/Grid",
-                "Module 3: JavaScript Basics & DOM Manipulation",
-                "Module 4: Responsive Design with Bootstrap",
-                "Module 5: Git & Version Control",
-                "Module 6: Deployment & Portfolio Building"
-            ])
-        ),
-        Course(
-            name='Computer Science Foundations',
-            duration='3 Months',
-            description='Strengthen core CS skills with programming fundamentals, data structures, and problem-solving.',
-            price=499,
-            level='Foundational',
-            image='CS.jpg',
-            curriculum=json.dumps([
-                "Module 1: Introduction to Computing & Binary",
-                "Module 2: Algorithms & Logic Building",
-                "Module 3: Data Structures (Arrays, Lists, Stacks)",
-                "Module 4: Object-Oriented Programming Concepts",
-                "Module 5: Database Fundamentals (SQL)",
-                "Module 6: Operating Systems & Networking Basics"
-            ])
-        ),
-        Course(
-            name='Ethical Hacking and Penetration Testing',
-            duration='3 Months',
-            description='Learn ethical hacking fundamentals, penetration testing methodologies, and cybersecurity techniques from basics to intermediate level.',
-            price=499,
-            level='Foundational',
-            image='EHP.jpg',
-            curriculum=json.dumps([
-                "Module 1: Introduction to Cybersecurity & Ethical Hacking",
-                "Module 2: Networking Fundamentals & Linux Basics",
-                "Module 3: Reconnaissance & Information Gathering",
-                "Module 4: Vulnerability Scanning & Analysis",
-                "Module 5: Web Application Penetration Testing",
-                "Module 6: Exploitation Techniques & Reporting"
-            ])
-        ),
-        Course(
-            name='AI & Machine Learning Foundations',
-            duration='3 Months',
-            description='Explore the fundamentals of AI, machine learning workflows, and hands-on model building.',
-            price=499,
-            level='Foundational',
-            image='AIML.jpg',
-            curriculum=json.dumps([
-                "Module 1: Introduction to AI & Data Science",
-                "Module 2: Python for Data Science (NumPy, Pandas)",
-                "Module 3: Data Visualization (Matplotlib, Seaborn)",
-                "Module 4: Machine Learning Concepts (Supervised/Unsupervised)",
-                "Module 5: Building Simple Models (Scikit-Learn)",
-                "Module 6: Ethics in AI & Future Trends"
-            ])
-        ),
-        Course(
-            name='Programming Foundations with Python',
-            duration='3 Months',
-            description='Master Python programming from basics to intermediate level with real-world projects and problem-solving techniques.',
-            price=499,
-            level='Foundational',
-            image='PFP.jpg',
-            curriculum=json.dumps([
-                "Module 1: Python Syntax & Variables",
-                "Module 2: Control Flow (If/Else, Loops)",
-                "Module 3: Functions & Modules",
-                "Module 4: Data Structures (Lists, Dictionaries)",
-                "Module 5: File Handling & APIs",
-                "Module 6: Final Project: Building a Tool"
-            ])
-        ),
-        Course(
-            name='Data Science and Analytics',
-            duration='3 Months',
-            description='Learn data analysis, visualization, and business intelligence with Python, Pandas, and powerful analytics tools.',
-            price=499,
-            level='Intermediate',
-            image='DSA.jpg',
-            curriculum=json.dumps([
-                "Module 1: Python for Data Analysis",
-                "Module 2: Data Wrangling with Pandas",
-                "Module 3: Exploratory Data Analysis",
-                "Module 4: Statistical Analysis Basics",
-                "Module 5: Data Storytelling & Visualization",
-                "Module 6: Capstone Project"
-            ])
-        ),
-    ]
+    courses = []
+    
+    # Loop through the imported seed data
+    for course_data in COURSE_SEED_DATA:
+        courses.append(Course(
+            name=course_data['name'],
+            duration=course_data['duration'],
+            summary=course_data['summary'],
+            description=course_data['description'],
+            price=course_data['price'],
+            level=course_data['level'],
+            image=course_data['image'],
+            curriculum=json.dumps(course_data['curriculum'])
+        ))
     
     for course in courses:
         db.session.add(course)
     
     db.session.commit()
-    logger.info('Database seeded with courses.')
+    logger.info('Database seeded with 9 comprehensive courses.')
 
 
 # ==================== DATABASE INITIALIZATION ====================
@@ -406,48 +361,277 @@ def init_db_on_startup():
             # Create all tables (if they don't exist)
             # SQLAlchemy create_all() is supposed to be idempotent, but we catch any errors
             db.create_all()
-            logger.info("✓ Database tables created/verified")
+            logger.info("[OK] Database tables created/verified")
+            
+            # Migration: Add summary column if it doesn't exist (for existing databases)
+            try:
+                from sqlalchemy import text
+                with db.engine.connect() as conn:
+                    # Check if summary column exists
+                    result = conn.execute(text("PRAGMA table_info(courses)"))
+                    columns = [row[1] for row in result.fetchall()]
+                    if 'summary' not in columns:
+                        conn.execute(text("ALTER TABLE courses ADD COLUMN summary VARCHAR(200)"))
+                        conn.commit()
+                        logger.info("[OK] Added 'summary' column to courses table")
+            except Exception as migration_error:
+                logger.warning(f"Migration check for summary column: {migration_error}")
+            
+            # Update existing course descriptions and summaries with new formatted content
+            try:
+                import json
+                course_updates = {
+                    'Full Stack Development': {
+                        'summary': "Master end-to-end web development from frontend to backend with hands-on projects.",
+                        'description': """Become a complete web developer mastering both frontend and backend technologies.<br><br>
+
+<b>Course Overview</b><br>
+Build end-to-end web applications from database design to user interface. Master HTML/CSS/JavaScript on the frontend, Node.js/Python on the backend, and manage databases with SQL/MongoDB.<br><br>
+
+<b>What You'll Learn</b><br>
+• <b>Frontend:</b> HTML5, CSS3, JavaScript ES6+, React.js, Redux<br>
+• <b>Backend:</b> Node.js/Express.js, RESTful API design, Authentication<br>
+• <b>Databases:</b> SQL (PostgreSQL), MongoDB, Database optimization<br>
+• <b>DevOps:</b> Docker, CI/CD pipelines, Git workflows<br>
+• <b>Cloud:</b> Deployment on AWS/Heroku, Payment integration<br><br>
+
+<b>Who Should Enroll</b><br>
+Aspiring web developers, career changers, professionals advancing from frontend/backend-only roles, entrepreneurs building web products.<br><br>
+
+<b>Duration:</b> 4 Months (200+ hours) | <b>Prerequisites:</b> Basic programming knowledge"""
+                    },
+                    'Programming with Python': {
+                        'summary': "Learn Python from basics to advanced with real-world automation projects.",
+                        'description': """Master Python programming from fundamentals to advanced concepts.<br><br>
+
+<b>Course Overview</b><br>
+Learn Python syntax, OOP, data structures, and popular libraries. Build automation tools, data processing scripts, and intelligent applications.<br><br>
+
+<b>What You'll Learn</b><br>
+• <b>Fundamentals:</b> Syntax, variables, data types, control flow<br>
+• <b>OOP:</b> Classes, inheritance, polymorphism, encapsulation<br>
+• <b>Data Structures:</b> Lists, dictionaries, sets, tuples<br>
+• <b>Libraries:</b> NumPy, Pandas, Requests, BeautifulSoup<br>
+• <b>Projects:</b> Web scraper, automation tool, data processor<br><br>
+
+<b>Who Should Enroll</b><br>
+Beginners starting their programming journey, students, professionals wanting to add Python to their skillset.<br><br>
+
+<b>Duration:</b> 3 Months (120+ hours) | <b>Prerequisites:</b> None"""
+                    },
+                    'Data Science from Scratch': {
+                        'summary': "Transform raw data into insights using Python, statistics, and ML.",
+                        'description': """Transform raw data into actionable business insights.<br><br>
+
+<b>Course Overview</b><br>
+Master data cleaning, exploration, visualization, and predictive modeling. Work with real datasets and solve business problems end-to-end.<br><br>
+
+<b>What You'll Learn</b><br>
+• <b>Python:</b> NumPy, Pandas, Matplotlib, Seaborn<br>
+• <b>Statistics:</b> Probability, hypothesis testing, inference<br>
+• <b>ML:</b> Regression, classification, clustering algorithms<br>
+• <b>Visualization:</b> Charts, dashboards, storytelling with data<br>
+• <b>Tools:</b> Jupyter, Scikit-learn, real-world datasets<br><br>
+
+<b>Who Should Enroll</b><br>
+Analysts wanting to upskill, engineers transitioning to data roles, business professionals seeking data-driven decision making.<br><br>
+
+<b>Duration:</b> 4 Months (180+ hours) | <b>Prerequisites:</b> Basic Python knowledge"""
+                    },
+                    'Ethical Hacking and Penetration Testing': {
+                        'summary': "Master cybersecurity through hands-on ethical hacking and pen testing.",
+                        'description': """Learn to identify and fix security vulnerabilities professionally.<br><br>
+
+<b>Course Overview</b><br>
+Master networking, Linux, reconnaissance, scanning, and exploitation. Conduct real penetration tests and write professional security reports.<br><br>
+
+<b>What You'll Learn</b><br>
+• <b>Networking:</b> TCP/IP, protocols, packet analysis<br>
+• <b>Linux:</b> System administration, command line mastery<br>
+• <b>Reconnaissance:</b> Passive and active information gathering<br>
+• <b>Exploitation:</b> Web app vulnerabilities, system exploits<br>
+• <b>Tools:</b> Kali Linux, Burp Suite, Metasploit, Nmap<br><br>
+
+<b>Who Should Enroll</b><br>
+IT professionals, network admins, security enthusiasts, anyone interested in cybersecurity careers.<br><br>
+
+<b>Duration:</b> 3 Months (150+ hours) | <b>Prerequisites:</b> Basic networking knowledge"""
+                    },
+                    'Crash Course in Computer Science': {
+                        'summary': "Essential foundation covering how computers work from hardware to software.",
+                        'description': """Build a solid foundation for all tech careers.<br><br>
+
+<b>Course Overview</b><br>
+Learn how computers work from hardware to software. Master binary, circuits, algorithms, data structures, operating systems, and networking concepts.<br><br>
+
+<b>What You'll Learn</b><br>
+• <b>Hardware:</b> Binary, logic gates, CPUs, memory<br>
+• <b>Algorithms:</b> Complexity analysis, searching, sorting<br>
+• <b>Data Structures:</b> Arrays, linked lists, trees, graphs<br>
+• <b>Operating Systems:</b> Processes, memory management<br>
+• <b>Networking:</b> Internet fundamentals, protocols<br><br>
+
+<b>Who Should Enroll</b><br>
+Complete beginners, students starting CS education, anyone wanting to understand how computers work.<br><br>
+
+<b>Duration:</b> 2 Months (80+ hours) | <b>Prerequisites:</b> None"""
+                    },
+                    'Machine Learning and AI Foundations': {
+                        'summary': "Build intelligent systems using ML algorithms, neural networks, and deep learning.",
+                        'description': """Build intelligent systems that learn and improve.<br><br>
+
+<b>Course Overview</b><br>
+Master ML algorithms, neural networks, deep learning, NLP, and computer vision. Deploy predictive models in production environments.<br><br>
+
+<b>What You'll Learn</b><br>
+• <b>ML Basics:</b> Regression, classification, clustering<br>
+• <b>Neural Networks:</b> Perceptrons, backpropagation, CNNs, RNNs<br>
+• <b>Deep Learning:</b> TensorFlow, PyTorch frameworks<br>
+• <b>NLP:</b> Text processing, sentiment analysis, chatbots<br>
+• <b>Computer Vision:</b> Image classification, object detection<br><br>
+
+<b>Who Should Enroll</b><br>
+Developers wanting AI skills, data scientists expanding into ML, researchers and students in AI/ML.<br><br>
+
+<b>Duration:</b> 4 Months (200+ hours) | <b>Prerequisites:</b> Python, basic math/statistics"""
+                    },
+                    'Data Analytics and BI Tools': {
+                        'summary': "Transform business data into insights using Excel, SQL, Tableau, and Power BI.",
+                        'description': """Turn business data into strategic insights and decisions.<br><br>
+
+<b>Course Overview</b><br>
+Master Excel, SQL, Tableau, and Power BI. Create dashboards, analyze data, and present insights to executives effectively.<br><br>
+
+<b>What You'll Learn</b><br>
+• <b>Excel:</b> Advanced functions, pivot tables, macros<br>
+• <b>SQL:</b> Complex queries, optimization, data extraction<br>
+• <b>Tableau:</b> Visualizations, interactive dashboards<br>
+• <b>Power BI:</b> Data modeling, DAX formulas, reports<br>
+• <b>Storytelling:</b> Executive presentations, data narratives<br><br>
+
+<b>Who Should Enroll</b><br>
+Business analysts, managers needing data skills, professionals in marketing/finance/operations.<br><br>
+
+<b>Duration:</b> 3 Months (150+ hours) | <b>Prerequisites:</b> Basic Excel knowledge"""
+                    },
+                    'Android App Development': {
+                        'summary': "Build production-ready Android apps with Kotlin and publish to Play Store.",
+                        'description': """Create professional Android applications from scratch.<br><br>
+
+<b>Course Overview</b><br>
+Master Kotlin and modern Android frameworks. Build feature-rich apps with material design, networking, databases, and publish to Play Store.<br><br>
+
+<b>What You'll Learn</b><br>
+• <b>Kotlin:</b> Modern Android programming language<br>
+• <b>UI:</b> Material Design, layouts, fragments, animations<br>
+• <b>Data:</b> SQLite, Room database, SharedPreferences<br>
+• <b>Networking:</b> Retrofit, REST APIs, JSON parsing<br>
+• <b>Publishing:</b> Play Store submission, monetization<br><br>
+
+<b>Who Should Enroll</b><br>
+Aspiring mobile developers, Java/Kotlin programmers, entrepreneurs wanting to build Android apps.<br><br>
+
+<b>Duration:</b> 3 Months (150+ hours) | <b>Prerequisites:</b> Basic programming knowledge"""
+                    },
+                    'MS Office Automation and AI Tools': {
+                        'summary': "Automate tasks and boost productivity with VBA, Power Automate, and AI.",
+                        'description': """Automate repetitive tasks and supercharge productivity.<br><br>
+
+<b>Course Overview</b><br>
+Master Excel VBA, Power Automate, Power Query, and AI tool integration. Build custom solutions that reduce manual work by 70-80%.<br><br>
+
+<b>What You'll Learn</b><br>
+• <b>Excel VBA:</b> Macros, automation, custom functions<br>
+• <b>Power Automate:</b> Cloud workflows, connectors, triggers<br>
+• <b>Power Query:</b> Data transformation, ETL processes<br>
+• <b>AI Tools:</b> ChatGPT, Copilot, GPT API integration<br>
+• <b>Office Suite:</b> Teams, Outlook, Access automation<br><br>
+
+<b>Who Should Enroll</b><br>
+Office workers, admins, managers wanting to automate daily tasks, anyone looking to boost productivity.<br><br>
+
+<b>Duration:</b> 2.5 Months (100+ hours) | <b>Prerequisites:</b> Basic Excel knowledge"""
+                    }
+                }
+                
+                for name, data in course_updates.items():
+                    course = Course.query.filter_by(name=name).first()
+                    if course:
+                        course.description = data['description']
+                        course.summary = data['summary']
+                
+                db.session.commit()
+                logger.info("[OK] Course descriptions updated with new format")
+            except Exception as update_error:
+                logger.warning(f"Course description update: {update_error}")
             
             # Check if courses are incomplete or have wrong data
             course_count = Course.query.count()
             
             # Define what courses should exist
             required_course_names = {
-                'Web Development Foundations',
-                'Computer Science Foundations',
+                'Full Stack Development',
+                'Programming with Python',
+                'Data Science from Scratch',
                 'Ethical Hacking and Penetration Testing',
-                'AI & Machine Learning Foundations',
-                'Programming Foundations with Python',
-                'Data Science and Analytics',
+                'Crash Course in Computer Science',
+                'Machine Learning and AI Foundations',
+                'Data Analytics and BI Tools',
+                'Android App Development',
+                'MS Office Automation and AI Tools',
             }
             
             # Expected valid image filenames
             valid_images = {
-                'webdev.jpg',
-                'CS.jpg',
-                'EHP.jpg',
-                'AIML.jpg',
-                'PFP.jpg',
-                'DSA.jpg',
+                'fsd.jpg',
+                'pp.jpg',
+                'ds.jpg',
+                'EHPT.jpg',
+                'ccc.jpg',
+                'maf.jpg',
+                'dabt.jpg',
+                'aad.jpg',
+                'moaat.jpg',
             }
             
             # Get actual course data from DB
             actual_courses = Course.query.all()
             actual_course_names = {c.name for c in actual_courses}
             actual_images = {c.image for c in actual_courses if c.image}
+            # Define expected course data
+            expected_courses = {
+                'Full Stack Development': (1499, 'Advanced'),
+                'Programming with Python': (999, 'Intermediate'),
+                'Data Science from Scratch': (1499, 'Advanced'),
+                'Ethical Hacking and Penetration Testing': (1499, 'Advanced'),
+                'Crash Course in Computer Science': (499, 'Foundational'),
+                'Machine Learning and AI Foundations': (999, 'Intermediate'),
+                'Data Analytics and BI Tools': (1499, 'Advanced'),
+                'Android App Development': (1499, 'Advanced'),
+                'MS Office Automation and AI Tools': (499, 'Foundational'),
+            }
             
             # Determine if database needs fixing
-            # Fix if: wrong count, wrong names, or invalid images
+            # Fix if: wrong count, wrong names, invalid images, OR wrong prices/levels
             needs_fix = (
-                course_count != 6 or 
+                course_count != 9 or 
                 actual_course_names != required_course_names or
-                not actual_images.issubset(valid_images) or
-                any(c.image and (c.image.startswith('/static') or 'office' in c.image.lower() or 'cs-' in c.image.lower()) for c in actual_courses)
+                not actual_images.issubset(valid_images)
             )
+            
+            # Also check if any course has wrong price or level
+            if not needs_fix:
+                for course in actual_courses:
+                    if course.name in expected_courses:
+                        exp_price, exp_level = expected_courses[course.name]
+                        if course.price != exp_price or course.level != exp_level:
+                            needs_fix = True
+                            logger.warning(f"⚠️  Wrong pricing/level detected for {course.name}: Rs.{course.price} {course.level} (expected Rs.{exp_price} {exp_level})")
+                            break
             
             if needs_fix:
                 logger.warning(f"⚠️  Database inconsistent - triggering fix")
-                logger.warning(f"    Course count: {course_count} (expected 6)")
+                logger.warning(f"    Course count: {course_count} (expected 9)")
                 logger.warning(f"    Expected names: {required_course_names}")
                 logger.warning(f"    Found names: {actual_course_names}")
                 logger.warning(f"    Found images: {actual_images}")
@@ -458,25 +642,25 @@ def init_db_on_startup():
                 Course.query.delete()
                 CourseReview.query.delete()  # Also delete reviews to keep data consistent
                 db.session.commit()
-                logger.info("✓ Cleared all course and review data")
+                logger.info("[OK] Cleared all course and review data")
                 
-                # Call seed_courses to create all 6 courses (force=True to bypass the check)
+                # Call seed_courses to create all 9 courses (force=True to bypass the check)
                 seed_courses(force=True)
-                logger.info("✓ Database reseeded with all 6 correct courses")
+                logger.info("[OK] Database reseeded with all 9 comprehensive courses")
             else:
-                logger.info(f"✓ Database verified: {course_count} courses with valid images")
+                logger.info(f"[OK] Database verified: {course_count} courses with valid images")
             
             # Final verification
             final_count = Course.query.count()
             final_images = {c.image for c in Course.query.all() if c.image}
-            logger.info(f"✓ Database init complete: {final_count} courses, images: {final_images}")
+            logger.info(f"[OK] Database init complete: {final_count} courses, images: {final_images}")
             db.session.commit()
         except Exception as e:
             error_str = str(e).lower()
             # Ignore "table already exists" errors - happens when multiple workers initialize
             if "already exists" in error_str or "table" in error_str and "exists" in error_str:
                 logger.info(f"✓ Database tables already exist (expected in multi-worker setup)")
-                print(f"✓ Database tables already exist (expected in multi-worker setup)", file=sys.stdout, flush=True)
+                print(f"[OK] Database tables already exist (expected in multi-worker setup)", file=sys.stdout, flush=True)
             else:
                 logger.error(f"Error initializing database: {str(e)}")
                 print(f"✗ Database init error: {str(e)}", file=sys.stderr, flush=True)
@@ -494,7 +678,7 @@ def init_db_if_needed():
         try:
             init_db_on_startup()
             db_initialized = True
-            print("✓ Database initialized successfully on first request", file=sys.stdout, flush=True)
+            print("[OK] Database initialized successfully on first request", file=sys.stdout, flush=True)
         except Exception as e:
             print(f"✗ ERROR during database initialization: {e}", file=sys.stderr, flush=True)
             traceback.print_exc(file=sys.stderr)
@@ -503,7 +687,7 @@ def init_db_if_needed():
 try:
     init_db_on_startup()
     db_initialized = True
-    print("✓ Database initialized successfully at startup", file=sys.stdout, flush=True)
+    print("[OK] Database initialized successfully at startup", file=sys.stdout, flush=True)
 except Exception as e:
     print(f"⚠ Database initialization deferred to first request: {e}", file=sys.stderr, flush=True)
 
@@ -511,8 +695,8 @@ except Exception as e:
 
 # App startup complete message
 print("=" * 50, file=sys.stdout, flush=True)
-print("✓ FLASK APP INITIALIZATION COMPLETE", file=sys.stdout, flush=True)
-print("✓ Ready to handle requests", file=sys.stdout, flush=True)
+print("[OK] FLASK APP INITIALIZATION COMPLETE", file=sys.stdout, flush=True)
+print("[OK] Ready to handle requests", file=sys.stdout, flush=True)
 print("=" * 50, file=sys.stdout, flush=True)
 
 # ==================== CUSTOM DECORATORS ====================
@@ -670,10 +854,34 @@ def home():
     """Homepage"""
     try:
         featured_courses = Course.query.limit(4).all()
-        return render_template('index.html', courses=featured_courses)
+        return render_template('index.html', courses=featured_courses, blogs=BLOG_POSTS)
     except Exception as e:
         logger.error(f"Error loading home page: {str(e)}")
         return jsonify({'status': 'error', 'message': 'Unable to load home page'}), 500
+
+
+@app.route('/blog')
+def blog():
+    """Blog listing page"""
+    blogs = Blog.query.filter_by(is_published=True).order_by(Blog.created_at.desc()).all()
+    return render_template('blog.html', blogs=blogs)
+
+
+@app.route('/blog/<int:blog_id>')
+def blog_detail(blog_id):
+    """Individual blog post page"""
+    post = Blog.query.get_or_404(blog_id)
+    
+    # Check publication status
+    if not post.is_published:
+        # Allow admin/author to preview
+        if not current_user.is_authenticated or not current_user.is_admin:
+            return render_template('404.html'), 404
+            
+    recent_posts = Blog.query.filter_by(is_published=True).filter(Blog.id != blog_id).order_by(Blog.created_at.desc()).limit(3).all()
+    return render_template('blog_detail.html', blog=post, recent_posts=recent_posts)
+
+
 
 
 @app.route('/courses')
@@ -713,82 +921,24 @@ def about():
         'partners': '50+',
         'trainers': '20+'
     }
-    return render_template('about.html', stats=stats)
+    
+    return render_template('about.html', stats=stats, values=ABOUT_VALUES)
 
 
 @app.route('/services')
 def services():
-    """Services page"""
-    services_list = [
-        {
-            'id': 1,
-            'title': 'Web Development Foundations',
-            'icon': 'fa-laptop-code',
-            'description': 'Build responsive sites with HTML, CSS, JavaScript, and modern workflows.',
-            'duration': '3 Months',
-            'price': 499
-        },
-        {
-            'id': 2,
-            'title': 'Computer Science Foundations',
-            'icon': 'fa-database',
-            'description': 'Strengthen programming fundamentals, data structures, and problem-solving.',
-            'duration': '3 Months',
-            'price': 499
-        },
-        {
-            'id': 3,
-            'title': 'Ethical Hacking and Penetration Testing',
-            'icon': 'fa-user-secret',
-            'description': 'Learn ethical hacking, penetration testing, and cybersecurity from basics to intermediate.',
-            'duration': '3 Months',
-            'price': 499
-        },
-        {
-            'id': 4,
-            'title': 'AI & Machine Learning Foundations',
-            'icon': 'fa-robot',
-            'description': 'Understand ML workflows, model building, and core AI concepts.',
-            'duration': '3 Months',
-            'price': 499
-        }
-    ]
-    return render_template('services.html', services=services_list)
+    """Services page - Course Categories"""
+    return render_template('services.html', services=SERVICES_LIST)
 
 
 @app.route('/internships')
 def internships():
     """Internships page"""
-    internships_list = [
-        {
-            'id': 1,
-            'role': 'Web Development Intern',
-            'company': 'School of Technology and AI Innovations',
-            'duration': '3 Months',
-            'location': 'Remote',
-            'stipend': 999,
-            'description': 'Build real-world websites with React, Node.js & MongoDB. Gain hands-on experience with modern web technologies and industry best practices.'
-        },
-        {
-            'id': 2,
-            'role': 'Python Development Intern',
-            'company': 'School of Technology and AI Innovations',
-            'duration': '3 Months',
-            'location': 'Remote',
-            'stipend': 999,
-            'description': 'Master backend development with Python. Build APIs, manage databases, and work on real-world projects with experienced mentors.'
-        },
-        {
-            'id': 3,
-            'role': 'Data Science and AI Intern',
-            'company': 'School of Technology and AI Innovations',
-            'duration': '3 Months',
-            'location': 'Remote',
-            'stipend': 999,
-            'description': 'Work with real datasets and build ML models. Learn machine learning, deep learning, and solve real-world AI problems.'
-        }
-    ]
-    return render_template('internships.html', internships=internships_list)
+    return render_template('internships.html', internships=INTERNSHIPS_LIST)
+
+
+
+
 
 
 @app.route('/apply/<int:internship_id>', methods=['POST'])
@@ -1570,6 +1720,37 @@ def upi_payment(course_id):
         }), 500
 
 
+@app.route('/subscribe', methods=['POST'])
+def subscribe():
+    """Newsletter subscription route"""
+    email = request.form.get('email')
+    
+    if not email or not is_valid_email(email):
+        flash('Please enter a valid email address.', 'danger')
+        return redirect(request.referrer)
+    
+    # Check if already subscribed
+    if NewsletterSubscriber.query.filter_by(email=email).first():
+        flash('You are already subscribed to our newsletter!', 'info')
+        return redirect(request.referrer)
+        
+    try:
+        subscriber = NewsletterSubscriber(email=email)
+        db.session.add(subscriber)
+        db.session.commit()
+        flash('Successfully subscribed to the newsletter!', 'success')
+        
+        # Optional: Send welcome email to subscriber
+        # send_newsletter_welcome_email(email) 
+        
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f'Newsletter subscription error: {str(e)}')
+        flash('An error occurred. Please try again later.', 'danger')
+        
+    return redirect(request.referrer)
+
+
 # ==================== ADMIN ROUTES ====================
 
 @app.route('/admin/panel')
@@ -1900,6 +2081,111 @@ def admin_delete_application(application_id):
             'status': 'error',
             'message': 'An error occurred while deleting the application.'
         }), 500
+
+
+# ==================== ADMIN BLOG ROUTES ====================
+
+@app.route('/admin/blogs')
+@login_required
+@admin_required
+def admin_blogs():
+    """List all blogs"""
+    page = request.args.get('page', 1, type=int)
+    blogs = Blog.query.order_by(Blog.created_at.desc()).paginate(page=page, per_page=20)
+    return render_template('admin_blogs.html', blogs=blogs.items, pagination=blogs)
+
+
+@app.route('/admin/blogs/new', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def admin_bloq_new():
+    """Create new blog post"""
+    if request.method == 'POST':
+        title = request.form.get('title')
+        content = request.form.get('content')
+        excerpt = request.form.get('excerpt')
+        author = request.form.get('author')
+        is_published = request.form.get('is_published') == 'on'
+        
+        # Handle Image Upload
+        image_filename = None
+        if 'image' in request.files:
+            file = request.files['image']
+            if file and file.filename:
+                from werkzeug.utils import secure_filename
+                filename = secure_filename(file.filename)
+                # Add timestamp to prevent duplicates
+                filename = f"{int(datetime.utcnow().timestamp())}_{filename}"
+                save_path = os.path.join(app.root_path, 'static', 'images', filename)
+                file.save(save_path)
+                image_filename = filename
+        
+        # Generate Slug
+        slug = re.sub(r'[^a-z0-9\s-]', '', title.lower())
+        slug = re.sub(r'[-\s]+', '-', slug).strip('-')
+        
+        # Check for unique slug
+        if Blog.query.filter_by(slug=slug).first():
+            slug = f"{slug}-{uuid.uuid4().hex[:4]}"
+            
+        blog = Blog(
+            title=title,
+            slug=slug,
+            content=content,
+            excerpt=excerpt,
+            author=author,
+            image=image_filename,
+            is_published=is_published
+        )
+        db.session.add(blog)
+        db.session.commit()
+        flash('Blog post created successfully!', 'success')
+        return redirect(url_for('admin_blogs'))
+        
+    return render_template('admin_blog_form.html', blog=None)
+
+
+@app.route('/admin/blogs/edit/<int:blog_id>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def admin_blog_edit(blog_id):
+    """Edit blog post"""
+    blog = Blog.query.get_or_404(blog_id)
+    
+    if request.method == 'POST':
+        blog.title = request.form.get('title')
+        blog.content = request.form.get('content')
+        blog.excerpt = request.form.get('excerpt')
+        blog.author = request.form.get('author')
+        blog.is_published = request.form.get('is_published') == 'on'
+        
+        if 'image' in request.files:
+            file = request.files['image']
+            if file and file.filename:
+                from werkzeug.utils import secure_filename
+                filename = secure_filename(file.filename)
+                filename = f"{int(datetime.utcnow().timestamp())}_{filename}"
+                save_path = os.path.join(app.root_path, 'static', 'images', filename)
+                file.save(save_path)
+                blog.image = filename
+                
+        db.session.commit()
+        flash('Blog post updated successfully!', 'success')
+        return redirect(url_for('admin_blogs'))
+        
+    return render_template('admin_blog_form.html', blog=blog)
+
+
+@app.route('/admin/blogs/delete/<int:blog_id>', methods=['POST'])
+@login_required
+@admin_required
+def admin_blog_delete(blog_id):
+    """Delete blog post"""
+    blog = Blog.query.get_or_404(blog_id)
+    db.session.delete(blog)
+    db.session.commit()
+    flash('Blog post deleted.', 'success')
+    return redirect(url_for('admin_blogs'))
 
 
 @app.route('/admin/application/<int:application_id>/update-status', methods=['POST'])

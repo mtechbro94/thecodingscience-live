@@ -40,7 +40,10 @@
                                 <div class="star-display"></div>
                             </div>
                             
-                            <p class="card-text">{{ course.description }}</p>
+                            <!-- Course Summary -->
+                            <p class="card-text text-muted small mb-2">{{ course.summary or course.description[:100] + '...' }}</p>
+                            
+                            <p class="card-text text-muted small"><i class="fas fa-clock"></i> {{ course.duration }} | <span class="badge bg-secondary">{{ course.level }}</span></p>
                         </div>
                         <div class="card-footer bg-white">
                             <button class="btn btn-primary w-100 enroll-btn mb-2" 

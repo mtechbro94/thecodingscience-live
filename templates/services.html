@@ -6,8 +6,8 @@
 <section class="py-5" style="margin-top: 80px;">
     <div class="container">
         <h1 class="mb-4">Live Trainings</h1>
-        <p class="lead mb-5">Foundational 3-month programs delivered live, each at ₹499. Pick a track and start building skills fast.</p>
-        
+        <p class="lead mb-5">Explore our course categories and find the perfect learning path for your career goals.</p>
+
         <div class="row">
             {% for service in services %}
             <div class="col-md-6 col-lg-3 mb-4">
@@ -15,61 +15,52 @@
                     <div class="card-body text-center">
                         <i class="fas {{ service.icon }} fa-3x text-primary mb-3"></i>
                         <h5 class="card-title">{{ service.title }}</h5>
-                        <p class="card-text text-muted">{{ service.description }}</p>
+                        <p class="card-text text-muted small">{{ service.description }}</p>
                         <p class="small text-muted mb-0">
                             <i class="fas fa-clock"></i> {{ service.duration }}
                             &nbsp;•&nbsp;
-                            <i class="fas fa-rupee-sign"></i> ₹{{ service.price }}
+                            ₹{{ service.price }}
                         </p>
                     </div>
                     <div class="card-footer bg-white text-center">
-                        <a href="/courses" class="btn btn-sm btn-outline-primary">View Course Details</a>
+                        <a href="/courses" class="btn btn-sm btn-primary">Explore Courses</a>
                     </div>
                 </div>
             </div>
             {% endfor %}
         </div>
-
         <!-- Detailed Services -->
         <div class="row mt-5">
-            <div class="col-lg-8 mx-auto">
+            <div class="col-12">
                 <h2 class="text-center mb-5">Why Our Live Trainings?</h2>
-                
+
                 <div class="row">
-                    <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
-                        <div class="feature-box">
-                            <div class="feature-icon">
-                                <i class="fas fa-user-tie fa-2x text-primary"></i>
-                            </div>
-                            <h4>Industry-Expert Instructors</h4>
-                            <p>All our instructors are working professionals with real-world experience in their respective domains.</p>
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="feature-box text-center p-4 h-100">
+                            <i class="fas fa-user-tie fa-2x text-primary mb-3"></i>
+                            <h5>Expert Instructors</h5>
+                            <p class="mb-0 small">Working professionals with real-world experience.</p>
                         </div>
                     </div>
-                    <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
-                        <div class="feature-box">
-                            <div class="feature-icon">
-                                <i class="fas fa-project-diagram fa-2x text-success"></i>
-                            </div>
-                            <h4>Real-World Projects</h4>
-                            <p>Build actual projects that are deployed and used. Your portfolio will be impressive to employers.</p>
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="feature-box text-center p-4 h-100">
+                            <i class="fas fa-project-diagram fa-2x text-success mb-3"></i>
+                            <h5>Real Projects</h5>
+                            <p class="mb-0 small">Build portfolio-ready projects.</p>
                         </div>
                     </div>
-                    <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
-                        <div class="feature-box">
-                            <div class="feature-icon">
-                                <i class="fas fa-briefcase fa-2x text-info"></i>
-                            </div>
-                            <h4>Career Support</h4>
-                            <p>From resume optimization to interview preparation, we support your entire job search journey.</p>
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="feature-box text-center p-4 h-100">
+                            <i class="fas fa-briefcase fa-2x text-info mb-3"></i>
+                            <h5>Career Support</h5>
+                            <p class="mb-0 small">Resume & interview prep included.</p>
                         </div>
                     </div>
-                    <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
-                        <div class="feature-box">
-                            <div class="feature-icon">
-                                <i class="fas fa-users fa-2x text-danger"></i>
-                            </div>
-                            <h4>Community & Networking</h4>
-                            <p>Connect with peers, mentors, and industry professionals. Build lasting professional relationships.</p>
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="feature-box text-center p-4 h-100">
+                            <i class="fas fa-users fa-2x text-danger mb-3"></i>
+                            <h5>Community</h5>
+                            <p class="mb-0 small">Connect with peers & professionals.</p>
                         </div>
                     </div>
                 </div>
