@@ -1052,7 +1052,8 @@ def home():
     """Homepage"""
     try:
         featured_courses = Course.query.limit(4).all()
-        return render_template('index.html', courses=featured_courses, blogs=BLOG_POSTS)
+        featured_blogs = Blog.query.filter_by(is_published=True).order_by(Blog.created_at.desc()).limit(6).all()
+        return render_template('index.html', courses=featured_courses, blogs=featured_blogs)
     except Exception as e:
         logger.error(f"Error loading home page: {str(e)}")
         return jsonify({'status': 'error', 'message': 'Unable to load home page'}), 500
