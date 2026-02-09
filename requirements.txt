@@ -12,3 +12,4 @@ WTForms==3.0.1
 whitenoise==6.6.0
 pytest==7.4.0
 pytest-cov==4.1.0
+markdown==3.10.1

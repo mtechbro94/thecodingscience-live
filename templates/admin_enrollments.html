@@ -11,25 +11,25 @@
                 <i class="fas fa-arrow-left"></i> Back to Dashboard
             </a>
         </div>
-        
+
         <!-- Status Filter -->
         <div class="card shadow mb-4">
             <div class="card-body">
                 <div class="btn-group" role="group">
-                    <a href="?status=all" 
-                       class="btn {% if status_filter == 'all' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                    <a href="?status=all"
+                        class="btn {% if status_filter == 'all' %}btn-primary{% else %}btn-outline-primary{% endif %}">
                         All ({{ enrollments.total }})
                     </a>
-                    <a href="?status=completed" 
-                       class="btn {% if status_filter == 'completed' %}btn-success{% else %}btn-outline-success{% endif %}">
+                    <a href="?status=completed"
+                        class="btn {% if status_filter == 'completed' %}btn-success{% else %}btn-outline-success{% endif %}">
                         Completed
                     </a>
-                    <a href="?status=pending" 
-                       class="btn {% if status_filter == 'pending' %}btn-warning{% else %}btn-outline-warning{% endif %}">
+                    <a href="?status=pending"
+                        class="btn {% if status_filter == 'pending' %}btn-warning{% else %}btn-outline-warning{% endif %}">
                         Pending
                     </a>
                 </div>
-                
+
                 {% if status_filter == 'pending' and enrollments.items %}
                 <button class="btn btn-success float-end" onclick="bulkVerify()">
                     <i class="fas fa-check-double"></i> Verify All Selected
@@ -37,7 +37,7 @@
                 {% endif %}
             </div>
         </div>
-        
+
         <div class="card shadow">
             <div class="card-header bg-dark text-white">
                 <h5 class="mb-0">Enrollments ({{ enrollments.total }})</h5>
@@ -81,23 +81,23 @@
                                 <td>{{ enrollment.payment_method or 'N/A' }}</td>
                                 <td>
                                     {% if enrollment.status == 'completed' %}
-                                        <span class="badge bg-success">Completed</span>
+                                    <span class="badge bg-success">Completed</span>
                                     {% elif enrollment.status == 'pending' %}
-                                        <span class="badge bg-warning">Pending</span>
+                                    <span class="badge bg-warning">Pending</span>
                                     {% else %}
-                                        <span class="badge bg-danger">{{ enrollment.status }}</span>
+                                    <span class="badge bg-danger">{{ enrollment.status }}</span>
                                     {% endif %}
                                 </td>
                                 <td>{{ enrollment.enrolled_at.strftime('%Y-%m-%d') }}</td>
                                 <td>
                                     {% if enrollment.status == 'pending' %}
-                                    <button class="btn btn-sm btn-success" 
-                                            onclick="verifyEnrollment({{ enrollment.id }})">
+                                    <button class="btn btn-sm btn-success"
+                                        onclick="verifyEnrollment({{ enrollment.id }})">
                                         <i class="fas fa-check"></i> Verify
                                     </button>
                                     {% endif %}
-                                    <button class="btn btn-sm btn-danger" 
-                                            onclick="deleteEnrollment({{ enrollment.id }})">
+                                    <button class="btn btn-sm btn-danger"
+                                        onclick="deleteEnrollment({{ enrollment.id }})">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -106,38 +106,42 @@
                         </tbody>
                     </table>
                 </div>
-                
+
                 <!-- Pagination -->
                 {% if enrollments.pages > 1 %}
                 <nav>
                     <ul class="pagination justify-content-center">
                         {% if enrollments.has_prev %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ enrollments.prev_num }}&status={{ status_filter }}">Previous</a>
+                            <a class="page-link"
+                                href="?page={{ enrollments.prev_num }}&status={{ status_filter }}">Previous</a>
                         </li>
                         {% endif %}
-                        
-                        {% for page_num in enrollments.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
-                            {% if page_num %}
-                                {% if page_num == enrollments.page %}
-                                <li class="page-item active">
-                                    <span class="page-link">{{ page_num }}</span>
-                                </li>
-                                {% else %}
-                                <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_num }}&status={{ status_filter }}">{{ page_num }}</a>
-                                </li>
-                                {% endif %}
-                            {% else %}
-                                <li class="page-item disabled">
-                                    <span class="page-link">...</span>
-                                </li>
-                            {% endif %}
+
+                        {% for page_num in enrollments.iter_pages(left_edge=1, right_edge=1, left_current=2,
+                        right_current=2) %}
+                        {% if page_num %}
+                        {% if page_num == enrollments.page %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ page_num }}</span>
+                        </li>
+                        {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_num }}&status={{ status_filter }}">{{ page_num
+                                }}</a>
+                        </li>
+                        {% endif %}
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                        {% endif %}
                         {% endfor %}
-                        
+
                         {% if enrollments.has_next %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ enrollments.next_num }}&status={{ status_filter }}">Next</a>
+                            <a class="page-link"
+                                href="?page={{ enrollments.next_num }}&status={{ status_filter }}">Next</a>
                         </li>
                         {% endif %}
                     </ul>
@@ -152,93 +156,93 @@
 </section>
 
 <script>
-function verifyEnrollment(enrollmentId) {
-    fetch(`/admin/enrollment/${enrollmentId}/verify`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            alert(data.message);
-            location.reload();
-        } else {
-            alert(data.message || 'Error verifying enrollment');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while verifying the enrollment');
-    });
-}
-
-function deleteEnrollment(enrollmentId) {
-    if (!confirm('Are you sure you want to delete this enrollment? This action cannot be undone.')) {
-        return;
+    function verifyEnrollment(enrollmentId) {
+        fetch(`/admin/enrollment/${enrollmentId}/verify`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success' || data.status === 'info') {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert(data.message || 'Error verifying enrollment');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while verifying the enrollment');
+            });
     }
-    
-    fetch(`/admin/enrollment/${enrollmentId}/delete`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            alert(data.message);
-            location.reload();
-        } else {
-            alert(data.message || 'Error deleting enrollment');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while deleting the enrollment');
-    });
-}
 
-function toggleSelectAll() {
-    const selectAll = document.getElementById('selectAll');
-    const checkboxes = document.querySelectorAll('.enrollment-checkbox');
-    checkboxes.forEach(cb => cb.checked = selectAll.checked);
-}
-
-function bulkVerify() {
-    const checked = document.querySelectorAll('.enrollment-checkbox:checked');
-    if (checked.length === 0) {
-        alert('Please select at least one enrollment to verify.');
-        return;
-    }
-    
-    if (!confirm(`Are you sure you want to verify ${checked.length} enrollment(s)?`)) {
-        return;
-    }
-    
-    const enrollmentIds = Array.from(checked).map(cb => parseInt(cb.value));
-    
-    fetch('/admin/enrollments/bulk-verify', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ enrollment_ids: enrollmentIds })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            alert(data.message);
-            location.reload();
-        } else {
-            alert(data.message || 'Error verifying enrollments');
+    function deleteEnrollment(enrollmentId) {
+        if (!confirm('Are you sure you want to delete this enrollment? This action cannot be undone.')) {
+            return;
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred during bulk verification');
-    });
-}
+
+        fetch(`/admin/enrollment/${enrollmentId}/delete`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert(data.message || 'Error deleting enrollment');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while deleting the enrollment');
+            });
+    }
+
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll');
+        const checkboxes = document.querySelectorAll('.enrollment-checkbox');
+        checkboxes.forEach(cb => cb.checked = selectAll.checked);
+    }
+
+    function bulkVerify() {
+        const checked = document.querySelectorAll('.enrollment-checkbox:checked');
+        if (checked.length === 0) {
+            alert('Please select at least one enrollment to verify.');
+            return;
+        }
+
+        if (!confirm(`Are you sure you want to verify ${checked.length} enrollment(s)?`)) {
+            return;
+        }
+
+        const enrollmentIds = Array.from(checked).map(cb => parseInt(cb.value));
+
+        fetch('/admin/enrollments/bulk-verify', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ enrollment_ids: enrollmentIds })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert(data.message || 'Error verifying enrollments');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred during bulk verification');
+            });
+    }
 </script>
 {% endblock %}

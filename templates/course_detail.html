@@ -265,6 +265,10 @@
         e.preventDefault();
 
         const formData = new FormData(this);
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
 
         fetch(this.action, {
             method: 'POST',
@@ -273,16 +277,120 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    showAlert(data.message, 'success');
-                    bootstrap.Modal.getInstance(document.getElementById('enrollModal')).hide();
-                    setTimeout(() => window.location.reload(), 2000);
+                    // Start UPI Flow - Fetch QR Code
+                    fetch(`/upi-payment/{{ course.id }}`)
+                        .then(r => r.json())
+                        .then(qrData => {
+                            if (qrData.status === 'success') {
+                                // Replace modal body with QR code
+                                const modalBody = document.querySelector('#enrollModal .modal-body');
+                                const modalFooter = document.querySelector('#enrollModal .modal-footer');
+
+                                modalBody.innerHTML = `
+                                    <div class="text-center">
+                                        <h4 class="text-success mb-3"><i class="fas fa-check-circle"></i> Enrollment Initiated!</h4>
+                                        <p>Please scan the QR code to complete your payment of <strong>₹${qrData.amount}</strong></p>
+                                        <img src="${qrData.qr_code}" alt="UPI QR Code" class="img-fluid mb-3" style="max-width: 250px; border: 2px solid #eee;">
+                                        <p class="mb-1"><strong>UPI ID:</strong> ${qrData.upi_id}</p>
+                                        <p class="text-muted small mb-3">Transaction ID: ${qrData.transaction_id}</p>
+                                        
+                                        <div class="card bg-light border-0 p-3 mb-3 text-start">
+                                            <label class="form-label small fw-bold">Enter UPI Reference ID / UTR:</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="utrInput" placeholder="e.g. 123456789012" maxlength="12">
+                                                <button class="btn btn-success" type="button" id="verifyPaymentBtn">
+                                                    Verify Payment
+                                                </button>
+                                            </div>
+                                            <small class="text-muted mt-1" id="verifyMsg">Enter the 12-digit UTR from your payment app.</small>
+                                        </div>
+
+                                        <div class="alert alert-warning mt-3">
+                                            <small><i class="fas fa-info-circle"></i> Check your SMS or Payment App for the UTR/Reference No.</small>
+                                        </div>
+                                    </div>
+                                `;
+
+                                modalFooter.innerHTML = `
+                                    <button type="button" class="btn btn-secondary" onclick="window.location.reload()">Close</button>
+                                `;
+
+                                // Add Event Listener for Verify Button
+                                document.getElementById('verifyPaymentBtn').addEventListener('click', function () {
+                                    const utr = document.getElementById('utrInput').value.trim();
+                                    const msgEl = document.getElementById('verifyMsg');
+                                    const btn = this;
+
+                                    if (utr.length < 6) {
+                                        msgEl.className = "text-danger mt-1";
+                                        msgEl.innerText = "Please enter a valid UTR.";
+                                        return;
+                                    }
+
+                                    btn.disabled = true;
+                                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+                                    fetch('/verify-payment/{{ course.id }}', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ utr: utr })
+                                    })
+                                        .then(r => r.json())
+                                        .then(res => {
+                                            if (res.status === 'success') {
+                                                msgEl.className = "text-success mt-1 fw-bold";
+                                                msgEl.innerText = res.message;
+
+                                                // Ensure we show specific success UI
+                                                if (res.verified) {
+                                                    btn.className = "btn btn-success disabled";
+                                                    btn.innerHTML = '<i class="fas fa-check"></i> Verified';
+                                                    document.getElementById('utrInput').disabled = true;
+                                                    setTimeout(() => window.location.reload(), 2000);
+                                                } else {
+                                                    btn.disabled = false;
+                                                    btn.innerText = "Check Again";
+                                                }
+                                            } else {
+                                                msgEl.className = "text-danger mt-1";
+                                                msgEl.innerText = res.message;
+                                                btn.disabled = false;
+                                                btn.innerHTML = 'Verify Payment';
+                                            }
+                                        })
+                                        .catch(err => {
+                                            console.error(err);
+                                            msgEl.className = "text-danger mt-1";
+                                            msgEl.innerText = "Error verifying payment.";
+                                            btn.disabled = false;
+                                            btn.innerHTML = 'Verify Payment';
+                                        });
+                                });
+
+                            } else {
+                                showAlert('Error generating QR code', 'danger');
+                                submitBtn.disabled = false;
+                                submitBtn.innerHTML = originalBtnText;
+                            }
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            showAlert('Error loading payment details', 'danger');
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = originalBtnText;
+                        });
+
                 } else {
                     showAlert(data.message, 'danger');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
                 showAlert('An error occurred. Please try again.', 'danger');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
             });
     });
 

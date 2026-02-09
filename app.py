@@ -221,7 +221,9 @@ class Enrollment(db.Model):
     payment_id = db.Column(db.String(100), nullable=True, unique=True)
     amount_paid = db.Column(db.Float, nullable=True)
     enrolled_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    enrolled_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     verified_at = db.Column(db.DateTime, nullable=True)
+    utr = db.Column(db.String(50), nullable=True, index=True)  # User submitted UTR
     
     def __repr__(self):
         return f'<Enrollment {self.user_id} -> {self.course_id}>'
@@ -313,6 +315,22 @@ class NewsletterSubscriber(db.Model):
         return f'<NewsletterSubscriber {self.email}>'
 
 
+# ==================== PAYMENT AUTOMATION MODELS ====================
+
+class UnclaimedPayment(db.Model):
+    """Store incoming payments from Webhooks that haven't been claimed yet"""
+    __tablename__ = 'unclaimed_payments'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    utr = db.Column(db.String(50), unique=True, nullable=False, index=True)
+    amount = db.Column(db.Float, nullable=False)
+    sender = db.Column(db.String(100), nullable=True)  # Sender name/number from SMS
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<Payment {self.utr} - ₹{self.amount}>'
+
+
 # ==================== FLASK-LOGIN HELPER ====================
 
 @login_manager.user_loader
@@ -376,6 +394,20 @@ def init_db_on_startup():
                         logger.info("[OK] Added 'summary' column to courses table")
             except Exception as migration_error:
                 logger.warning(f"Migration check for summary column: {migration_error}")
+
+            # Migration: Add utr column to enrollments if missing
+            try:
+                from sqlalchemy import text
+                with db.engine.connect() as conn:
+                    result = conn.execute(text("PRAGMA table_info(enrollments)"))
+                    columns = [row[1] for row in result.fetchall()]
+                    if 'utr' not in columns:
+                        conn.execute(text("ALTER TABLE enrollments ADD COLUMN utr VARCHAR(50)"))
+                        conn.execute(text("CREATE INDEX ix_enrollments_utr ON enrollments (utr)"))
+                        conn.commit()
+                        logger.info("[OK] Added 'utr' column to enrollments table")
+            except Exception as migration_error:
+                logger.warning(f"Migration check for utr column: {migration_error}")
             
             # Update existing course descriptions and summaries with new formatted content
             try:
@@ -1720,6 +1752,141 @@ def upi_payment(course_id):
         }), 500
 
 
+@app.route('/verify-payment/<int:course_id>', methods=['POST'])
+@login_required
+def verify_payment(course_id):
+    """Verify payment using User Submitted UTR"""
+    course = Course.query.get_or_404(course_id)
+    
+    try:
+        utr = request.json.get('utr', '').strip()
+        
+        if not utr or len(utr) < 6:
+            return jsonify({'status': 'error', 'message': 'Invalid UTR/Reference Number.'}), 400
+            
+        # Check if already enrolled
+        enrollment = Enrollment.query.filter_by(
+            user_id=current_user.id,
+            course_id=course_id
+        ).first()
+        
+        # Check if payment exists in UnclaimedPayment
+        payment = UnclaimedPayment.query.filter_by(utr=utr).first()
+        
+        status_message = "Payment verification pending. You will be notified shortly."
+        verification_status = 'pending'
+        
+        if payment:
+            # Match found! Verify instantly
+            verification_status = 'completed'
+            status_message = "✓ Payment verified successfully! You are now enrolled."
+            
+            # Remove from unclaimed
+            db.session.delete(payment)
+        
+        if enrollment:
+            enrollment.utr = utr
+            if verification_status == 'completed':
+                enrollment.status = 'completed'
+                enrollment.verified_at = datetime.utcnow()
+                send_welcome_email(current_user.name, current_user.email, course.name, course.price)
+        else:
+            # Create new enrollment with this UTR
+            enrollment = Enrollment(
+                user_id=current_user.id,
+                course_id=course_id,
+                status=verification_status,
+                payment_method='upi_utr',
+                utr=utr,
+                amount_paid=course.price,
+                payment_id=f"UTR-{utr}",
+                verified_at=datetime.utcnow() if verification_status == 'completed' else None
+            )
+            db.session.add(enrollment)
+            
+            if verification_status == 'completed':
+                 send_welcome_email(current_user.name, current_user.email, course.name, course.price)
+        
+        db.session.commit()
+        
+        return jsonify({
+            'status': 'success',
+            'message': status_message,
+            'verified': verification_status == 'completed'
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f'Verification error: {str(e)}')
+        return jsonify({'status': 'error', 'message': 'Verification failed. Please try again.'}), 500
+
+
+@app.route('/api/webhook/payment', methods=['POST'])
+def payment_webhook():
+    """Receive payment notifications from SMS Forwarder App"""
+    # Verify Secret
+    secret = request.args.get('secret')
+    expected_secret = os.getenv('WEBHOOK_SECRET')
+    
+    if not secret or secret != expected_secret:
+        return jsonify({'status': 'error', 'message': 'Unauthorized'}), 401
+    
+    try:
+        data = request.get_json()
+        utr = data.get('utr') or data.get('message_body') # App might send body
+        amount = data.get('amount')
+        sender = data.get('sender')
+        
+        # If raw message body, try to extract UTR (Regex for common formats)
+        if not utr and 'message_body' in data:
+            # Simple regex for 12 digit UTR usually found in bank SMS
+            # Example: "Ref no 123456789012"
+            import re
+            match = re.search(r'\b\d{12}\b', data['message_body'])
+            if match:
+                utr = match.group(0)
+        
+        if not utr:
+            return jsonify({'status': 'ignored', 'message': 'No UTR found'}), 200
+            
+        # Check if this UTR is already processed (in Enrollments)
+        existing_enrollment = Enrollment.query.filter_by(utr=utr).first()
+        
+        if existing_enrollment:
+            if existing_enrollment.status != 'completed':
+                existing_enrollment.status = 'completed'
+                existing_enrollment.verified_at = datetime.utcnow()
+                db.session.commit()
+                
+                # Send email
+                user = User.query.get(existing_enrollment.user_id)
+                course = Course.query.get(existing_enrollment.course_id)
+                send_welcome_email(user.name, user.email, course.name, course.price)
+                
+                return jsonify({'status': 'success', 'message': 'Enrollment verified'}), 200
+            return jsonify({'status': 'ignored', 'message': 'Already verified'}), 200
+            
+        # Check if already in Unclaimed
+        if UnclaimedPayment.query.filter_by(utr=utr).first():
+            return jsonify({'status': 'ignored', 'message': 'Duplicate payment'}), 200
+            
+        # Store in Unclaimed Payments
+        payment = UnclaimedPayment(
+            utr=utr,
+            amount=float(amount) if amount else 0.0,
+            sender=sender
+        )
+        db.session.add(payment)
+        db.session.commit()
+        
+        return jsonify({'status': 'success', 'message': 'Payment stored'}), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f'Webhook error: {str(e)}')
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+
 @app.route('/subscribe', methods=['POST'])
 def subscribe():
     """Newsletter subscription route"""
@@ -1952,6 +2119,8 @@ def admin_verify_enrollment(enrollment_id):
         })
     except Exception as e:
         db.session.rollback()
+        import traceback
+        traceback.print_exc()
         logger.error(f'Error verifying enrollment: {str(e)}')
         return jsonify({
             'status': 'error',
