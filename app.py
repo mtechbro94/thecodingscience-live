@@ -353,14 +353,50 @@ class AppState(db.Model):
     @classmethod
     def set(cls, key, value):
         """Set state value by key (create or update)"""
+        # Try a simple update if it exists first
+        from sqlalchemy.exc import IntegrityError
+
         state = cls.query.filter_by(key=key).first()
         if state:
             state.value = str(value)
             state.updated_at = datetime.utcnow()
-        else:
-            state = cls(key=key, value=str(value))
-            db.session.add(state)
-        db.session.commit()
+            try:
+                db.session.commit()
+            except Exception:
+                db.session.rollback()
+                # Last-resort set after rollback
+                state = cls.query.filter_by(key=key).first()
+                if state:
+                    state.value = str(value)
+                    state.updated_at = datetime.utcnow()
+                    db.session.commit()
+            return
+
+        # If not exists, attempt insert. Handle race where another process inserts concurrently.
+        try:
+            new_state = cls(key=key, value=str(value))
+            db.session.add(new_state)
+            db.session.commit()
+            return
+        except IntegrityError:
+            # Another process inserted the row concurrently. Rollback and update the existing row.
+            db.session.rollback()
+            state = cls.query.filter_by(key=key).first()
+            if state:
+                state.value = str(value)
+                state.updated_at = datetime.utcnow()
+                try:
+                    db.session.commit()
+                except Exception:
+                    db.session.rollback()
+            else:
+                # As a fallback, try to insert again (best effort)
+                try:
+                    retry_state = cls(key=key, value=str(value))
+                    db.session.add(retry_state)
+                    db.session.commit()
+                except Exception:
+                    db.session.rollback()
 
 
 # ==================== FLASK-LOGIN HELPER ====================
