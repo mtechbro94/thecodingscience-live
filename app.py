@@ -438,6 +438,32 @@ def seed_courses(force=False):
     logger.info('Database seeded with 9 comprehensive courses.')
 
 
+def seed_blogs(force=False):
+    """Initialize database with blog post data"""
+    if not force and Blog.query.first() is not None:
+        return  # Database already seeded
+    
+    blogs = []
+    
+    # Convert the static BLOG_POSTS data to database records
+    for blog_data in BLOG_POSTS:
+        blogs.append(Blog(
+            title=blog_data.get('title', 'Untitled'),
+            slug=blog_data.get('slug', '').lower().replace(' ', '-'),
+            excerpt=blog_data.get('excerpt', ''),
+            content=blog_data.get('content', ''),
+            image=blog_data.get('image', 'blog-default.jpg'),
+            author=blog_data.get('author', 'The Coding Science'),
+            is_published=blog_data.get('is_published', True)
+        ))
+    
+    for blog in blogs:
+        db.session.add(blog)
+    
+    db.session.commit()
+    logger.info(f'Database seeded with {len(blogs)} blog posts.')
+
+
 # ==================== DATABASE INITIALIZATION ====================
 
 def init_db_on_startup():
@@ -794,6 +820,9 @@ Office workers, admins, managers wanting to automate daily tasks, anyone looking
                 logger.info("[OK] Database reseeded with all 9 comprehensive courses")
             else:
                 logger.info(f"[OK] Database verified: {course_count} courses with valid images")
+            
+            # Seed blogs from BLOG_POSTS data
+            seed_blogs()
             
             # Final verification
             final_count = Course.query.count()
