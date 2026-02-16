@@ -1,0 +1,321 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Trainers - Admin - {{ site_name }}{% endblock %}
+
+{% block content %}
+<section class="py-5" style="margin-top: 80px;">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="fas fa-chalkboard-teacher text-success"></i> Manage Trainers</h1>
+            <a href="{{ url_for('admin_panel') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category if category != 'message' else 'info' }} alert-dismissible fade show"
+            role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <!-- Stats -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="stat-card success">
+                    <div>
+                        <div class="stat-card-label">Total Trainers</div>
+                        <div class="stat-card-value">{{ trainers|length }}</div>
+                    </div>
+                    <div class="stat-card-icon"><i class="fas fa-users"></i></div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stat-card warning">
+                    <div>
+                        <div class="stat-card-label">Pending Approval</div>
+                        <div class="stat-card-value">{{ trainers|selectattr('is_pending_approval')|list|length }}</div>
+                    </div>
+                    <div class="stat-card-icon"><i class="fas fa-clock"></i></div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stat-card primary">
+                    <div>
+                        <div class="stat-card-label">Active Trainers</div>
+                        <div class="stat-card-value">{{ trainers|selectattr('is_approved')|list|length }}</div>
+                    </div>
+                    <div class="stat-card-icon"><i class="fas fa-check-circle"></i></div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stat-card info">
+                    <div>
+                        <div class="stat-card-label">Total Courses</div>
+                        <div class="stat-card-value">{{ courses|length }}</div>
+                    </div>
+                    <div class="stat-card-icon"><i class="fas fa-book"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trainers Table -->
+        <div class="card shadow mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-user-tie"></i> All Trainers</h5>
+            </div>
+            <div class="card-body">
+                {% if trainers %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Education</th>
+                                <th>Experience</th>
+                                <th>Status</th>
+                                <th>Assigned Courses</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for trainer in trainers %}
+                            <tr>
+                                <td>{{ trainer.id }}</td>
+                                <td>
+                                    <strong>{{ trainer.name }}</strong>
+                                    {% if trainer.expertise %}
+                                    <br><small class="text-muted">{{ trainer.expertise[:50] }}{% if
+                                        trainer.expertise|length > 50 %}...{% endif %}</small>
+                                    {% endif %}
+                                </td>
+                                <td>{{ trainer.email }}</td>
+                                <td>{{ trainer.education or 'N/A' }}</td>
+                                <td>{{ trainer.experience or 0 }} years</td>
+                                <td>
+                                    {% if trainer.is_approved %}
+                                    <span class="badge bg-success"><i class="fas fa-check"></i> Approved</span>
+                                    {% else %}
+                                    <span class="badge bg-warning text-dark"><i class="fas fa-clock"></i> Pending</span>
+                                    <button class="btn btn-sm btn-success ms-1"
+                                        onclick="approveTrainer({{ trainer.id }}, '{{ trainer.name }}')">
+                                        Approve
+                                    </button>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">{{ trainer.assigned_courses|length }} courses</span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary"
+                                        onclick="showAssignModal({{ trainer.id }}, '{{ trainer.name }}')">
+                                        <i class="fas fa-book"></i> Assign Courses
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> No trainers found. Trainers can register at /register and will
+                    appear here for approval.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Course Assignment Overview -->
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-book"></i> Course Assignments</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Course</th>
+                                <th>Level</th>
+                                <th>Assigned Trainer</th>
+                                <th>Students Enrolled</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for course in courses %}
+                            <tr>
+                                <td><strong>{{ course.name }}</strong></td>
+                                <td><span class="badge bg-secondary">{{ course.level }}</span></td>
+                                <td>
+                                    {% if course.trainer %}
+                                    <span class="badge bg-success">{{ course.trainer.name }}</span>
+                                    {% else %}
+                                    <span class="badge bg-warning text-dark"><i class="fas fa-exclamation-triangle"></i>
+                                        Unassigned</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ course.enrollments|length }}</td>
+                                <td>
+                                    <select class="form-select form-select-sm course-trainer-select"
+                                        data-course-id="{{ course.id }}" style="width: auto; min-width: 150px;">
+                                        <option value="">-- Unassigned --</option>
+                                        {% for trainer in trainers %}
+                                        {% if trainer.is_approved %}
+                                        <option value="{{ trainer.id }}" {% if course.trainer_id==trainer.id
+                                            %}selected{% endif %}>
+                                            {{ trainer.name }}
+                                        </option>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Assign Courses Modal -->
+<div class="modal fade" id="assignModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="fas fa-book"></i> Assign Courses to <span id="trainerName"></span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="trainerId">
+                <div class="row" id="coursesList">
+                    {% for course in courses %}
+                    <div class="col-md-6 mb-3">
+                        <div class="form-check course-check-item" data-course-id="{{ course.id }}">
+                            <input class="form-check-input course-checkbox" type="checkbox" id="course{{ course.id }}"
+                                value="{{ course.id }}">
+                            <label class="form-check-label" for="course{{ course.id }}">
+                                <strong>{{ course.name }}</strong>
+                                <br><small class="text-muted">{{ course.level }} • {{ course.duration }}</small>
+                            </label>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveAssignments()">
+                    <i class="fas fa-save"></i> Save Assignments
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Handle dropdown trainer assignment
+    document.querySelectorAll('.course-trainer-select').forEach(select => {
+        select.addEventListener('change', function () {
+            const courseId = this.dataset.courseId;
+            const trainerId = this.value;
+
+            fetch(`/admin/course/${courseId}/assign-trainer`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ trainer_id: trainerId || null })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        showAlert('success', data.message);
+                    } else {
+                        showAlert('danger', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showAlert('danger', 'Failed to assign trainer');
+                });
+        });
+    });
+
+    function approveTrainer(userId, name) {
+        if (!confirm(`Approve trainer "${name}"?`)) return;
+
+        fetch(`/admin/trainer/${userId}/approve`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    location.reload();
+                } else {
+                    window.alert(data.message);
+                }
+            });
+    }
+
+    function showAssignModal(trainerId, trainerName) {
+        document.getElementById('trainerId').value = trainerId;
+        document.getElementById('trainerName').textContent = trainerName;
+
+        // Fetch current assignments
+        fetch(`/admin/trainer/${trainerId}/courses`)
+            .then(response => response.json())
+            .then(data => {
+                // Uncheck all first
+                document.querySelectorAll('.course-checkbox').forEach(cb => cb.checked = false);
+                // Check assigned courses
+                data.courses.forEach(courseId => {
+                    const cb = document.getElementById('course' + courseId);
+                    if (cb) cb.checked = true;
+                });
+                new bootstrap.Modal(document.getElementById('assignModal')).show();
+            });
+    }
+
+    function saveAssignments() {
+        const trainerId = document.getElementById('trainerId').value;
+        const selectedCourses = [];
+        document.querySelectorAll('.course-checkbox:checked').forEach(cb => {
+            selectedCourses.push(parseInt(cb.value));
+        });
+
+        fetch(`/admin/trainer/${trainerId}/assign-courses`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ course_ids: selectedCourses })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    location.reload();
+                } else {
+                    window.alert(data.message);
+                }
+            });
+    }
+
+    function showAlert(type, message) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+        alertDiv.style.cssText = 'top: 100px; right: 20px; z-index: 9999;';
+        alertDiv.innerHTML = `${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
+        document.body.appendChild(alertDiv);
+        setTimeout(() => alertDiv.remove(), 3000);
+    }
+</script>
+{% endblock %}
