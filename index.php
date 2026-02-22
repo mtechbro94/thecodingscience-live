@@ -101,6 +101,10 @@ switch ($path) {
         require 'views/profile.php';
         break;
 
+    case 'social-init':
+        require 'social_init.php';
+        break;
+
 
     // Admin Routes
     case 'admin/dashboard':
