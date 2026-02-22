@@ -207,4 +207,17 @@ CREATE TABLE `unclaimed_payments` (
   UNIQUE KEY `utr` (`utr`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `site_settings`
+--
+
+DROP TABLE IF EXISTS `site_settings`;
+CREATE TABLE `site_settings` (
+  `key` varchar(50) NOT NULL,
+  `value` text DEFAULT NULL,
+  PRIMARY KEY (`key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 COMMIT;
