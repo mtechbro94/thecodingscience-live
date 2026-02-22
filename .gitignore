@@ -74,3 +74,6 @@ dmypy.json
 secrets/
 credentials.json
 
+# Windows Reserved
+nul
+
