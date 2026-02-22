@@ -102,6 +102,7 @@ switch ($path) {
         break;
 
     case 'social-init':
+    case 'social-init.php':
         require 'social_init.php';
         break;
 
