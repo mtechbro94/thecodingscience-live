@@ -147,18 +147,18 @@ require_once 'includes/header.php';
                         </div>
 
                         <div class="d-flex justify-content-center gap-3">
-                            <a href="/social-login/google" class="btn btn-outline-danger px-3 py-2 flex-grow-1"
+                            <button onclick="socialLogin('google')" class="btn btn-outline-danger px-3 py-2 flex-grow-1"
                                 title="Continue with Google">
                                 <i class="fab fa-google"></i> Google
-                            </a>
-                            <a href="/social-login/linkedin" class="btn btn-outline-primary px-3 py-2 flex-grow-1"
-                                title="Continue with LinkedIn">
+                            </button>
+                            <button onclick="socialLogin('linkedin')"
+                                class="btn btn-outline-primary px-3 py-2 flex-grow-1" title="Continue with LinkedIn">
                                 <i class="fab fa-linkedin-in"></i> LinkedIn
-                            </a>
-                            <a href="/social-login/github" class="btn btn-outline-dark px-3 py-2 flex-grow-1"
+                            </button>
+                            <button onclick="socialLogin('github')" class="btn btn-outline-dark px-3 py-2 flex-grow-1"
                                 title="Continue with GitHub">
                                 <i class="fab fa-github"></i> GitHub
-                            </a>
+                            </button>
                         </div>
 
 
@@ -174,6 +174,14 @@ require_once 'includes/header.php';
         </div>
     </div>
 </section>
+
+<script>
+    function socialLogin(provider) {
+        const roleElement = document.querySelector('input[name="login_role"]:checked');
+        const role = roleElement ? roleElement.value : 'student';
+        window.location.href = '/social-login/' + provider + '?role=' + role;
+    }
+</script>
 
 <style>
     .btn-check:checked+.btn-outline-primary {
