@@ -138,6 +138,30 @@ require_once 'includes/header.php';
                             </button>
                         </form>
 
+                        <div class="text-center my-4">
+                            <div class="d-flex align-items-center">
+                                <hr class="flex-grow-1">
+                                <span class="mx-3 text-muted small text-uppercase">Or continue with</span>
+                                <hr class="flex-grow-1">
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="/social-login/google" class="btn btn-outline-danger px-3 py-2 flex-grow-1"
+                                title="Continue with Google">
+                                <i class="fab fa-google"></i> Google
+                            </a>
+                            <a href="/social-login/linkedin" class="btn btn-outline-primary px-3 py-2 flex-grow-1"
+                                title="Continue with LinkedIn">
+                                <i class="fab fa-linkedin-in"></i> LinkedIn
+                            </a>
+                            <a href="/social-login/github" class="btn btn-outline-dark px-3 py-2 flex-grow-1"
+                                title="Continue with GitHub">
+                                <i class="fab fa-github"></i> GitHub
+                            </a>
+                        </div>
+
+
                         <hr>
 
                         <p class="text-center">

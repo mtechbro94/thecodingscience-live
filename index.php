@@ -168,6 +168,10 @@ switch ($path) {
         } elseif (preg_match('/^submit-payment\/(\d+)$/', $path, $matches)) {
             $id = $matches[1];
             require 'views/submit_payment.php';
+        } elseif (preg_match('/^social-login\/([a-z]+)$/', $path, $match)) {
+            require 'views/social_login.php';
+        } elseif (preg_match('/^social-callback\/([a-z]+)$/', $path, $match)) {
+            require 'views/social_callback.php';
         } elseif (preg_match('/^apply-internship\/(\d+)$/', $path, $matches)) {
             $id = $matches[1];
             require 'views/apply_internship.php';

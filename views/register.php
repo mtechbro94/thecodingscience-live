@@ -100,15 +100,18 @@ require_once 'includes/header.php';
                         <form method="POST" action="">
                             <!-- Role Selection -->
                             <div class="mb-4">
-                                <label class="form-label text-center d-block mb-3"><i class="fas fa-user-tag"></i> Register As</label>
+                                <label class="form-label text-center d-block mb-3"><i class="fas fa-user-tag"></i>
+                                    Register As</label>
                                 <div class="d-flex justify-content-center gap-3">
-                                    <input type="radio" class="btn-check" name="register_role" id="roleStudent" value="student" checked onchange="toggleTrainerFields()">
+                                    <input type="radio" class="btn-check" name="register_role" id="roleStudent"
+                                        value="student" checked onchange="toggleTrainerFields()">
                                     <label class="btn btn-outline-primary px-4 py-3" for="roleStudent">
                                         <i class="fas fa-user-graduate fa-2x d-block mb-2"></i>
                                         Student
                                     </label>
 
-                                    <input type="radio" class="btn-check" name="register_role" id="roleTrainer" value="trainer" onchange="toggleTrainerFields()">
+                                    <input type="radio" class="btn-check" name="register_role" id="roleTrainer"
+                                        value="trainer" onchange="toggleTrainerFields()">
                                     <label class="btn btn-outline-success px-4 py-3" for="roleTrainer">
                                         <i class="fas fa-chalkboard-teacher fa-2x d-block mb-2"></i>
                                         Trainer
@@ -123,28 +126,35 @@ require_once 'includes/header.php';
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Full Name *</label>
-                                    <input type="text" class="form-control" name="name" required placeholder="John Doe" value="<?php echo isset($_POST['name']) ? htmlspecialchars($_POST['name']) : ''; ?>">
+                                    <input type="text" class="form-control" name="name" required placeholder="John Doe"
+                                        value="<?php echo isset($_POST['name']) ? htmlspecialchars($_POST['name']) : ''; ?>">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Email Address *</label>
-                                    <input type="email" class="form-control" name="email" required placeholder="your@email.com" value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
+                                    <input type="email" class="form-control" name="email" required
+                                        placeholder="your@email.com"
+                                        value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
                                 </div>
                             </div>
 
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Phone Number *</label>
-                                    <input type="tel" class="form-control" name="phone" required placeholder="+91 98765 43210" value="<?php echo isset($_POST['phone']) ? htmlspecialchars($_POST['phone']) : ''; ?>">
+                                    <input type="tel" class="form-control" name="phone" required
+                                        placeholder="+91 98765 43210"
+                                        value="<?php echo isset($_POST['phone']) ? htmlspecialchars($_POST['phone']) : ''; ?>">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Password *</label>
-                                    <input type="password" class="form-control" name="password" required placeholder="Minimum 6 characters">
+                                    <input type="password" class="form-control" name="password" required
+                                        placeholder="Minimum 6 characters">
                                 </div>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Confirm Password *</label>
-                                <input type="password" class="form-control" name="confirm_password" required placeholder="Re-enter password">
+                                <input type="password" class="form-control" name="confirm_password" required
+                                    placeholder="Re-enter password">
                             </div>
 
                             <!-- Trainer Specific Fields -->
@@ -152,34 +162,41 @@ require_once 'includes/header.php';
                                 <hr>
                                 <h5 class="mb-3"><i class="fas fa-chalkboard-teacher"></i> Trainer Information</h5>
                                 <div class="alert alert-info">
-                                    <i class="fas fa-info-circle"></i> Trainer accounts require admin approval before you can access the full dashboard.
+                                    <i class="fas fa-info-circle"></i> Trainer accounts require admin approval before
+                                    you can access the full dashboard.
                                 </div>
 
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Educational Qualification *</label>
-                                        <input type="text" class="form-control" name="education" placeholder="e.g., B.Tech in Computer Science">
+                                        <input type="text" class="form-control" name="education"
+                                            placeholder="e.g., B.Tech in Computer Science">
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Years of Experience *</label>
-                                        <input type="number" class="form-control" name="experience" min="0" max="50" placeholder="e.g., 5">
+                                        <input type="number" class="form-control" name="experience" min="0" max="50"
+                                            placeholder="e.g., 5">
                                     </div>
                                 </div>
 
                                 <div class="mb-3">
                                     <label class="form-label">Areas of Expertise *</label>
-                                    <input type="text" class="form-control" name="expertise" placeholder="e.g., Python, Data Science, Machine Learning">
+                                    <input type="text" class="form-control" name="expertise"
+                                        placeholder="e.g., Python, Data Science, Machine Learning">
                                 </div>
 
                                 <div class="mb-3">
                                     <label class="form-label">Short Bio</label>
-                                    <textarea class="form-control" name="bio" rows="3" placeholder="Tell us about yourself..."></textarea>
+                                    <textarea class="form-control" name="bio" rows="3"
+                                        placeholder="Tell us about yourself..."></textarea>
                                 </div>
                             </div>
 
                             <div class="form-check mb-4">
-                                <input class="form-check-input" type="checkbox" name="agree_terms" id="agreeTerms" required>
-                                <label class="form-check-label" for="agreeTerms">I agree to the Terms and Conditions</label>
+                                <input class="form-check-input" type="checkbox" name="agree_terms" id="agreeTerms"
+                                    required>
+                                <label class="form-check-label" for="agreeTerms">I agree to the Terms and
+                                    Conditions</label>
                             </div>
 
                             <button type="submit" class="btn btn-primary w-100 mb-3" id="submitBtn">
@@ -187,8 +204,30 @@ require_once 'includes/header.php';
                             </button>
                         </form>
 
+                        <div class="text-center my-4">
+                            <div class="d-flex align-items-center">
+                                <hr class="flex-grow-1">
+                                <span class="mx-3 text-muted small text-uppercase">Or continue with</span>
+                                <hr class="flex-grow-1">
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-center gap-3">
+                            <button onclick="socialLogin('google')" class="btn btn-outline-danger px-3 py-2 flex-grow-1" title="Continue with Google">
+                                <i class="fab fa-google"></i> Google
+                            </button>
+                            <button onclick="socialLogin('linkedin')" class="btn btn-outline-primary px-3 py-2 flex-grow-1" title="Continue with LinkedIn">
+                                <i class="fab fa-linkedin-in"></i> LinkedIn
+                            </button>
+                            <button onclick="socialLogin('github')" class="btn btn-outline-dark px-3 py-2 flex-grow-1" title="Continue with GitHub">
+                                <i class="fab fa-github"></i> GitHub
+                            </button>
+                        </div>
+
+
                         <hr>
-                        <p class="text-center">Already have an account? <a href="/login" class="text-primary fw-bold">Sign In Here</a></p>
+                        <p class="text-center">Already have an account? <a href="/login"
+                                class="text-primary fw-bold">Sign In Here</a></p>
                     </div>
                 </div>
             </div>
@@ -197,16 +236,30 @@ require_once 'includes/header.php';
 </section>
 
 <style>
-    .btn-check:checked+.btn-outline-primary { background: linear-gradient(135deg, #007bff, #0056b3); color: white; border-color: #007bff; }
-    .btn-check:checked+.btn-outline-success { background: linear-gradient(135deg, #28a745, #1e7e34); color: white; border-color: #28a745; }
+    .btn-check:checked+.btn-outline-primary {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white;
+        border-color: #007bff;
+    }
+
+    .btn-check:checked+.btn-outline-success {
+        background: linear-gradient(135deg, #28a745, #1e7e34);
+        color: white;
+        border-color: #28a745;
+    }
 </style>
 
 <script>
+    function socialLogin(provider) {
+        const role = document.querySelector('input[name="register_role"]:checked').value;
+        window.location.href = '/social-login/' + provider + '?role=' + role;
+    }
+
     function toggleTrainerFields() {
         const isTrainer = document.getElementById('roleTrainer').checked;
         const trainerFields = document.getElementById('trainerFields');
         const submitText = document.getElementById('submitText');
-        
+
         if (isTrainer) {
             trainerFields.style.display = 'block';
             submitText.textContent = 'Register as Trainer';
@@ -221,7 +274,7 @@ require_once 'includes/header.php';
             document.getElementsByName('expertise')[0].required = false;
         }
     }
-    
+
     // Run on load to set correct state (e.g. if page reloads after error)
     document.addEventListener('DOMContentLoaded', toggleTrainerFields);
 </script>
