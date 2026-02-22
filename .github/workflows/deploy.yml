@@ -13,6 +13,22 @@ jobs:
       - name: 🚚 Get latest code
         uses: actions/checkout@v3
 
+      - name: 🔧 Create .env file
+        run: |
+          echo "ENVIRONMENT=production" >> .env
+          echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
+          echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
+          echo "DB_USER=${{ secrets.DB_USER }}" >> .env
+          echo "DB_PASS=${{ secrets.PROD_DB_PASS }}" >> .env
+          echo "SITE_URL=${{ secrets.SITE_URL }}" >> .env
+          echo "SITE_NAME=\"${{ secrets.SITE_NAME }}\"" >> .env
+          echo "RAZORPAY_KEY_ID=${{ secrets.RAZORPAY_KEY_ID }}" >> .env
+          echo "RAZORPAY_KEY_SECRET=${{ secrets.RAZORPAY_KEY_SECRET }}" >> .env
+          echo "SMTP_HOST=${{ secrets.SMTP_HOST }}" >> .env
+          echo "SMTP_USER=${{ secrets.SMTP_USER }}" >> .env
+          echo "SMTP_PASS=${{ secrets.SMTP_PASS }}" >> .env
+          echo "SMTP_PORT=${{ secrets.SMTP_PORT }}" >> .env
+
       - name: 🚀 Sync Files
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
@@ -25,7 +41,6 @@ jobs:
             **/.git*
             **/.git*/**
             **/node_modules/**
-            **/.env
             *.sql
             README.md
             .github/**
