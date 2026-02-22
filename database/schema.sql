@@ -10,6 +10,16 @@ SET time_zone = "+00:00";
 -- Table structure for table `users`
 --
 
+DROP TABLE IF EXISTS `unclaimed_payments`;
+DROP TABLE IF EXISTS `newsletter_subscribers`;
+DROP TABLE IF EXISTS `internship_applications`;
+DROP TABLE IF EXISTS `contact_messages`;
+DROP TABLE IF EXISTS `blogs`;
+DROP TABLE IF EXISTS `course_reviews`;
+DROP TABLE IF EXISTS `enrollments`;
+DROP TABLE IF EXISTS `courses`;
+DROP TABLE IF EXISTS `users`;
+
 CREATE TABLE `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `email` varchar(120) NOT NULL,
