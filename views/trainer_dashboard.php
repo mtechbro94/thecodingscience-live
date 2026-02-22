@@ -33,16 +33,25 @@ require_once 'includes/header.php';
             <div class="col-lg-3 mb-4">
                 <div class="card shadow-sm border-0">
                     <div class="card-body text-center">
-                        <div class="avatar-circle bg-success text-white mx-auto mb-3 d-flex align-items-center justify-content-center"
-                            style="width: 80px; height: 80px; font-size: 2rem; border-radius: 50%;">
-                            <?php echo strtoupper(substr($user['name'], 0, 1)); ?>
-                        </div>
+                        <?php
+                        $profile_img = $_SESSION['user_profile_image'] ?? null;
+                        if ($profile_img): ?>
+                            <img src="/assets/images/profiles/<?php echo $profile_img; ?>" alt="Profile"
+                                class="rounded-circle mb-3 shadow-sm"
+                                style="width: 80px; height: 80px; object-fit: cover; border: 3px solid #f8f9fa;">
+                        <?php else: ?>
+                            <div class="avatar-circle bg-success text-white mx-auto mb-3 d-flex align-items-center justify-content-center"
+                                style="width: 80px; height: 80px; font-size: 2rem; border-radius: 50%;">
+                                <?php echo strtoupper(substr($user['name'], 0, 1)); ?>
+                            </div>
+                        <?php endif; ?>
                         <h5 class="card-title">
                             <?php echo $user['name']; ?>
                         </h5>
                         <p class="text-muted small">
                             <?php echo $user['email']; ?>
                         </p>
+
                         <span class="badge bg-success">Trainer</span>
                     </div>
                     <div class="list-group list-group-flush">

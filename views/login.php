@@ -54,6 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['user_name'] = $user['name'];
             $_SESSION['user_role'] = $user['role'];
             $_SESSION['user_email'] = $user['email'];
+            $_SESSION['user_profile_image'] = $user['profile_image'];
             $_SESSION['is_approved'] = $user['is_approved'] ?? 1;
 
             set_flash('success', 'Welcome back, ' . $user['name'] . '!');

@@ -117,6 +117,9 @@ function get_setting($key, $default = '')
 function get_image_url($path, $type = 'common')
 {
     if (empty($path)) {
+        if ($type === 'profile') {
+            return '/assets/images/default-avatar.png';
+        }
         return '/assets/images/placeholder.webp';
     }
 
@@ -125,7 +128,22 @@ function get_image_url($path, $type = 'common')
         return $path;
     }
 
+    if ($type === 'profile') {
+        return '/assets/images/profiles/' . $path;
+    }
+
     return '/assets/images/' . $path;
+}
+
+/**
+ * Get user avatar URL
+ */
+function get_avatar($user_data)
+{
+    if (!empty($user_data['profile_image'])) {
+        return get_image_url($user_data['profile_image'], 'profile');
+    }
+    return get_image_url('', 'profile');
 }
 
 /**
@@ -135,7 +153,7 @@ function send_email($to, $subject, $message, $is_html = true)
 {
     $from_email = defined('SMTP_USER') ? SMTP_USER : 'noreply@thecodingscience.com';
     $from_name = defined('SITE_NAME') ? SITE_NAME : 'The Coding Science';
-    
+
     // Try SMTP first
     if (defined('SMTP_HOST') && defined('SMTP_USER') && defined('SMTP_PASS')) {
         $result = smtp_mail($to, $subject, $message, $from_email, $from_name, $is_html);
@@ -143,7 +161,7 @@ function send_email($to, $subject, $message, $is_html = true)
             return true;
         }
     }
-    
+
     // Fallback to PHP mail()
     $headers = "MIME-Version: 1.0\r\n";
     if ($is_html) {
@@ -151,7 +169,7 @@ function send_email($to, $subject, $message, $is_html = true)
     }
     $headers .= "From: $from_name <$from_email>\r\n";
     $headers .= "Reply-To: $from_email\r\n";
-    
+
     return @mail($to, $subject, $message, $headers);
 }
 
@@ -164,11 +182,11 @@ function smtp_mail($to, $subject, $message, $from_email, $from_name, $is_html = 
     $smtp_port = 465;
     $smtp_user = SMTP_USER;
     $smtp_pass = SMTP_PASS;
-    
+
     $from = $from_name . " <" . $from_email . ">";
-    
+
     $fp = @fsockopen($smtp_host, $smtp_port, $errno, $errstr, 30);
-    
+
     if (!$fp) {
         // Try port 587 with TLS
         $fp = @fsockopen('tls://smtp.gmail.com', 587, $errno, $errstr, 30);
@@ -176,57 +194,58 @@ function smtp_mail($to, $subject, $message, $from_email, $from_name, $is_html = 
             return false;
         }
     }
-    
+
     $response = fgets($fp, 515);
-    
+
     // EHLO
     fputs($fp, "EHLO localhost\r\n");
     while ($line = fgets($fp, 515)) {
-        if (substr($line, 3, 1) == " ") break;
+        if (substr($line, 3, 1) == " ")
+            break;
     }
-    
+
     // AUTH LOGIN
     fputs($fp, "AUTH LOGIN\r\n");
     $response = fgets($fp, 515);
-    
+
     // Username
     fputs($fp, base64_encode($smtp_user) . "\r\n");
     $response = fgets($fp, 515);
-    
+
     // Password
     fputs($fp, base64_encode($smtp_pass) . "\r\n");
     $response = fgets($fp, 515);
-    
+
     if (substr($response, 0, 3) != '235') {
         fclose($fp);
         return false;
     }
-    
+
     // MAIL FROM
     fputs($fp, "MAIL FROM: <$smtp_user>\r\n");
     fgets($fp, 515);
-    
+
     // RCPT TO
     fputs($fp, "RCPT TO: <$to>\r\n");
     fgets($fp, 515);
-    
+
     // DATA
     fputs($fp, "DATA\r\n");
     $response = fgets($fp, 515);
-    
+
     // Message headers and body
     $headers = "From: $from\r\n";
     $headers .= "Reply-To: $from_email\r\n";
     $headers .= "MIME-Version: 1.0\r\n";
     $headers .= "Content-Type: " . ($is_html ? "text/html" : "text/plain") . "; charset=UTF-8\r\n";
-    
+
     fputs($fp, $headers . "\r\n" . $subject . "\r\n\r\n" . $message . "\r\n.\r\n");
     $response = fgets($fp, 515);
-    
+
     // QUIT
     fputs($fp, "QUIT\r\n");
     fclose($fp);
-    
+
     return true;
 }
 
@@ -236,31 +255,32 @@ function smtp_mail($to, $subject, $message, $from_email, $from_name, $is_html = 
  */
 function render_markdown($text)
 {
-    if (empty($text)) return '';
-    
+    if (empty($text))
+        return '';
+
     $text = htmlspecialchars($text);
-    
+
     // Convert line breaks to <br>
     $text = nl2br($text);
-    
+
     // Bold: **text** or __text__
     $text = preg_replace('/\*\*(.+?)\*\*/', '<strong>$1</strong>', $text);
     $text = preg_replace('/__(.+?)__/', '<strong>$1</strong>', $text);
-    
+
     // Italic: *text* or _text_
     $text = preg_replace('/\*(.+?)\*/', '<em>$1</em>', $text);
     $text = preg_replace('/_(.+?)_/', '<em>$1</em>', $text);
-    
+
     // Links: [text](url)
     $text = preg_replace('/\[(.+?)\]\((.+?)\)/', '<a href="$2" target="_blank" rel="noopener">$1</a>', $text);
-    
+
     // Unordered lists: - item or * item
     $text = preg_replace('/^[\*\-]\s+(.+)$/m', '<li>$1</li>', $text);
     $text = preg_replace('/(<li>.*<\/li>)/s', '<ul>$1</ul>', $text);
-    
+
     // Clean up multiple <br> in a row
     $text = preg_replace('/(<br\s*\/?>\s*){3,}/', '<br>', $text);
-    
+
     return $text;
 }
 ?>
