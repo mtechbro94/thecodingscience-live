@@ -16,9 +16,11 @@ require_once 'includes/header.php';
 <!-- Hero Section -->
 <section class="hero-section">
     <div class="hero-overlay">
-        <h1><?php echo get_setting('hero_title', 'School Of Technology and AI Innovations'); ?></h1>
+        <h1><?php echo get_setting('hero_title', 'School of Technology and AI Innovations'); ?></h1>
         <p class="hero-subtitle">
-            <?php echo get_setting('hero_subtitle', 'Empowering the Next Generation of Tech Leaders'); ?></p>
+            <?php echo get_setting('hero_subtitle', 'Empowering the Youth of Jammu and Kashmir to lead the world in AI, Data Science and Emerging Technologies'); ?>
+        </p>
+
         <a href="/courses" class="btn btn-primary btn-lg mt-4 shadow">Start Learning Now</a>
     </div>
 </section>

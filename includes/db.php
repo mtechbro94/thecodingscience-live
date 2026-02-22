@@ -34,9 +34,10 @@ try {
             ('instagram_url', ''),
             ('youtube_url', ''),
             ('linkedin_url', ''),
-            ('hero_title', 'Master The Coding Science'),
-            ('hero_subtitle', 'Join our community of developers and start your journey today.'),
+            ('hero_title', 'School of Technology and AI Innovations'),
+            ('hero_subtitle', 'Empowering the Youth of Jammu and Kashmir to lead the world in AI, Data Science and Emerging Technologies'),
             ('enrollment_instructions', 'Please pay the course fee to the UPI ID: **thecodingscience@upi**. After payment, enter your Transaction ID (UTR) below for verification.')");
+
     }
 
     // Global site settings
