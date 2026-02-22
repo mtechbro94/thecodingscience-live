@@ -26,7 +26,6 @@ jobs:
             **/.git*/**
             **/node_modules/**
             .env
-            .env.example
             *.sql
             README.md
             .github/**
