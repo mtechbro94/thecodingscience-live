@@ -93,9 +93,14 @@ switch ($path) {
         require 'views/dashboard.php';
         break;
 
+    case 'trainer-dashboard':
+        require 'views/trainer_dashboard.php';
+        break;
+
     case 'profile':
         require 'views/profile.php';
         break;
+
 
     // Admin Routes
     case 'admin/dashboard':

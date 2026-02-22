@@ -13,6 +13,11 @@ if ($user['role'] === 'admin') {
     redirect('/admin/dashboard');
 }
 
+// Redirect Trainer
+if ($user['role'] === 'trainer') {
+    redirect('/trainer-dashboard');
+}
+
 $page_title = "Dashboard";
 
 // Fetch Enrollments
@@ -165,42 +170,43 @@ require_once 'includes/header.php';
                                                 <div class="progress-bar bg-success" role="progressbar" style="width: 100%"></div>
                                             </div>
                                             <a href="/course/<?php echo $enrollment['course_id']; ?>"
-                                            class="btn btn-primary btn-sm w-100">Continue Learning</a>
-                                    <?php elseif ($enrollment['status'] === 'pending'): ?>
-                                        <div class="alert alert-light border border-warning small py-2 mb-3">
-                                            <i class="fas fa-clock text-warning"></i>
-                                            <?php if ($enrollment['razorpay_payment_id']): ?>
-                                                Payment initiated. Please complete payment.
-                                            <?php else: ?>
-                                                Action Required: Please complete payment to activate.
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="row g-2">
-                                            <div class="col-6">
-                                                <a href="/razorpay-payment/<?php echo $enrollment['id']; ?>"
-                                                    class="btn btn-warning btn-sm w-100">
-                                                    <i class="fas fa-credit-card me-1"></i> Pay Now
-                                                </a>
+                                                class="btn btn-primary btn-sm w-100">Continue Learning</a>
+                                        <?php elseif ($enrollment['status'] === 'pending'): ?>
+                                            <div class="alert alert-light border border-warning small py-2 mb-3">
+                                                <i class="fas fa-clock text-warning"></i>
+                                                <?php if ($enrollment['razorpay_payment_id']): ?>
+                                                    Payment initiated. Please complete payment.
+                                                <?php else: ?>
+                                                    Action Required: Please complete payment to activate.
+                                                <?php endif; ?>
                                             </div>
-                                            <div class="col-6">
-                                                <a href="/course/<?php echo $enrollment['course_id']; ?>"
-                                                    class="btn btn-outline-primary btn-sm w-100">Details</a>
+                                            <div class="row g-2">
+                                                <div class="col-6">
+                                                    <a href="/razorpay-payment/<?php echo $enrollment['id']; ?>"
+                                                        class="btn btn-warning btn-sm w-100">
+                                                        <i class="fas fa-credit-card me-1"></i> Pay Now
+                                                    </a>
+                                                </div>
+                                                <div class="col-6">
+                                                    <a href="/course/<?php echo $enrollment['course_id']; ?>"
+                                                        class="btn btn-outline-primary btn-sm w-100">Details</a>
+                                                </div>
                                             </div>
-                                        </div>
-                                    <?php else: ?>
-                                        <p class="small text-danger mb-2">Status: <?php echo ucfirst($enrollment['status']); ?></p>
-                                        <a href="/course/<?php echo $enrollment['course_id']; ?>"
-                                            class="btn btn-outline-primary btn-sm w-100">View Details</a>
-                                    <?php endif; ?>
+                                        <?php else: ?>
+                                            <p class="small text-danger mb-2">Status: <?php echo ucfirst($enrollment['status']); ?>
+                                            </p>
+                                            <a href="/course/<?php echo $enrollment['course_id']; ?>"
+                                                class="btn btn-outline-primary btn-sm w-100">View Details</a>
+                                        <?php endif; ?>
 
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
         </div>
-    </div>
     </div>
 </section>
 
