@@ -33,7 +33,7 @@ define('SITE_URL', getenv('SITE_URL') ?: 'https://thecodingscience.com');
 define('CONTACT_EMAIL', 'csdsofficial249@gmail.com');
 define('ACADEMY_EMAIL', 'academy@thecodingscience.com');
 define('SUPPORT_EMAIL', 'support@thecodingscience.com');
-define('CONTACT_PHONE', '+917006196821');
+define('CONTACT_PHONE', '+916006516909');
 define('SECONDARY_PHONE', '+917889899153');
 
 // Payment Gateway Configuration
