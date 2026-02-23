@@ -3,15 +3,6 @@
 require_once 'config.php';
 require_once 'includes/db.php';
 
-// Only allow admin to run this or simple check
-if (!is_logged_in() || !is_admin()) {
-    // If not logged in as admin, you can also use a secret key from URL
-    $secret = $_GET['secret'] ?? '';
-    if ($secret !== 'initocial2026') {
-        die("Unauthorized access.");
-    }
-}
-
 try {
     echo "<h1>Social Auth Initialization</h1>";
 
