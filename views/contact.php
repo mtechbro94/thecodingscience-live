@@ -26,6 +26,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $pdo->prepare("INSERT INTO contact_messages (name, email, phone, subject, message) VALUES (?, ?, ?, ?, ?)");
             $stmt->execute([$name, $email, $phone, $subject, $message]);
 
+            $email_subject = "New Contact Form Submission: " . ($subject ?: 'No Subject');
+            $email_message = "
+                <html>
+                <body>
+                    <h2>New Contact Form Message</h2>
+                    <p><strong>Name:</strong> {$name}</p>
+                    <p><strong>Email:</strong> {$email}</p>
+                    <p><strong>Phone:</strong> {$phone}</p>
+                    <p><strong>Subject:</strong> {$subject}</p>
+                    <p><strong>Message:</strong></p>
+                    <p>" . nl2br(htmlspecialchars($message)) . "</p>
+                </body>
+                </html>
+            ";
+
+            send_email(CONTACT_EMAIL, $email_subject, $email_message, true);
+
             echo json_encode(['status' => 'success', 'message' => 'Thank you! Your message has been sent.']);
         } catch (PDOException $e) {
             echo json_encode(['status' => 'error', 'message' => 'Database error: ' . $e->getMessage()]);
