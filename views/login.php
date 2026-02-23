@@ -151,14 +151,6 @@ require_once 'includes/header.php';
                                 title="Continue with Google">
                                 <i class="fab fa-google"></i> Google
                             </button>
-                            <button onclick="socialLogin('linkedin')"
-                                class="btn btn-outline-primary px-3 py-2 flex-grow-1" title="Continue with LinkedIn">
-                                <i class="fab fa-linkedin-in"></i> LinkedIn
-                            </button>
-                            <button onclick="socialLogin('github')" class="btn btn-outline-dark px-3 py-2 flex-grow-1"
-                                title="Continue with GitHub">
-                                <i class="fab fa-github"></i> GitHub
-                            </button>
                         </div>
 
 
