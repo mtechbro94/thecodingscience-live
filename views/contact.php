@@ -120,6 +120,20 @@ require_once 'includes/header.php';
                     </div>
                 </div>
 
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body text-center">
+                        <div class="contact-icon">
+                            <i class="fas fa-phone fa-2x text-success"></i>
+                        </div>
+                        <h5>WhatsApp</h5>
+                        <p class="mb-0">
+                            <a href="tel:<?php echo SECONDARY_PHONE; ?>" class="text-decoration-none">
+                                <?php echo SECONDARY_PHONE; ?>
+                            </a>
+                        </p>
+                    </div>
+                </div>
+
                 <div class="card shadow-sm">
                     <div class="card-body text-center">
                         <div class="contact-icon">

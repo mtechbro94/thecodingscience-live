@@ -34,6 +34,7 @@ define('CONTACT_EMAIL', 'csdsofficial249@gmail.com');
 define('ACADEMY_EMAIL', 'academy@thecodingscience.com');
 define('SUPPORT_EMAIL', 'support@thecodingscience.com');
 define('CONTACT_PHONE', '+917006196821');
+define('SECONDARY_PHONE', '+917889899153');
 
 // Payment Gateway Configuration
 define('RAZORPAY_KEY_ID', getenv('RAZORPAY_KEY_ID') ?: '');
