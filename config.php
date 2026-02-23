@@ -31,6 +31,8 @@ define('DB_PASS', getenv('DB_PASS') ?: '');
 define('SITE_NAME', getenv('SITE_NAME') ?: 'The Coding Science');
 define('SITE_URL', getenv('SITE_URL') ?: 'https://thecodingscience.com');
 define('CONTACT_EMAIL', 'csdsofficial249@gmail.com');
+define('ACADEMY_EMAIL', 'academy@thecodingscience.com');
+define('SUPPORT_EMAIL', 'support@thecodingscience.com');
 define('CONTACT_PHONE', '+917006196821');
 
 // Payment Gateway Configuration

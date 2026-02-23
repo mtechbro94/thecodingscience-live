@@ -69,10 +69,38 @@ require_once 'includes/header.php';
                         <div class="contact-icon">
                             <i class="fas fa-envelope fa-2x text-primary"></i>
                         </div>
-                        <h5>Email</h5>
+                        <h5>General Inquiry</h5>
                         <p class="mb-0">
                             <a href="mailto:<?php echo CONTACT_EMAIL; ?>" class="text-decoration-none">
                                 <?php echo CONTACT_EMAIL; ?>
+                            </a>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body text-center">
+                        <div class="contact-icon">
+                            <i class="fas fa-graduation-cap fa-2x text-success"></i>
+                        </div>
+                        <h5>Academy</h5>
+                        <p class="mb-0">
+                            <a href="mailto:<?php echo ACADEMY_EMAIL; ?>" class="text-decoration-none">
+                                <?php echo ACADEMY_EMAIL; ?>
+                            </a>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body text-center">
+                        <div class="contact-icon">
+                            <i class="fas fa-headset fa-2x text-info"></i>
+                        </div>
+                        <h5>Support</h5>
+                        <p class="mb-0">
+                            <a href="mailto:<?php echo SUPPORT_EMAIL; ?>" class="text-decoration-none">
+                                <?php echo SUPPORT_EMAIL; ?>
                             </a>
                         </p>
                     </div>
