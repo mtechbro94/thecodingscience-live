@@ -802,6 +802,7 @@ footer hr {
         min-height: 80vh;
         margin-top: 70px;
         padding: 1.5rem;
+        background-attachment: scroll;
     }
 
     .hero-section h1 {
@@ -1020,6 +1021,7 @@ footer hr {
     .hero-section {
         min-height: 90vh;
         margin-top: 65px;
+        background-attachment: scroll;
     }
 
     .hero-section h1 {
@@ -1070,6 +1072,7 @@ footer hr {
     .hero-section {
         min-height: 90vh;
         margin-top: 60px;
+        background-attachment: scroll;
     }
 
     .hero-section h1 {
