@@ -76,10 +76,10 @@ require_once 'includes/header.php';
             <?php foreach ($blogs as $index => $blog): ?>
                 <div class="col-md-4 mb-4">
                     <div class="card h-100 shadow-sm border-0 hover-lift">
-                        <div class="overflow-hidden">
-                            <img src="<?php echo get_image_url($blog['image']); ?>" class="card-img-top zoom-effect"
+                        <div class="overflow-hidden" style="height: 220px;">
+                            <img src="<?php echo get_image_url($blog['image']); ?>" class="card-img-top"
                                 alt="<?php echo htmlspecialchars($blog['title']); ?>"
-                                style="height: 220px; object-fit: cover;" loading="lazy" decoding="async">
+                                style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
 
                         <div class="card-body p-4">
