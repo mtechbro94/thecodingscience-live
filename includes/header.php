@@ -48,6 +48,26 @@ require_once __DIR__ . '/functions.php';
     <?php if (isset($extra_css))
         echo $extra_css; ?>
 
+    <!-- Google Search Console Verification -->
+    <?php
+    $gsc_verification = get_setting('google_search_console_verification', '');
+    if (!empty($gsc_verification)): ?>
+        <meta name="google-site-verification" content="<?php echo htmlspecialchars($gsc_verification); ?>">
+    <?php endif; ?>
+
+    <!-- Google Analytics -->
+    <?php
+    $ga_id = get_setting('google_analytics_id', '');
+    if (!empty($ga_id)): ?>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=<?php echo htmlspecialchars($ga_id); ?>"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '<?php echo htmlspecialchars($ga_id); ?>');
+        </script>
+    <?php endif; ?>
+
 </head>
 
 <body>

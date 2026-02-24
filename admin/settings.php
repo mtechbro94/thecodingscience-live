@@ -131,6 +131,28 @@ require_once __DIR__ . '/includes/header.php';
 
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fab fa-google me-2"></i>Google SEO Settings</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Google Search Console Verification Meta Tag</label>
+                        <input type="text" class="form-control" name="settings[google_search_console_verification]" 
+                            value="<?php echo htmlspecialchars($current_settings['google_search_console_verification'] ?? ''); ?>" 
+                            placeholder="e.g., xyz123abc...">
+                        <small class="text-muted">Get this from Google Search Console → Settings → Verification</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Google Analytics 4 Measurement ID</label>
+                        <input type="text" class="form-control" name="settings[google_analytics_id]" 
+                            value="<?php echo htmlspecialchars($current_settings['google_analytics_id'] ?? ''); ?>" 
+                            placeholder="e.g., G-XXXXXXXXXX">
+                        <small class="text-muted">Get this from Google Analytics → Admin → Data Streams</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
                     <h5 class="mb-0">Enrollment Instructions (Markdown)</h5>
                 </div>
                 <div class="card-body">
