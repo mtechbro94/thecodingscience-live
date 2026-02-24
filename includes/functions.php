@@ -118,9 +118,9 @@ function get_image_url($path, $type = 'common')
 {
     if (empty($path)) {
         if ($type === 'profile') {
-            return '/assets/images/default-avatar.png';
+            return SITE_URL . '/assets/images/default-avatar.png';
         }
-        return '/assets/images/placeholder.webp';
+        return SITE_URL . '/assets/images/placeholder.webp';
     }
 
     // If it's already a full URL
@@ -129,10 +129,10 @@ function get_image_url($path, $type = 'common')
     }
 
     if ($type === 'profile') {
-        return '/assets/images/profiles/' . $path;
+        return SITE_URL . '/assets/images/profiles/' . $path;
     }
 
-    return '/assets/images/' . $path;
+    return SITE_URL . '/assets/images/' . $path;
 }
 
 /**
