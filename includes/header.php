@@ -56,17 +56,13 @@ require_once __DIR__ . '/functions.php';
     <?php endif; ?>
 
     <!-- Google Analytics -->
-    <?php
-    $ga_id = get_setting('google_analytics_id', '');
-    if (!empty($ga_id)): ?>
-        <script async src="https://www.googletagmanager.com/gtag/js?id=<?php echo htmlspecialchars($ga_id); ?>"></script>
-        <script>
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '<?php echo htmlspecialchars($ga_id); ?>');
-        </script>
-    <?php endif; ?>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0TMYFTPESW"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-0TMYFTPESW');
+    </script>
 
 </head>
 
