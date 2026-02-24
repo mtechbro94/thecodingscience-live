@@ -46,20 +46,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Handle Image Upload
     $image = $blog['image'] ?? null;
-    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-        $allowed = ['jpg', 'jpeg', 'png', 'webp'];
-        $filename = $_FILES['image']['name'];
-        $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+    // DEBUG: Log upload attempt
+    error_log("Image upload check: " . print_r($_FILES['image'] ?? [], true));
+    if (isset($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE) {
+        $file_error = $_FILES['image']['error'];
+        
+        if ($file_error === UPLOAD_ERR_INI_SIZE) {
+            $errors[] = "Image is too large. Maximum size is 2MB.";
+        } elseif ($file_error === UPLOAD_ERR_FORM_SIZE) {
+            $errors[] = "Image exceeds the maximum allowed file size.";
+        } elseif ($file_error === UPLOAD_ERR_PARTIAL) {
+            $errors[] = "Image was only partially uploaded.";
+        } elseif ($file_error === UPLOAD_ERR_OK) {
+            $allowed = ['jpg', 'jpeg', 'png', 'webp'];
+            $filename = $_FILES['image']['name'];
+            $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
 
-        if (in_array($ext, $allowed)) {
-            $new_filename = uniqid('blog_', true) . '.' . $ext;
-            $upload_dir = '../assets/images/';
-            if (!is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
-            
-            if (move_uploaded_file($_FILES['image']['tmp_name'], $upload_dir . $new_filename)) {
-                $image = $new_filename;
+            if (in_array($ext, $allowed)) {
+                $new_filename = uniqid('blog_', true) . '.' . $ext;
+                $upload_dir = __DIR__ . '/../assets/images/';
+                if (!is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
+                
+                if (move_uploaded_file($_FILES['image']['tmp_name'], $upload_dir . $new_filename)) {
+                    $image = $new_filename;
+                } else {
+                    $errors[] = "Failed to upload image. Check directory permissions.";
+                }
             } else {
-                $errors[] = "Failed to upload image";
+                $errors[] = "Invalid file type. Allowed: jpg, jpeg, png, webp";
             }
         }
     }
@@ -102,6 +116,11 @@ require_once __DIR__ . '/includes/header.php';
     <div class="alert alert-danger">
         <ul class="mb-0"><?php foreach ($errors as $error): ?><li><?php echo $error; ?></li><?php endforeach; ?></ul>
     </div>
+<?php endif; 
+
+// DEBUG: Show image value being saved
+if (isset($image) && !empty($image)): ?>
+    <div class="alert alert-info">Image being saved: <?php echo htmlspecialchars($image); ?></div>
 <?php endif; ?>
 
 <form method="POST" enctype="multipart/form-data">
