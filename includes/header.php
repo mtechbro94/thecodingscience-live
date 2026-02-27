@@ -13,7 +13,11 @@ require_once __DIR__ . '/functions.php';
     </title>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="/assets/images/favicon.ico">
+    <?php 
+    $favicon = get_setting('site_favicon', '');
+    $favicon_url = !empty($favicon) ? '/assets/images/' . htmlspecialchars($favicon) : '/assets/images/favicon.ico';
+    ?>
+    <link rel="icon" type="image/x-icon" href="<?php echo $favicon_url; ?>">
     
     <!-- Canonical URL -->
     <link rel="canonical" href="<?php echo isset($og_url) ? $og_url : SITE_URL . $_SERVER['REQUEST_URI']; ?>">
@@ -36,7 +40,10 @@ require_once __DIR__ . '/functions.php';
     <meta property="og:description"
         content="<?php echo isset($og_description) ? htmlspecialchars($og_description) : 'Transform your career with specialized industry-led training in Web Development, Python, and AI.'; ?>">
     <meta property="og:image"
-        content="<?php echo isset($og_image) ? $og_image : SITE_URL . '/assets/images/logo.jpeg'; ?>">
+        content="<?php 
+            $logo = get_setting('site_logo', '');
+            echo isset($og_image) ? $og_image : (!empty($logo) ? SITE_URL . '/assets/images/' . $logo : SITE_URL . '/assets/images/logo.jpeg'); 
+        ?>">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
@@ -46,7 +53,10 @@ require_once __DIR__ . '/functions.php';
     <meta property="twitter:description"
         content="<?php echo isset($og_description) ? htmlspecialchars($og_description) : 'Transform your career with specialized industry-led training in Web Development, Python, and AI.'; ?>">
     <meta property="twitter:image"
-        content="<?php echo isset($og_image) ? $og_image : SITE_URL . '/assets/images/logo.jpeg'; ?>">
+        content="<?php 
+            $logo = get_setting('site_logo', '');
+            echo isset($og_image) ? $og_image : (!empty($logo) ? SITE_URL . '/assets/images/' . $logo : SITE_URL . '/assets/images/logo.jpeg'); 
+        ?>">
 
     <?php if (isset($extra_css))
         echo $extra_css; ?>
@@ -74,7 +84,11 @@ require_once __DIR__ . '/functions.php';
     <nav class="navbar navbar-expand-lg fixed-top navbar-custom">
         <div class="container-fluid px-4">
             <a class="navbar-brand" href="/">
-                <img src="/assets/images/logo.jpeg" alt="Logo" class="navbar-logo me-2">
+                <?php 
+                $logo = get_setting('site_logo', '');
+                if (!empty($logo)): ?>
+                    <img src="/assets/images/<?php echo htmlspecialchars($logo); ?>" alt="Logo" class="navbar-logo me-2">
+                <?php endif; ?>
                 <strong>
                     <?php echo get_setting('site_name', SITE_NAME); ?>
                 </strong>

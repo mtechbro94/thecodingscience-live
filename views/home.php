@@ -14,7 +14,14 @@ require_once 'includes/header.php';
 ?>
 
 <!-- Hero Section -->
-<section class="hero-section">
+<?php 
+$hero_bg = get_setting('hero_background', '');
+$hero_style = '';
+if (!empty($hero_bg)) {
+    $hero_style = 'background-image: url(/assets/images/' . htmlspecialchars($hero_bg) . ');';
+}
+?>
+<section class="hero-section" style="<?php echo $hero_style; ?>">
     <div class="hero-overlay">
         <h1><?php echo get_setting('hero_title', 'School of Technology and AI Innovations'); ?></h1>
         <p class="hero-subtitle">

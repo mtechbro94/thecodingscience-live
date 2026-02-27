@@ -115,7 +115,10 @@ document.getElementById('razorpay-btn').addEventListener('click', function() {
         currency: "INR",
         name: "<?php echo addslashes(SITE_NAME); ?>",
         description: "Course: <?php echo addslashes($enrollment['course_name']); ?>",
-        image: "/assets/images/logo.jpeg",
+        image: "<?php 
+            $logo = get_setting('site_logo', '');
+            echo !empty($logo) ? '/assets/images/' . $logo : '/assets/images/logo.jpeg'; 
+        ?>",
         receipt: "<?php echo $receipt_id; ?>",
         handler: function(response) {
             // Payment successful
