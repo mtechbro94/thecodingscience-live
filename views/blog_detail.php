@@ -10,7 +10,8 @@ if (empty($slug)) {
 
 // Fetch Blog Details with Author Info
 try {
-    $stmt = $pdo->prepare("SELECT b.*, u.name as author_name, u.profile_image as author_image FROM blogs b 
+    $stmt = $pdo->prepare("SELECT b.*, u.name as author_name, u.profile_image as author_image, u.email as author_email, u.bio as author_bio 
+                            FROM blogs b 
                             LEFT JOIN users u ON b.author_id = u.id 
                             WHERE b.slug = ? AND b.is_published = 1");
     $stmt->execute([$slug]);
@@ -21,6 +22,8 @@ try {
     $blog = $stmt->fetch();
     $blog['author_name'] = $blog['author'] ?? 'Admin';
     $blog['author_image'] = null;
+    $blog['author_email'] = null;
+    $blog['author_bio'] = null;
 }
 
 // Fallback to author field if no author_id or no user found
@@ -77,16 +80,21 @@ require_once 'includes/header.php';
                             <img src="/assets/images/profiles/<?php echo htmlspecialchars($blog['author_image']); ?>" 
                                  alt="<?php echo htmlspecialchars($blog['author_name']); ?>"
                                  class="rounded-circle me-2"
-                                 style="width: 32px; height: 32px; object-fit: cover;">
+                                 style="width: 40px; height: 40px; object-fit: cover;">
                         <?php else: ?>
                             <div class="bg-success text-white rounded-circle me-2 d-flex align-items-center justify-content-center"
-                                 style="width: 32px; height: 32px; font-size: 14px;">
+                                 style="width: 40px; height: 40px; font-size: 16px;">
                                 <?php echo strtoupper(substr($blog['author_name'] ?? 'A', 0, 1)); ?>
                             </div>
                         <?php endif; ?>
-                        <span class="fw-bold text-dark">
-                            <?php echo htmlspecialchars($blog['author_name'] ?? 'Admin'); ?>
-                        </span>
+                        <div>
+                            <span class="fw-bold text-dark d-block">
+                                <?php echo htmlspecialchars($blog['author_name'] ?? 'Admin'); ?>
+                            </span>
+                            <?php if (!empty($blog['author_email'])): ?>
+                                <small class="text-muted"><?php echo htmlspecialchars($blog['author_email']); ?></small>
+                            <?php endif; ?>
+                        </div>
                     </div>
                     <div class="d-flex align-items-center">
                         <i class="fas fa-calendar-alt me-2"></i>
