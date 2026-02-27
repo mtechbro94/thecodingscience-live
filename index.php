@@ -124,6 +124,14 @@ switch ($path) {
     case 'admin/users.php':
         require 'admin/users.php';
         break;
+
+    default:
+        // Dynamic Admin Routes
+        if (preg_match('/^admin\/users\/edit\/(\d+)$/', $path, $matches)) {
+            $user_id = $matches[1];
+            require 'admin/users.php';
+            break;
+        }
     case 'admin/courses':
     case 'admin/courses.php':
         require 'admin/courses.php';

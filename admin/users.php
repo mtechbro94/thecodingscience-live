@@ -13,6 +13,92 @@ if (!is_admin()) {
 
 $page_title = "Users";
 
+// Handle Edit User Form
+if (preg_match('/\/admin\/users\/edit\/(\d+)$/', $_SERVER['REQUEST_URI'] ?? '', $matches) || isset($_GET['edit'])) {
+    $edit_id = isset($matches[1]) ? (int) $matches[1] : (int)($_GET['edit'] ?? 0);
+    
+    if ($edit_id > 0) {
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+        $stmt->execute([$edit_id]);
+        $edit_user = $stmt->fetch();
+        
+        if (!$edit_user) {
+            set_flash('danger', 'User not found.');
+            redirect('/admin/users');
+        }
+        
+        // Handle form submission
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $name = sanitize($_POST['name'] ?? '');
+            $email = sanitize($_POST['email'] ?? '');
+            $role = sanitize($_POST['role'] ?? 'student');
+            $is_approved = isset($_POST['is_approved']) ? 1 : 0;
+            $is_active = isset($_POST['is_active']) ? 1 : 0;
+            
+            if (empty($name) || empty($email)) {
+                set_flash('danger', 'Name and email are required.');
+            } else {
+                $stmt = $pdo->prepare("UPDATE users SET name = ?, email = ?, role = ?, is_approved = ?, is_active = ? WHERE id = ?");
+                $stmt->execute([$name, $email, $role, $is_approved, $is_active, $edit_id]);
+                set_flash('success', 'User updated successfully.');
+                redirect('/admin/users');
+            }
+        }
+        
+        $page_title = "Edit User";
+        include __DIR__ . '/includes/header.php';
+        ?>
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">Edit User</h1>
+            <a href="/admin/users" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Users
+            </a>
+        </div>
+        
+        <?php echo get_flash(); ?>
+        
+        <form method="POST">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label">Name</label>
+                                <input type="text" class="form-control" name="name" value="<?php echo htmlspecialchars($edit_user['name']); ?>" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" value="<?php echo htmlspecialchars($edit_user['email']); ?>" disabled>
+                                <small class="text-muted">Email cannot be changed.</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Role</label>
+                                <select class="form-select" name="role">
+                                    <option value="student" <?php echo $edit_user['role'] === 'student' ? 'selected' : ''; ?>>Student</option>
+                                    <option value="trainer" <?php echo $edit_user['role'] === 'trainer' ? 'selected' : ''; ?>>Trainer</option>
+                                    <option value="admin" <?php echo $edit_user['role'] === 'admin' ? 'selected' : ''; ?>>Admin</option>
+                                </select>
+                            </div>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="is_approved" name="is_approved" <?php echo $edit_user['is_approved'] ? 'checked' : ''; ?>>
+                                <label class="form-check-label" for="is_approved">Approved (for Trainers)</label>
+                            </div>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="is_active" name="is_active" <?php echo $edit_user['is_active'] ? 'checked' : ''; ?>>
+                                <label class="form-check-label" for="is_active">Active Account</label>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Update User</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <?php
+        require_once __DIR__ . '/includes/footer.php';
+        exit;
+    }
+}
+
 // Handle Actions
 if (isset($_GET['action']) && isset($_GET['id'])) {
     $action = $_GET['action'];
