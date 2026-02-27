@@ -14,8 +14,9 @@ if (!is_admin()) {
 $page_title = "Users";
 
 // Handle Edit User Form
-if (preg_match('/\/admin\/users\/edit\/(\d+)$/', $_SERVER['REQUEST_URI'] ?? '', $matches) || isset($_GET['edit'])) {
-    $edit_id = isset($matches[1]) ? (int) $matches[1] : (int)($_GET['edit'] ?? 0);
+$edit_id = 0;
+if (isset($_GET['edit'])) {
+    $edit_id = (int)$_GET['edit'];
     
     if ($edit_id > 0) {
         $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
@@ -219,7 +220,7 @@ require_once __DIR__ . '/includes/header.php';
                                             <i class="fas fa-check"></i>
                                         </a>
                                     <?php endif; ?>
-                                    <a href="/admin/users/edit/<?php echo $user['id']; ?>" class="btn btn-outline-secondary"
+                                    <a href="/admin/users?edit=<?php echo $user['id']; ?>" class="btn btn-outline-secondary"
                                         title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
