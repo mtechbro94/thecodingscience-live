@@ -2,12 +2,21 @@
 // views/blogs.php
 
 // Fetch All Published Blogs with Author Info
-$stmt = $pdo->query("SELECT b.*, u.name as author_name, u.profile_image as author_image 
-                     FROM blogs b 
-                     LEFT JOIN users u ON b.author_id = u.id 
-                     WHERE b.is_published = 1 
-                     ORDER BY b.created_at DESC");
-$blogs = $stmt->fetchAll();
+try {
+    $stmt = $pdo->query("SELECT b.*, u.name as author_name, u.profile_image as author_image 
+                         FROM blogs b 
+                         LEFT JOIN users u ON b.author_id = u.id 
+                         WHERE b.is_published = 1 
+                         ORDER BY b.created_at DESC");
+    $blogs = $stmt->fetchAll();
+} catch (PDOException $e) {
+    $stmt = $pdo->query("SELECT * FROM blogs WHERE is_published = 1 ORDER BY created_at DESC");
+    $blogs = $stmt->fetchAll();
+    foreach ($blogs as &$blog) {
+        $blog['author_name'] = $blog['author'] ?? 'Admin';
+        $blog['author_image'] = null;
+    }
+}
 
 $page_title = "Our Blog";
 require_once 'includes/header.php';

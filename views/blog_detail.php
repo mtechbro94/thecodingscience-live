@@ -9,11 +9,19 @@ if (empty($slug)) {
 }
 
 // Fetch Blog Details with Author Info
-$stmt = $pdo->prepare("SELECT b.*, u.name as author_name, u.profile_image as author_image FROM blogs b 
-                        LEFT JOIN users u ON b.author_id = u.id 
-                        WHERE b.slug = ? AND b.is_published = 1");
-$stmt->execute([$slug]);
-$blog = $stmt->fetch();
+try {
+    $stmt = $pdo->prepare("SELECT b.*, u.name as author_name, u.profile_image as author_image FROM blogs b 
+                            LEFT JOIN users u ON b.author_id = u.id 
+                            WHERE b.slug = ? AND b.is_published = 1");
+    $stmt->execute([$slug]);
+    $blog = $stmt->fetch();
+} catch (PDOException $e) {
+    $stmt = $pdo->prepare("SELECT * FROM blogs WHERE slug = ? AND is_published = 1");
+    $stmt->execute([$slug]);
+    $blog = $stmt->fetch();
+    $blog['author_name'] = $blog['author'] ?? 'Admin';
+    $blog['author_image'] = null;
+}
 
 // Fallback to author field if no author_id
 if (empty($blog['author_name'])) {
