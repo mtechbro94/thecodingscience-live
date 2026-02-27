@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 🚚 Get latest code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 🔧 Create .env file
         run: |
@@ -31,7 +31,7 @@ jobs:
           echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
           echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
 
-      - name: 🚧 Show maintenance page during deploy
+      - name: 🚧 Set maintenance mode
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -40,13 +40,9 @@ jobs:
           server-dir: ${{ secrets.FTP_REMOTE_PATH }}
           upload-files: |
             maintenance.html -> index.html
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            *.sql
-            README.md
-            .github/**
+
+      - name: ⏳ Wait for cache clear
+        run: sleep 3
 
       - name: 🚀 Deploy website
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
@@ -64,3 +60,14 @@ jobs:
             README.md
             .github/**
             maintenance.html
+
+      - name: ✅ Restore index.php
+        if: always()
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: ${{ secrets.FTP_REMOTE_PATH }}
+          upload-files: |
+            index.php
