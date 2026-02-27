@@ -59,6 +59,12 @@ require_once 'includes/header.php';
                             class="list-group-item list-group-item-action active bg-success border-success">
                             <i class="fas fa-tachometer-alt me-2"></i> Dashboard
                         </a>
+                        <a href="/trainer-blogs" class="list-group-item list-group-item-action">
+                            <i class="fas fa-blog me-2"></i> My Blogs
+                        </a>
+                        <a href="/trainer-blog/new" class="list-group-item list-group-item-action">
+                            <i class="fas fa-plus-square me-2"></i> Write New Blog
+                        </a>
                         <a href="/profile" class="list-group-item list-group-item-action">
                             <i class="fas fa-user me-2"></i> My Profile
                         </a>

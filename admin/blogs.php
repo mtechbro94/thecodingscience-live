@@ -26,8 +26,11 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
     redirect('/admin/blogs');
 }
 
-// Fetch Blogs
-$stmt = $pdo->query("SELECT * FROM blogs ORDER BY created_at DESC");
+// Fetch Blogs with Author Info
+$stmt = $pdo->query("SELECT b.*, u.name as author_name, u.profile_image as author_image 
+                     FROM blogs b 
+                     LEFT JOIN users u ON b.author_id = u.id 
+                     ORDER BY b.created_at DESC");
 $blogs = $stmt->fetchAll();
 
 require_once __DIR__ . '/includes/header.php';
@@ -89,7 +92,15 @@ require_once __DIR__ . '/includes/header.php';
                                 </small>
                             </td>
                             <td>
-                                <?php echo htmlspecialchars($blog['author']); ?>
+                                <div class="d-flex align-items-center">
+                                    <?php if (!empty($blog['author_image'])): ?>
+                                        <img src="/assets/images/profiles/<?php echo htmlspecialchars($blog['author_image']); ?>" 
+                                             alt="<?php echo htmlspecialchars($blog['author_name']); ?>"
+                                             class="rounded-circle me-2"
+                                             style="width: 28px; height: 28px; object-fit: cover;">
+                                    <?php endif; ?>
+                                    <?php echo htmlspecialchars($blog['author_name'] ?? $blog['author']); ?>
+                                </div>
                             </td>
                             <td>
                                 <?php if ($blog['is_published']): ?>

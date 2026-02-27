@@ -8,10 +8,18 @@ if (empty($slug)) {
     redirect('/blogs');
 }
 
-// Fetch Blog Details
-$stmt = $pdo->prepare("SELECT * FROM blogs WHERE slug = ? AND is_published = 1");
+// Fetch Blog Details with Author Info
+$stmt = $pdo->prepare("SELECT b.*, u.name as author_name, u.profile_image as author_image FROM blogs b 
+                        LEFT JOIN users u ON b.author_id = u.id 
+                        WHERE b.slug = ? AND b.is_published = 1");
 $stmt->execute([$slug]);
 $blog = $stmt->fetch();
+
+// Fallback to author field if no author_id
+if (empty($blog['author_name'])) {
+    $blog['author_name'] = $blog['author'];
+    $blog['author_image'] = null;
+}
 
 if (!$blog) {
     redirect('/blogs');
@@ -52,9 +60,16 @@ require_once 'includes/header.php';
 
                 <div class="d-flex align-items-center mb-4 text-muted">
                     <div class="d-flex align-items-center me-4">
-                        <i class="fas fa-user-circle me-2"></i>
-                        <span>
-                            <?php echo htmlspecialchars($blog['author']); ?>
+                        <?php if ($blog['author_image']): ?>
+                            <img src="/assets/images/profiles/<?php echo htmlspecialchars($blog['author_image']); ?>" 
+                                 alt="<?php echo htmlspecialchars($blog['author_name']); ?>"
+                                 class="rounded-circle me-2"
+                                 style="width: 32px; height: 32px; object-fit: cover;">
+                        <?php else: ?>
+                            <i class="fas fa-user-circle me-2"></i>
+                        <?php endif; ?>
+                        <span class="fw-bold text-dark">
+                            <?php echo htmlspecialchars($blog['author_name']); ?>
                         </span>
                     </div>
                     <div class="d-flex align-items-center">
@@ -102,23 +117,28 @@ require_once 'includes/header.php';
                     $full_url = SITE_URL . '/blog/' . $blog['slug'];
                     $encoded_url = urlencode($full_url);
                     $encoded_title = urlencode($blog['title']);
+                    $whatsapp_text = urlencode($blog['title'] . "\n\n" . $full_url);
 
                     $share_links = [
                         'facebook' => "https://www.facebook.com/sharer/sharer.php?u={$encoded_url}",
                         'twitter' => "https://twitter.com/intent/tweet?url={$encoded_url}&text={$encoded_title}",
-                        'linkedin' => "https://www.linkedin.com/shareArticle?mini=true&url={$encoded_url}&title={$encoded_title}"
+                        'linkedin' => "https://www.linkedin.com/shareArticle?mini=true&url={$encoded_url}&title={$encoded_title}",
+                        'whatsapp' => "https://wa.me/?text={$whatsapp_text}"
                     ];
                     ?>
                     <div class="share-buttons">
                         <span class="me-2 text-muted">Share:</span>
+                        <a href="<?php echo $share_links['whatsapp']; ?>" target="_blank"
+                            class="btn btn-sm btn-outline-success rounded-circle me-2" title="Share on WhatsApp"><i
+                                class="fab fa-whatsapp"></i></a>
                         <a href="<?php echo $share_links['facebook']; ?>" target="_blank"
-                            class="btn btn-sm btn-outline-secondary rounded-circle me-2"><i
+                            class="btn btn-sm btn-outline-primary rounded-circle me-2" title="Share on Facebook"><i
                                 class="fab fa-facebook-f"></i></a>
                         <a href="<?php echo $share_links['twitter']; ?>" target="_blank"
-                            class="btn btn-sm btn-outline-secondary rounded-circle me-2"><i
+                            class="btn btn-sm btn-outline-dark rounded-circle me-2" title="Share on X/Twitter"><i
                                 class="fab fa-twitter"></i></a>
                         <a href="<?php echo $share_links['linkedin']; ?>" target="_blank"
-                            class="btn btn-sm btn-outline-secondary rounded-circle"><i
+                            class="btn btn-sm btn-outline-primary rounded-circle" title="Share on LinkedIn"><i
                                 class="fab fa-linkedin-in"></i></a>
                     </div>
                 </div>

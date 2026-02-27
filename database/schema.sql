@@ -31,6 +31,7 @@ CREATE TABLE `users` (
   `reset_token` varchar(255) DEFAULT NULL,
   `reset_token_time` int(11) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
+  `profile_image` varchar(200) DEFAULT NULL,
   -- Trainer Fields
   `education` varchar(255) DEFAULT NULL,
   `expertise` varchar(500) DEFAULT NULL,
@@ -126,11 +127,14 @@ CREATE TABLE `blogs` (
   `content` text NOT NULL,
   `image` varchar(200) DEFAULT NULL,
   `author` varchar(100) NOT NULL,
+  `author_id` int(11) DEFAULT NULL,
   `date` varchar(50) DEFAULT NULL,
   `is_published` tinyint(1) DEFAULT 1,
   `created_at` datetime DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
-  UNIQUE KEY `slug` (`slug`)
+  UNIQUE KEY `slug` (`slug`),
+  KEY `author_id` (`author_id`),
+  CONSTRAINT `fk_blog_author` FOREIGN KEY (`author_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------

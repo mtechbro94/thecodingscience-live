@@ -1,8 +1,12 @@
 <?php
 // views/blogs.php
 
-// Fetch All Published Blogs
-$stmt = $pdo->query("SELECT * FROM blogs WHERE is_published = 1 ORDER BY created_at DESC");
+// Fetch All Published Blogs with Author Info
+$stmt = $pdo->query("SELECT b.*, u.name as author_name, u.profile_image as author_image 
+                     FROM blogs b 
+                     LEFT JOIN users u ON b.author_id = u.id 
+                     WHERE b.is_published = 1 
+                     ORDER BY b.created_at DESC");
 $blogs = $stmt->fetchAll();
 
 $page_title = "Our Blog";
@@ -33,6 +37,24 @@ require_once 'includes/header.php';
                             <p class="card-text text-muted mb-4">
                                 <?php echo htmlspecialchars($blog['excerpt']); ?>
                             </p>
+                            <div class="d-flex align-items-center">
+                                <?php if (!empty($blog['author_image'])): ?>
+                                    <img src="/assets/images/profiles/<?php echo htmlspecialchars($blog['author_image']); ?>" 
+                                         alt="<?php echo htmlspecialchars($blog['author_name']); ?>"
+                                         class="rounded-circle me-2"
+                                         style="width: 32px; height: 32px; object-fit: cover;">
+                                <?php else: ?>
+                                    <div class="bg-secondary text-white rounded-circle me-2 d-flex align-items-center justify-content-center"
+                                         style="width: 32px; height: 32px; font-size: 0.875rem;">
+                                        <?php echo strtoupper(substr($blog['author_name'] ?? $blog['author'], 0, 1)); ?>
+                                    </div>
+                                <?php endif; ?>
+                                <span class="text-muted small">
+                                    <?php echo htmlspecialchars($blog['author_name'] ?? $blog['author']); ?>
+                                    <span class="mx-1">·</span>
+                                    <?php echo date('M d, Y', strtotime($blog['created_at'])); ?>
+                                </span>
+                            </div>
                         </div>
                         <div class="card-footer bg-white border-0 px-4 pb-4">
                             <a href="/blog/<?php echo $blog['slug']; ?>" class="btn btn-outline-primary rounded-pill">Read
