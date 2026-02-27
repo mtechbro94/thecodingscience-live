@@ -42,7 +42,7 @@ require_once __DIR__ . '/functions.php';
     <meta property="og:image"
         content="<?php 
             $logo = get_setting('site_logo', '');
-            echo isset($og_image) ? $og_image : (!empty($logo) ? SITE_URL . '/assets/images/' . $logo : SITE_URL . '/assets/images/logo.jpeg'); 
+            echo isset($og_image) ? $og_image : (!empty($logo) ? SITE_URL . '/assets/images/' . $logo : SITE_URL . '/assets/images/logo.png'); 
         ?>">
 
     <!-- Twitter -->
@@ -55,7 +55,7 @@ require_once __DIR__ . '/functions.php';
     <meta property="twitter:image"
         content="<?php 
             $logo = get_setting('site_logo', '');
-            echo isset($og_image) ? $og_image : (!empty($logo) ? SITE_URL . '/assets/images/' . $logo : SITE_URL . '/assets/images/logo.jpeg'); 
+            echo isset($og_image) ? $og_image : (!empty($logo) ? SITE_URL . '/assets/images/' . $logo : SITE_URL . '/assets/images/logo.png'); 
         ?>">
 
     <?php if (isset($extra_css))
