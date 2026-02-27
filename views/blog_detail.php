@@ -23,10 +23,15 @@ try {
     $blog['author_image'] = null;
 }
 
-// Fallback to author field if no author_id
+// Fallback to author field if no author_id or no user found
 if (empty($blog['author_name'])) {
-    $blog['author_name'] = $blog['author'];
+    $blog['author_name'] = $blog['author'] ?? 'Admin';
     $blog['author_image'] = null;
+}
+
+// If user has no profile image but author field exists, use default avatar
+if (empty($blog['author_image']) && !empty($blog['author'])) {
+    $blog['author_name'] = $blog['author'];
 }
 
 if (!$blog) {
@@ -68,16 +73,19 @@ require_once 'includes/header.php';
 
                 <div class="d-flex align-items-center mb-4 text-muted">
                     <div class="d-flex align-items-center me-4">
-                        <?php if ($blog['author_image']): ?>
+                        <?php if (!empty($blog['author_image'])): ?>
                             <img src="/assets/images/profiles/<?php echo htmlspecialchars($blog['author_image']); ?>" 
                                  alt="<?php echo htmlspecialchars($blog['author_name']); ?>"
                                  class="rounded-circle me-2"
                                  style="width: 32px; height: 32px; object-fit: cover;">
                         <?php else: ?>
-                            <i class="fas fa-user-circle me-2"></i>
+                            <div class="bg-success text-white rounded-circle me-2 d-flex align-items-center justify-content-center"
+                                 style="width: 32px; height: 32px; font-size: 14px;">
+                                <?php echo strtoupper(substr($blog['author_name'] ?? 'A', 0, 1)); ?>
+                            </div>
                         <?php endif; ?>
                         <span class="fw-bold text-dark">
-                            <?php echo htmlspecialchars($blog['author_name']); ?>
+                            <?php echo htmlspecialchars($blog['author_name'] ?? 'Admin'); ?>
                         </span>
                     </div>
                     <div class="d-flex align-items-center">
