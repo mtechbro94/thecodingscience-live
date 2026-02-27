@@ -132,6 +132,13 @@ require_once __DIR__ . '/includes/header.php';
     max-width: 100%;
     border-radius: 0.5rem;
 }
+.editor-preview-side, .editor-preview {
+    transition: none !important;
+    transform: none !important;
+}
+.CodeMirror {
+    min-height: 400px;
+}
 </style>
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">

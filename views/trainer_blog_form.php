@@ -138,6 +138,18 @@ require_once 'includes/header.php';
     max-width: 100%;
     border-radius: 0.5rem;
 }
+.editor-preview-side, .editor-preview {
+    transition: none !important;
+    transform: none !important;
+}
+.CodeMirror {
+    min-height: 400px;
+}
+@media (max-width: 768px) {
+    .editor-preview-side {
+        display: none !important;
+    }
+}
 </style>
 
 <section class="py-4" style="margin-top: 80px;">
