@@ -81,5 +81,7 @@ nul
 assets/images/bg*.jpg
 assets/images/bg*.png
 assets/images/hero-*
+assets/images/blog-*.png
+assets/images/blog-*.jpg
 assets/uploads/
 
