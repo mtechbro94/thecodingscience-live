@@ -86,12 +86,12 @@ nav.navbar-custom:hover {
 }
 
 .nav-link {
-    color: #475569 !important;
-    font-weight: 600;
-    font-size: 0.95rem;
+    color: #1e293b !important;
+    font-weight: 700;
+    font-size: 1rem;
     transition: var(--transition);
-    margin: 0 0.1rem;
-    padding: 0.5rem 0.9rem !important;
+    margin: 0 0.15rem;
+    padding: 0.6rem 1rem !important;
     position: relative;
     border-radius: 8px;
 }
@@ -99,21 +99,16 @@ nav.navbar-custom:hover {
 .nav-link:hover {
     color: var(--primary-color) !important;
     background: var(--primary-light);
+    font-weight: 700;
 }
 
 .nav-link::after {
     display: none;
 }
-    border-radius: 2px;
-}
 
 .nav-link:hover {
     color: var(--primary-color) !important;
-    background-color: rgba(13, 110, 253, 0.08);
-}
-
-.nav-link:hover::after {
-    width: 70%;
+    background-color: var(--primary-light);
 }
 
 .nav-divider {
@@ -283,12 +278,14 @@ nav.navbar-custom:hover {
     border-radius: 8px;
     transition: var(--transition);
     box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+    color: #fff !important;
 }
 
 .navbar .btn-primary:hover {
     background: var(--primary-hover);
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+    color: #fff !important;
 }
 
 /* Hero Section */
