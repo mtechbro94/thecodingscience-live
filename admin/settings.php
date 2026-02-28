@@ -71,7 +71,7 @@ require_once __DIR__ . '/includes/header.php';
     <h1 class="h2">Site Settings</h1>
 </div>
 
-<form method="POST" class="mb-5">
+<form method="POST" enctype="multipart/form-data" class="mb-5">
     <div class="row">
         <div class="col-md-6">
             <div class="card shadow-sm mb-4">
