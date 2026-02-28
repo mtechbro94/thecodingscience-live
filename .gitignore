@@ -77,3 +77,9 @@ credentials.json
 # Windows Reserved
 nul
 
+# Uploaded images (user uploaded content)
+assets/images/bg*.jpg
+assets/images/bg*.png
+assets/images/hero-*
+assets/uploads/
+
