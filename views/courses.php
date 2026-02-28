@@ -12,7 +12,14 @@ $courses = [
         'price' => 2999,
         'description' => 'A foundational course designed for students starting their technology journey. It introduces how computers work, basic networking concepts, internet fundamentals, and problem-solving approaches used in computer science.',
         'icon' => 'fa-microchip',
-        'color' => 'primary'
+        'color' => 'primary',
+        'curriculum' => [
+            ['module' => 'Module 1: Introduction to Computers', 'topics' => ['What is a computer?', 'How computers work', 'Hardware vs Software', 'Basic computer components']],
+            ['module' => 'Module 2: Number Systems', 'topics' => ['Binary and Decimal', 'Hexadecimal', 'Data representation', 'ASCII and Unicode']],
+            ['module' => 'Module 3: Programming Basics', 'topics' => ['What is programming?', 'Algorithms and flowcharts', 'Pseudocode basics', 'Your first program']],
+            ['module' => 'Module 4: Internet & Networking', 'topics' => ['How the internet works', 'IP addresses and DNS', 'Web browsers explained', 'Introduction to HTML']],
+            ['module' => 'Module 5: Problem Solving', 'topics' => ['Logical thinking', 'Breakdown problems', 'Pattern recognition', 'Practice exercises']]
+        ]
     ],
     [
         'name' => 'Programming with Python',
@@ -20,7 +27,15 @@ $courses = [
         'price' => 3999,
         'description' => 'A practical programming course that teaches Python fundamentals, logic building, problem solving, and small real-world projects. This course serves as the foundation for advanced fields like data science, automation, and AI.',
         'icon' => 'fa-python',
-        'color' => 'success'
+        'color' => 'success',
+        'curriculum' => [
+            ['module' => 'Module 1: Python Basics', 'topics' => ['Installing Python', 'Your first Python program', 'Variables and data types', 'Basic operators']],
+            ['module' => 'Module 2: Control Flow', 'topics' => ['If-else statements', 'For loops', 'While loops', 'Nested loops']],
+            ['module' => 'Module 3: Functions', 'topics' => ['Defining functions', 'Parameters and return values', 'Scope of variables', 'Lambda functions']],
+            ['module' => 'Module 4: Data Structures', 'topics' => ['Lists and list operations', 'Dictionaries', 'Tuples and sets', 'Working with files']],
+            ['module' => 'Module 5: Object-Oriented Programming', 'topics' => ['Classes and objects', 'Inheritance', 'Encapsulation', 'Building a project']],
+            ['module' => 'Module 6: Real-World Projects', 'topics' => ['Calculator app', 'Number guessing game', 'Simple inventory system', 'Final project']]
+        ]
     ],
     [
         'name' => 'Full Stack Web Development',
@@ -28,7 +43,15 @@ $courses = [
         'price' => 7999,
         'description' => 'A complete web development program covering frontend and backend technologies. Students learn HTML, CSS, JavaScript, backend logic, databases, and how to build and deploy real web applications.',
         'icon' => 'fa-globe',
-        'color' => 'info'
+        'color' => 'info',
+        'curriculum' => [
+            ['module' => 'Module 1: HTML Fundamentals', 'topics' => ['Document structure', 'HTML5 semantic tags', 'Forms and inputs', 'SEO basics']],
+            ['module' => 'Module 2: CSS & Styling', 'topics' => ['CSS selectors', 'Flexbox layout', 'CSS Grid', 'Responsive design', 'Animations']],
+            ['module' => 'Module 3: JavaScript Basics', 'topics' => ['Variables and data types', 'DOM manipulation', 'Events and listeners', 'ES6+ features']],
+            ['module' => 'Module 4: Advanced JavaScript', 'topics' => ['Async/Await', 'Fetch API', 'Local storage', 'JavaScript frameworks intro']],
+            ['module' => 'Module 5: Backend Development', 'topics' => ['Server basics', 'PHP fundamentals', 'MySQL database', 'REST APIs']],
+            ['module' => 'Module 6: Deployment & Projects', 'topics' => ['Git version control', 'Deploying to servers', 'Building a blog', 'Building an e-commerce cart', 'Final portfolio project']]
+        ]
     ],
     [
         'name' => 'Data Science from Scratch',
@@ -36,7 +59,15 @@ $courses = [
         'price' => 6999,
         'description' => 'A hands-on introduction to data science covering data analysis, visualization, statistics basics, and working with real datasets using Python.',
         'icon' => 'fa-chart-bar',
-        'color' => 'warning'
+        'color' => 'warning',
+        'curriculum' => [
+            ['module' => 'Module 1: Introduction to Data Science', 'topics' => ['What is data science?', 'Data science workflow', 'Python for data science', 'Jupyter notebooks']],
+            ['module' => 'Module 2: Python for Data Analysis', 'topics' => ['NumPy arrays', 'Pandas DataFrames', 'Data cleaning', 'Handling missing data']],
+            ['module' => 'Module 3: Data Visualization', 'topics' => ['Matplotlib basics', 'Seaborn for statistical plots', 'Interactive charts', 'Storytelling with data']],
+            ['module' => 'Module 4: Statistics Fundamentals', 'topics' => ['Descriptive statistics', 'Probability basics', 'Hypothesis testing', 'Correlation and regression']],
+            ['module' => 'Module 5: Working with Real Data', 'topics' => ['Kaggle datasets', 'Data preprocessing', 'Feature engineering', 'Exploratory data analysis']],
+            ['module' => 'Module 6: Capstone Project', 'topics' => ['Complete data analysis project', 'Visualization dashboard', 'Insights presentation', 'Final submission']]
+        ]
     ],
     [
         'name' => 'Machine Learning and AI Foundations',
@@ -44,7 +75,15 @@ $courses = [
         'price' => 7999,
         'description' => 'A foundational machine learning course that introduces core algorithms, model training, evaluation techniques, and real-world AI applications.',
         'icon' => 'fa-brain',
-        'color' => 'danger'
+        'color' => 'danger',
+        'curriculum' => [
+            ['module' => 'Module 1: Introduction to ML', 'topics' => ['What is machine learning?', 'Types of ML algorithms', 'Supervised vs Unsupervised', 'Setting up ML environment']],
+            ['module' => 'Module 2: Regression Models', 'topics' => ['Linear regression', 'Polynomial regression', 'Logistic regression', 'Model evaluation']],
+            ['module' => 'Module 3: Classification', 'topics' => ['Decision trees', 'Random forests', 'K-Nearest Neighbors', 'Support Vector Machines']],
+            ['module' => 'Module 4: Clustering & Dimensionality', 'topics' => ['K-Means clustering', 'Hierarchical clustering', 'PCA', 'Feature selection']],
+            ['module' => 'Module 5: Neural Networks', 'topics' => ['Perceptrons', 'Activation functions', 'Building neural networks', 'TensorFlow basics']],
+            ['module' => 'Module 6: AI Applications', 'topics' => ['Computer vision intro', 'NLP basics', 'Chatbot project', 'Deploying ML models']]
+        ]
     ],
     [
         'name' => 'Ethical Hacking and Cybersecurity',
@@ -52,7 +91,15 @@ $courses = [
         'price' => 6999,
         'description' => 'A cybersecurity course that teaches networking basics, common vulnerabilities, ethical hacking tools, and penetration testing concepts.',
         'icon' => 'fa-shield-alt',
-        'color' => 'dark'
+        'color' => 'dark',
+        'curriculum' => [
+            ['module' => 'Module 1: Networking Fundamentals', 'topics' => ['OSI model', 'TCP/IP protocols', 'IP addressing', 'DNS and DHCP']],
+            ['module' => 'Module 2: Linux for Hackers', 'topics' => ['Linux basics', 'Command line mastery', 'Bash scripting', 'Essential tools']],
+            ['module' => 'Module 3: Information Gathering', 'topics' => ['Footprinting', 'Network scanning', 'Vulnerability assessment', 'Enumeration']],
+            ['module' => 'Module 4: System Hacking', 'topics' => ['Password attacks', 'Privilege escalation', 'Malware basics', 'Sniffing and spoofing']],
+            ['module' => 'Module 5: Web Application Security', 'topics' => ['OWASP Top 10', 'SQL injection', 'XSS attacks', 'CSRF and security headers']],
+            ['module' => 'Module 6: Penetration Testing', 'topics' => ['Metasploit framework', 'Writing penetration reports', 'Legal and ethical boundaries', 'Career in cybersecurity']]
+        ]
     ]
 ];
 
@@ -195,6 +242,12 @@ function getLevelBadgeClass($level) {
     background: var(--primary-color);
     border-radius: 2px;
 }
+.modal-header.bg-primary { background: var(--primary-color) !important; }
+.modal-header.bg-success { background: var(--success-color) !important; }
+.modal-header.bg-info { background: var(--info-color) !important; }
+.modal-header.bg-warning { background: #f59e0b !important; }
+.modal-header.bg-danger { background: var(--danger-color) !important; }
+.modal-header.bg-dark { background: var(--dark-color) !important; }
 </style>
 
 <!-- Individual Courses Section -->
@@ -229,10 +282,64 @@ function getLevelBadgeClass($level) {
                             <h5 class="card-title fw-bold mb-3"><?php echo $course['name']; ?></h5>
                             <p class="card-text text-muted small mb-4"><?php echo $course['description']; ?></p>
                             <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <span class="combo-price fs-4">₹<?php echo number_format($course['price']); ?></span>
+                                <span class="combo-price fs-4">₹<?php echo number_format($course['price']); ?></span>
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#curriculumModal<?php echo $index; ?>">
+                                        <i class="fas fa-list-alt me-1"></i> View Curriculum
+                                    </button>
+                                    <a href="/enroll?course=<?php echo urlencode($course['name']); ?>" class="btn btn-primary btn-sm">Enroll Now</a>
                                 </div>
-                                <a href="/enroll?course=<?php echo urlencode($course['name']); ?>" class="btn btn-primary">Enroll Now</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Curriculum Modal -->
+                <div class="modal fade" id="curriculumModal<?php echo $index; ?>" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <div class="modal-header bg-<?php echo $course['color']; ?> text-white">
+                                <h5 class="modal-title fw-bold">
+                                    <i class="fas <?php echo $course['icon']; ?> me-2"></i>
+                                    <?php echo $course['name']; ?>
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-4">
+                                    <span class="badge bg-<?php echo $course['color']; ?>"><?php echo $course['level']; ?></span>
+                                    <span class="badge bg-secondary ms-2"><?php echo count($course['curriculum']); ?> Modules</span>
+                                </div>
+                                
+                                <div class="curriculum-timeline">
+                                    <?php foreach ($course['curriculum'] as $modIndex => $module): ?>
+                                        <div class="curriculum-module mb-4">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <div class="module-number bg-<?php echo $course['color']; ?> text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; min-width: 32px;">
+                                                    <?php echo $modIndex + 1; ?>
+                                                </div>
+                                                <h6 class="fw-bold mb-0"><?php echo $module['module']; ?></h6>
+                                            </div>
+                                            <div class="module-topics ms-5">
+                                                <?php foreach ($module['topics'] as $topic): ?>
+                                                    <div class="d-flex align-items-center mb-2">
+                                                        <i class="fas fa-check-circle text-<?php echo $course['color']; ?> me-2" style="font-size: 0.8rem;"></i>
+                                                        <span class="text-muted"><?php echo $topic; ?></span>
+                                                    </div>
+                                                <?php endforeach; ?>
+                                            </div>
+                                        </div>
+                                        <?php if ($modIndex < count($course['curriculum']) - 1): ?>
+                                            <div class="curriculum-line bg-<?php echo $course['color']; ?>-subtle mx-5 mb-4" style="height: 2px;"></div>
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <a href="/enroll?course=<?php echo urlencode($course['name']); ?>" class="btn btn-primary">
+                                    <i class="fas fa-graduation-cap me-1"></i> Enroll Now - ₹<?php echo number_format($course['price']); ?>
+                                </a>
                             </div>
                         </div>
                     </div>
