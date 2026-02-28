@@ -35,25 +35,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $upload_success = [];
     
     foreach ($image_fields as $field) {
-        if (isset($_FILES[$field]) && $_FILES[$field]['error'] === UPLOAD_ERR_OK) {
+        $file_info = $_FILES[$field] ?? null;
+        
+        if ($file_info && $file_info['error'] === UPLOAD_ERR_OK) {
             $allowed = ['jpg', 'jpeg', 'png', 'gif', 'ico', 'webp', 'svg'];
-            $filename = $_FILES[$field]['name'];
+            $filename = $file_info['name'];
             $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
             
             if (in_array($ext, $allowed)) {
                 $new_filename = ($field === 'site_favicon' ? 'favicon.' . $ext : ($field === 'site_logo' ? 'logo.' . $ext : 'hero-bg.' . $ext));
                 $target_path = $upload_dir . $new_filename;
                 
-                if (copy($_FILES[$field]['tmp_name'], $target_path)) {
+                if (copy($file_info['tmp_name'], $target_path)) {
                     $stmt = $pdo->prepare("INSERT INTO site_settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value` = ?");
                     $stmt->execute([$field, $new_filename, $new_filename]);
                     $upload_success[] = "$field uploaded: $new_filename";
                 } else {
-                    $upload_errors[] = "Failed to upload $field. Check folder permissions.";
+                    $upload_errors[] = "Failed to copy $field. Check folder permissions.";
                 }
             } else {
                 $upload_errors[] = "Invalid file type for $field: $ext";
             }
+        } else if ($file_info && $file_info['error'] !== UPLOAD_ERR_NO_FILE) {
+            $upload_errors[] = "Upload error for $field: code " . $file_info['error'];
         }
         
         // Handle remove checkbox
