@@ -283,4 +283,76 @@ function render_markdown($text)
 
     return $text;
 }
+
+/**
+ * Validate coupon code and calculate discount
+ */
+function validate_coupon($code, $total_amount, $pdo)
+{
+    $code = strtoupper(trim($code));
+    
+    try {
+        $stmt = $pdo->prepare("SELECT * FROM coupons WHERE code = ? AND is_active = 1");
+        $stmt->execute([$code]);
+        $coupon = $stmt->fetch();
+        
+        if (!$coupon) {
+            return ['success' => false, 'message' => 'Invalid coupon code'];
+        }
+        
+        // Check expiry
+        $now = new DateTime();
+        if ($coupon['valid_from'] && new DateTime($coupon['valid_from']) > $now) {
+            return ['success' => false, 'message' => 'Coupon is not yet valid'];
+        }
+        if ($coupon['valid_until'] && new DateTime($coupon['valid_until']) < $now) {
+            return ['success' => false, 'message' => 'Coupon has expired'];
+        }
+        
+        // Check minimum purchase
+        if ($coupon['min_purchase'] > 0 && $total_amount < $coupon['min_purchase']) {
+            return ['success' => false, 'message' => 'Minimum purchase of ₹' . number_format($coupon['min_purchase']) . ' required'];
+        }
+        
+        // Check max uses
+        if ($coupon['max_uses'] !== null && $coupon['used_count'] >= $coupon['max_uses']) {
+            return ['success' => false, 'message' => 'Coupon usage limit reached'];
+        }
+        
+        // Calculate discount
+        if ($coupon['discount_type'] === 'percentage') {
+            $discount = ($total_amount * $coupon['discount_value']) / 100;
+        } else {
+            $discount = min($coupon['discount_value'], $total_amount);
+        }
+        
+        $final_amount = $total_amount - $discount;
+        
+        return [
+            'success' => true,
+            'coupon' => $coupon,
+            'discount' => $discount,
+            'original_amount' => $total_amount,
+            'final_amount' => $final_amount
+        ];
+        
+    } catch (PDOException $e) {
+        return ['success' => false, 'message' => 'Error validating coupon'];
+    }
+}
+
+/**
+ * Increment coupon usage count
+ */
+function use_coupon($code, $pdo)
+{
+    $code = strtoupper(trim($code));
+    try {
+        $stmt = $pdo->prepare("UPDATE coupons SET used_count = used_count + 1 WHERE code = ?");
+        $stmt->execute([$code]);
+        return true;
+    } catch (PDOException $e) {
+        return false;
+    }
+}
 ?>

@@ -49,6 +49,27 @@ try {
         $site_settings[$row['key']] = $row['value'];
     }
 
+    // Check if coupons table exists, create if not
+    $couponsTableExists = $pdo->query("SHOW TABLES LIKE 'coupons'")->rowCount() > 0;
+
+    if (!$couponsTableExists) {
+        $pdo->exec("CREATE TABLE IF NOT EXISTS `coupons` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `code` varchar(50) NOT NULL,
+            `discount_type` enum('percentage','fixed') NOT NULL DEFAULT 'percentage',
+            `discount_value` decimal(10,2) NOT NULL,
+            `min_purchase` decimal(10,2) DEFAULT 0,
+            `max_uses` int(11) DEFAULT NULL,
+            `used_count` int(11) DEFAULT 0,
+            `valid_from` datetime DEFAULT NULL,
+            `valid_until` datetime DEFAULT NULL,
+            `is_active` tinyint(1) DEFAULT 1,
+            `created_at` datetime DEFAULT current_timestamp(),
+            PRIMARY KEY (`id`),
+            UNIQUE KEY `code` (`code`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+    }
+
 } catch (\PDOException $e) {
 
     // In production, log this instead of showing it

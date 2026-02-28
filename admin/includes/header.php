@@ -96,6 +96,12 @@ if (!is_admin()) {
                     </a>
                 </li>
                 <li>
+                    <a href="/admin/coupons"
+                        class="nav-link <?php echo ($page_title == 'Manage Coupons') ? 'active' : ''; ?>">
+                        <i class="fas fa-ticket-alt me-2"></i> Coupons
+                    </a>
+                </li>
+                <li>
                     <a href="/admin/settings"
                         class="nav-link <?php echo ($page_title == 'Site Settings') ? 'active' : ''; ?>">
                         <i class="fas fa-cog me-2"></i> Site Settings
