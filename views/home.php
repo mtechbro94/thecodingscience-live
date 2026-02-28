@@ -18,7 +18,7 @@ require_once 'includes/header.php';
 $hero_bg = get_setting('hero_background', '');
 $hero_style = '';
 if (!empty($hero_bg)) {
-    $hero_style = 'background-image: url(/assets/images/' . htmlspecialchars($hero_bg) . ');';
+    $hero_style = 'background-image: url(/assets/images/' . htmlspecialchars($hero_bg) . '?v=' . time() . ');';
 }
 ?>
 <section class="hero-section" style="<?php echo $hero_style; ?>">
