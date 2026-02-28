@@ -281,9 +281,9 @@ function getLevelBadgeClass($level) {
                             </div>
                             <h5 class="card-title fw-bold mb-3"><?php echo $course['name']; ?></h5>
                             <p class="card-text text-muted small mb-4"><?php echo $course['description']; ?></p>
-                            <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex justify-content-between align-items-center mt-auto pt-3">
                                 <span class="combo-price fs-4">₹<?php echo number_format($course['price']); ?></span>
-                                <div class="d-flex gap-2">
+                                <div class="d-flex gap-2 flex-wrap">
                                     <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#curriculumModal<?php echo $index; ?>">
                                         <i class="fas fa-list-alt me-1"></i> View Curriculum
                                     </button>
