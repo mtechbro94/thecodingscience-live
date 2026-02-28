@@ -829,7 +829,7 @@ footer hr {
 /* Extra Small Devices (phones, 320px and up) */
 @media (max-width: 479px) {
     .hero-section {
-        min-height: 100vh;
+        min-height: 70vh;
         margin-top: 60px;
         padding: 1.5rem;
         background-attachment: scroll;
@@ -1051,7 +1051,7 @@ footer hr {
 /* Small Devices (tablets portrait, 576px - 767px) */
 @media (min-width: 576px) and (max-width: 767px) {
     .hero-section {
-        min-height: 90vh;
+        min-height: 75vh;
         margin-top: 65px;
         background-attachment: scroll;
         background-size: cover !important;
@@ -1104,7 +1104,7 @@ footer hr {
 /* Medium Devices (tablets landscape, 768px - 991px) */
 @media (min-width: 768px) and (max-width: 991px) {
     .hero-section {
-        min-height: 90vh;
+        min-height: 80vh;
         margin-top: 60px;
         background-attachment: scroll;
         background-size: cover !important;
