@@ -31,6 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
 
     $image_fields = ['site_logo', 'site_favicon', 'hero_background'];
+    $upload_errors = [];
     
     foreach ($image_fields as $field) {
         if (isset($_FILES[$field]) && $_FILES[$field]['error'] === UPLOAD_ERR_OK) {
@@ -44,7 +45,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (move_uploaded_file($_FILES[$field]['tmp_name'], $upload_dir . $new_filename)) {
                     $stmt = $pdo->prepare("INSERT INTO site_settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value` = ?");
                     $stmt->execute([$field, $new_filename, $new_filename]);
+                } else {
+                    $upload_errors[] = "Failed to upload $field. Check folder permissions.";
                 }
+            } else {
+                $upload_errors[] = "Invalid file type for $field. Allowed: jpg, jpeg, png, gif, ico, webp, svg";
             }
         }
         
@@ -55,7 +60,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    set_flash('success', 'Settings updated successfully.');
+    if (!empty($upload_errors)) {
+        foreach ($upload_errors as $error) {
+            set_flash('danger', $error);
+        }
+    } else {
+        set_flash('success', 'Settings updated successfully.');
+    }
     redirect('/admin/settings');
 }
 
