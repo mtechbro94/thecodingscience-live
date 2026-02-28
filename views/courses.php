@@ -11,7 +11,7 @@ $courses = [
         'level' => 'Beginner',
         'price' => 2999,
         'description' => 'A foundational course designed for students starting their technology journey. It introduces how computers work, basic networking concepts, internet fundamentals, and problem-solving approaches used in computer science.',
-        'icon' => 'fa-microchip',
+        'image' => 'ccc.jpg',
         'color' => 'primary',
         'curriculum' => [
             ['module' => 'Module 1: Introduction to Computers', 'topics' => ['What is a computer?', 'How computers work', 'Hardware vs Software', 'Basic computer components']],
@@ -26,7 +26,7 @@ $courses = [
         'level' => 'Beginner to Intermediate',
         'price' => 3999,
         'description' => 'A practical programming course that teaches Python fundamentals, logic building, problem solving, and small real-world projects. This course serves as the foundation for advanced fields like data science, automation, and AI.',
-        'icon' => 'fa-python',
+        'image' => 'pp.jpg',
         'color' => 'success',
         'curriculum' => [
             ['module' => 'Module 1: Python Basics', 'topics' => ['Installing Python', 'Your first Python program', 'Variables and data types', 'Basic operators']],
@@ -42,7 +42,7 @@ $courses = [
         'level' => 'Intermediate',
         'price' => 7999,
         'description' => 'A complete web development program covering frontend and backend technologies. Students learn HTML, CSS, JavaScript, backend logic, databases, and how to build and deploy real web applications.',
-        'icon' => 'fa-globe',
+        'image' => 'fsd.jpg',
         'color' => 'info',
         'curriculum' => [
             ['module' => 'Module 1: HTML Fundamentals', 'topics' => ['Document structure', 'HTML5 semantic tags', 'Forms and inputs', 'SEO basics']],
@@ -58,7 +58,7 @@ $courses = [
         'level' => 'Beginner to Intermediate',
         'price' => 6999,
         'description' => 'A hands-on introduction to data science covering data analysis, visualization, statistics basics, and working with real datasets using Python.',
-        'icon' => 'fa-chart-bar',
+        'image' => 'ds.jpg',
         'color' => 'warning',
         'curriculum' => [
             ['module' => 'Module 1: Introduction to Data Science', 'topics' => ['What is data science?', 'Data science workflow', 'Python for data science', 'Jupyter notebooks']],
@@ -74,7 +74,7 @@ $courses = [
         'level' => 'Intermediate to Advanced',
         'price' => 7999,
         'description' => 'A foundational machine learning course that introduces core algorithms, model training, evaluation techniques, and real-world AI applications.',
-        'icon' => 'fa-brain',
+        'image' => 'maf.jpg',
         'color' => 'danger',
         'curriculum' => [
             ['module' => 'Module 1: Introduction to ML', 'topics' => ['What is machine learning?', 'Types of ML algorithms', 'Supervised vs Unsupervised', 'Setting up ML environment']],
@@ -90,7 +90,7 @@ $courses = [
         'level' => 'Beginner to Intermediate',
         'price' => 6999,
         'description' => 'A cybersecurity course that teaches networking basics, common vulnerabilities, ethical hacking tools, and penetration testing concepts.',
-        'icon' => 'fa-shield-alt',
+        'image' => 'EHPT.jpg',
         'color' => 'dark',
         'curriculum' => [
             ['module' => 'Module 1: Networking Fundamentals', 'topics' => ['OSI model', 'TCP/IP protocols', 'IP addressing', 'DNS and DHCP']],
@@ -181,15 +181,6 @@ function getLevelBadgeClass($level) {
         font-size: 0.7rem !important;
         padding: 0.25rem 0.5rem !important;
     }
-}
-.course-icon {
-    width: 60px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 12px;
-    font-size: 1.5rem;
 }
 .level-badge {
     font-size: 0.75rem;
@@ -286,15 +277,15 @@ function getLevelBadgeClass($level) {
             <?php foreach ($courses as $index => $course): ?>
                 <div class="col-md-6 col-lg-4">
                     <div class="card h-100 course-card shadow-sm">
-                        <div class="card-body p-4">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <div class="course-icon bg-<?php echo $course['color']; ?>-subtle text-<?php echo $course['color']; ?>">
-                                    <i class="fas <?php echo $course['icon']; ?>"></i>
-                                </div>
-                                <span class="level-badge <?php echo getLevelBadgeClass($course['level']); ?>">
+                        <?php if (!empty($course['image'])): ?>
+                            <div class="position-relative" style="height: 160px; overflow: hidden;">
+                                <img src="/assets/images/<?php echo $course['image']; ?>" alt="<?php echo $course['name']; ?>" class="w-100 h-100" style="object-fit: cover;">
+                                <span class="position-absolute top-0 end-0 m-2 level-badge <?php echo getLevelBadgeClass($course['level']); ?>">
                                     <?php echo $course['level']; ?>
                                 </span>
                             </div>
+                        <?php endif; ?>
+                        <div class="card-body p-4">
                             <h5 class="card-title fw-bold mb-3"><?php echo $course['name']; ?></h5>
                             <p class="card-text text-muted small mb-4"><?php echo $course['description']; ?></p>
                             <div class="d-flex align-items-center justify-content-between pt-3 border-top gap-2">
@@ -316,12 +307,16 @@ function getLevelBadgeClass($level) {
                         <div class="modal-content">
                             <div class="modal-header bg-<?php echo $course['color']; ?> text-white">
                                 <h5 class="modal-title fw-bold">
-                                    <i class="fas <?php echo $course['icon']; ?> me-2"></i>
                                     <?php echo $course['name']; ?>
                                 </h5>
                                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
+                                <?php if (!empty($course['image'])): ?>
+                                    <div class="mb-3">
+                                        <img src="/assets/images/<?php echo $course['image']; ?>" alt="<?php echo $course['name']; ?>" class="img-fluid rounded" style="max-height: 200px; width: 100%; object-fit: cover;">
+                                    </div>
+                                <?php endif; ?>
                                 <div class="mb-4">
                                     <span class="badge bg-<?php echo $course['color']; ?>"><?php echo $course['level']; ?></span>
                                     <span class="badge bg-secondary ms-2"><?php echo count($course['curriculum']); ?> Modules</span>
