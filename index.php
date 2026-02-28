@@ -44,6 +44,10 @@ switch ($path) {
         require 'views/courses.php';
         break;
 
+    case 'enroll':
+        require 'views/enroll.php';
+        break;
+
     case 'internships':
         require 'views/internships.php';
         break;
@@ -151,6 +155,10 @@ switch ($path) {
     case 'admin/blog_form':
     case 'admin/blog_form.php':
         require 'admin/blog_form.php';
+        break;
+    case 'admin/coupons':
+    case 'admin/coupons.php':
+        require 'admin/coupons.php';
         break;
 
 
