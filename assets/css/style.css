@@ -289,7 +289,6 @@ nav.navbar-custom:hover {
     align-items: center;
     justify-content: center;
     background: linear-gradient(135deg, var(--primary-color) 0%, #0b5ed7 100%);
-    background-image: url('/assets/images/bg3.jpg');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
