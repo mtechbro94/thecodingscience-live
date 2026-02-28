@@ -107,10 +107,18 @@ if (!is_admin()) {
             <div class="dropdown">
                 <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
                     id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                    <div class="avatar-circle bg-primary text-white me-2 d-flex align-items-center justify-content-center"
-                        style="width: 32px; height: 32px; border-radius: 50%;">
-                        <?php echo substr($_SESSION['user_name'], 0, 1); ?>
-                    </div>
+                    <?php 
+                    $profile_img = $_SESSION['user_profile_image'] ?? null;
+                    if ($profile_img): ?>
+                        <img src="/assets/images/profiles/<?php echo htmlspecialchars($profile_img); ?>" 
+                             alt="Profile" class="rounded-circle me-2"
+                             style="width: 32px; height: 32px; object-fit: cover;">
+                    <?php else: ?>
+                        <div class="avatar-circle bg-primary text-white me-2 d-flex align-items-center justify-content-center"
+                            style="width: 32px; height: 32px; border-radius: 50%;">
+                            <?php echo substr($_SESSION['user_name'], 0, 1); ?>
+                        </div>
+                    <?php endif; ?>
                     <strong>
                         <?php echo $_SESSION['user_name']; ?>
                     </strong>
