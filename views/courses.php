@@ -271,7 +271,7 @@ function getLevelBadgeClass($level) {
     <div class="container">
         <div class="text-center mb-5">
             <h1 class="mb-3 fw-bold">Our Courses</h1>
-            <p class="lead text-muted">Master the latest technologies with our industry-aligned curriculum designed for students from class 8 to university level.</p>
+            <p class="lead text-muted">Master the latest technologies with our industry-aligned curriculum - from foundation to advanced level with job ready skillset.</p>
         </div>
 
         <!-- Level Legend -->
