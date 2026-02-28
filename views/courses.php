@@ -173,6 +173,15 @@ function getLevelBadgeClass($level) {
     box-shadow: 0 20px 40px rgba(0,0,0,0.1) !important;
     border-color: var(--primary-color);
 }
+.course-card .btn {
+    white-space: nowrap;
+}
+@media (max-width: 400px) {
+    .course-card .btn {
+        font-size: 0.7rem !important;
+        padding: 0.25rem 0.5rem !important;
+    }
+}
 .course-icon {
     width: 60px;
     height: 60px;
@@ -288,13 +297,13 @@ function getLevelBadgeClass($level) {
                             </div>
                             <h5 class="card-title fw-bold mb-3"><?php echo $course['name']; ?></h5>
                             <p class="card-text text-muted small mb-4"><?php echo $course['description']; ?></p>
-                            <div class="d-flex justify-content-between align-items-center pt-3 border-top">
-                                <span class="fw-bold fs-5 text-primary">₹<?php echo number_format($course['price']); ?></span>
+                            <div class="d-flex align-items-center justify-content-between pt-3 border-top gap-2">
+                                <span class="fw-bold fs-6 text-primary" style="white-space: nowrap;">₹<?php echo number_format($course['price']); ?></span>
                                 <div class="d-flex gap-2">
-                                    <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#curriculumModal<?php echo $index; ?>">
+                                    <button type="button" class="btn btn-outline-primary btn-sm py-1 px-2" style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#curriculumModal<?php echo $index; ?>">
                                         <i class="fas fa-list-alt me-1"></i> View Curriculum
                                     </button>
-                                    <a href="/enroll?course=<?php echo urlencode($course['name']); ?>" class="btn btn-primary btn-sm">Enroll Now</a>
+                                    <a href="/enroll?course=<?php echo urlencode($course['name']); ?>" class="btn btn-primary btn-sm py-1 px-2" style="font-size: 0.75rem;">Enroll Now</a>
                                 </div>
                             </div>
                         </div>
