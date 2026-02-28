@@ -16,8 +16,11 @@ require_once __DIR__ . '/functions.php';
     <?php 
     $favicon = get_setting('site_favicon', '');
     $favicon_url = !empty($favicon) ? '/assets/images/' . htmlspecialchars($favicon) : '/assets/images/favicon.ico';
+    $favicon_ext = pathinfo($favicon, PATHINFO_EXTENSION);
+    $favicon_type = in_array($favicon_ext, ['png', 'gif', 'webp']) ? 'image/' . $favicon_ext : 'image/x-icon';
+    $cache_bust = !empty($favicon) ? '?v=' . time() : '';
     ?>
-    <link rel="icon" type="image/x-icon" href="<?php echo $favicon_url; ?>">
+    <link rel="icon" type="<?php echo $favicon_type; ?>" href="<?php echo $favicon_url . $cache_bust; ?>">
     
     <!-- Canonical URL -->
     <link rel="canonical" href="<?php echo isset($og_url) ? $og_url : SITE_URL . $_SERVER['REQUEST_URI']; ?>">
