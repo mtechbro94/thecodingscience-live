@@ -4,104 +4,19 @@
 $page_title = "Our Courses";
 require_once 'includes/header.php';
 
-// Individual Courses Data
-$courses = [
-    [
-        'name' => 'Crash Course in Computer Science',
-        'level' => 'Beginner',
-        'price' => 2999,
-        'description' => 'A foundational course designed for students starting their technology journey. It introduces how computers work, basic networking concepts, internet fundamentals, and problem-solving approaches used in computer science.',
-        'image' => 'ccc.jpg',
-        'color' => 'primary',
-        'curriculum' => [
-            ['module' => 'Module 1: Introduction to Computers', 'topics' => ['What is a computer?', 'How computers work', 'Hardware vs Software', 'Basic computer components']],
-            ['module' => 'Module 2: Number Systems', 'topics' => ['Binary and Decimal', 'Hexadecimal', 'Data representation', 'ASCII and Unicode']],
-            ['module' => 'Module 3: Programming Basics', 'topics' => ['What is programming?', 'Algorithms and flowcharts', 'Pseudocode basics', 'Your first program']],
-            ['module' => 'Module 4: Internet & Networking', 'topics' => ['How the internet works', 'IP addresses and DNS', 'Web browsers explained', 'Introduction to HTML']],
-            ['module' => 'Module 5: Problem Solving', 'topics' => ['Logical thinking', 'Breakdown problems', 'Pattern recognition', 'Practice exercises']]
-        ]
-    ],
-    [
-        'name' => 'Programming with Python',
-        'level' => 'Beginner to Intermediate',
-        'price' => 3999,
-        'description' => 'A practical programming course that teaches Python fundamentals, logic building, problem solving, and small real-world projects. This course serves as the foundation for advanced fields like data science, automation, and AI.',
-        'image' => 'pp.jpg',
-        'color' => 'success',
-        'curriculum' => [
-            ['module' => 'Module 1: Python Basics', 'topics' => ['Installing Python', 'Your first Python program', 'Variables and data types', 'Basic operators']],
-            ['module' => 'Module 2: Control Flow', 'topics' => ['If-else statements', 'For loops', 'While loops', 'Nested loops']],
-            ['module' => 'Module 3: Functions', 'topics' => ['Defining functions', 'Parameters and return values', 'Scope of variables', 'Lambda functions']],
-            ['module' => 'Module 4: Data Structures', 'topics' => ['Lists and list operations', 'Dictionaries', 'Tuples and sets', 'Working with files']],
-            ['module' => 'Module 5: Object-Oriented Programming', 'topics' => ['Classes and objects', 'Inheritance', 'Encapsulation', 'Building a project']],
-            ['module' => 'Module 6: Real-World Projects', 'topics' => ['Calculator app', 'Number guessing game', 'Simple inventory system', 'Final project']]
-        ]
-    ],
-    [
-        'name' => 'Full Stack Web Development',
-        'level' => 'Intermediate',
-        'price' => 7999,
-        'description' => 'A complete web development program covering frontend and backend technologies. Students learn HTML, CSS, JavaScript, backend logic, databases, and how to build and deploy real web applications.',
-        'image' => 'fsd.jpg',
-        'color' => 'info',
-        'curriculum' => [
-            ['module' => 'Module 1: HTML Fundamentals', 'topics' => ['Document structure', 'HTML5 semantic tags', 'Forms and inputs', 'SEO basics']],
-            ['module' => 'Module 2: CSS & Styling', 'topics' => ['CSS selectors', 'Flexbox layout', 'CSS Grid', 'Responsive design', 'Animations']],
-            ['module' => 'Module 3: JavaScript Basics', 'topics' => ['Variables and data types', 'DOM manipulation', 'Events and listeners', 'ES6+ features']],
-            ['module' => 'Module 4: Advanced JavaScript', 'topics' => ['Async/Await', 'Fetch API', 'Local storage', 'JavaScript frameworks intro']],
-            ['module' => 'Module 5: Backend Development', 'topics' => ['Server basics', 'PHP fundamentals', 'MySQL database', 'REST APIs']],
-            ['module' => 'Module 6: Deployment & Projects', 'topics' => ['Git version control', 'Deploying to servers', 'Building a blog', 'Building an e-commerce cart', 'Final portfolio project']]
-        ]
-    ],
-    [
-        'name' => 'Data Science from Scratch',
-        'level' => 'Beginner to Intermediate',
-        'price' => 6999,
-        'description' => 'A hands-on introduction to data science covering data analysis, visualization, statistics basics, and working with real datasets using Python.',
-        'image' => 'ds.jpg',
-        'color' => 'warning',
-        'curriculum' => [
-            ['module' => 'Module 1: Introduction to Data Science', 'topics' => ['What is data science?', 'Data science workflow', 'Python for data science', 'Jupyter notebooks']],
-            ['module' => 'Module 2: Python for Data Analysis', 'topics' => ['NumPy arrays', 'Pandas DataFrames', 'Data cleaning', 'Handling missing data']],
-            ['module' => 'Module 3: Data Visualization', 'topics' => ['Matplotlib basics', 'Seaborn for statistical plots', 'Interactive charts', 'Storytelling with data']],
-            ['module' => 'Module 4: Statistics Fundamentals', 'topics' => ['Descriptive statistics', 'Probability basics', 'Hypothesis testing', 'Correlation and regression']],
-            ['module' => 'Module 5: Working with Real Data', 'topics' => ['Kaggle datasets', 'Data preprocessing', 'Feature engineering', 'Exploratory data analysis']],
-            ['module' => 'Module 6: Capstone Project', 'topics' => ['Complete data analysis project', 'Visualization dashboard', 'Insights presentation', 'Final submission']]
-        ]
-    ],
-    [
-        'name' => 'Machine Learning and AI Foundations',
-        'level' => 'Intermediate to Advanced',
-        'price' => 7999,
-        'description' => 'A foundational machine learning course that introduces core algorithms, model training, evaluation techniques, and real-world AI applications.',
-        'image' => 'maf.jpg',
-        'color' => 'danger',
-        'curriculum' => [
-            ['module' => 'Module 1: Introduction to ML', 'topics' => ['What is machine learning?', 'Types of ML algorithms', 'Supervised vs Unsupervised', 'Setting up ML environment']],
-            ['module' => 'Module 2: Regression Models', 'topics' => ['Linear regression', 'Polynomial regression', 'Logistic regression', 'Model evaluation']],
-            ['module' => 'Module 3: Classification', 'topics' => ['Decision trees', 'Random forests', 'K-Nearest Neighbors', 'Support Vector Machines']],
-            ['module' => 'Module 4: Clustering & Dimensionality', 'topics' => ['K-Means clustering', 'Hierarchical clustering', 'PCA', 'Feature selection']],
-            ['module' => 'Module 5: Neural Networks', 'topics' => ['Perceptrons', 'Activation functions', 'Building neural networks', 'TensorFlow basics']],
-            ['module' => 'Module 6: AI Applications', 'topics' => ['Computer vision intro', 'NLP basics', 'Chatbot project', 'Deploying ML models']]
-        ]
-    ],
-    [
-        'name' => 'Ethical Hacking and Cybersecurity',
-        'level' => 'Beginner to Intermediate',
-        'price' => 6999,
-        'description' => 'A cybersecurity course that teaches networking basics, common vulnerabilities, ethical hacking tools, and penetration testing concepts.',
-        'image' => 'EHPT.jpg',
-        'color' => 'dark',
-        'curriculum' => [
-            ['module' => 'Module 1: Networking Fundamentals', 'topics' => ['OSI model', 'TCP/IP protocols', 'IP addressing', 'DNS and DHCP']],
-            ['module' => 'Module 2: Linux for Hackers', 'topics' => ['Linux basics', 'Command line mastery', 'Bash scripting', 'Essential tools']],
-            ['module' => 'Module 3: Information Gathering', 'topics' => ['Footprinting', 'Network scanning', 'Vulnerability assessment', 'Enumeration']],
-            ['module' => 'Module 4: System Hacking', 'topics' => ['Password attacks', 'Privilege escalation', 'Malware basics', 'Sniffing and spoofing']],
-            ['module' => 'Module 5: Web Application Security', 'topics' => ['OWASP Top 10', 'SQL injection', 'XSS attacks', 'CSRF and security headers']],
-            ['module' => 'Module 6: Penetration Testing', 'topics' => ['Metasploit framework', 'Writing penetration reports', 'Legal and ethical boundaries', 'Career in cybersecurity']]
-        ]
-    ]
-];
+// Fetch courses from database
+$stmt = $pdo->query("SELECT * FROM courses ORDER BY id ASC");
+$courses = $stmt->fetchAll();
+
+// Decode curriculum for each course
+foreach ($courses as &$course) {
+    if (!empty($course['curriculum'])) {
+        $course['curriculum'] = json_decode($course['curriculum'], true);
+    } else {
+        $course['curriculum'] = [];
+    }
+}
+unset($course);
 
 // Combo Programs Data
 $combo_programs = [
