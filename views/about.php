@@ -3,7 +3,26 @@
 
 $page_title = "About Us";
 require_once 'includes/header.php';
+?>
 
+<style>
+    .feature-icon-large {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: #f8f9fa;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+    .feature-box:hover .feature-icon-large {
+        transform: scale(1.1);
+        background: #e9ecef;
+    }
+</style>
+
+<?php
 // Stats (Mirrors Flask app)
 $stats = [
     'students' => '5000+',
@@ -110,45 +129,79 @@ $values = [
             <?php endforeach; ?>
         </div>
 
-        <!-- Learning Methodology Section -->
+        <!-- Why Choose The Coding Science Section -->
         <h2 class="text-center mb-5">Why Choose The Coding Science?</h2>
-        <div class="row align-items-center mb-5">
-            <div class="col-lg-6 mb-4">
-                <img src="/assets/images/fsd.jpg" alt="Learning Methodology" class="img-fluid rounded shadow-lg"
-                    loading="lazy" decoding="async">
+        <div class="row g-4 mb-5">
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-box p-4 h-100 text-center">
+                    <div class="feature-icon-large mb-3">
+                        <i class="fas fa-project-diagram fa-3x text-primary"></i>
+                    </div>
+                    <h5>Project-Based Learning</h5>
+                    <p class="small mb-0">Learn by building real-world applications, not just watching videos. Gain practical experience with hands-on projects.</p>
+                </div>
             </div>
-            <div class="col-lg-6">
-                <div class="row">
-                    <div class="col-md-6 mb-4">
-                        <div class="feature-box p-4 h-100">
-                            <i class="fas fa-project-diagram fa-2x text-primary mb-3"></i>
-                            <h5>Project-Based</h5>
-                            <p class="small mb-0">Learn by building real-world applications, not just watching videos.
-                            </p>
-                        </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-box p-4 h-100 text-center">
+                    <div class="feature-icon-large mb-3">
+                        <i class="fas fa-chalkboard-teacher fa-3x text-success"></i>
                     </div>
-                    <div class="col-md-6 mb-4">
-                        <div class="feature-box p-4 h-100">
-                            <i class="fas fa-chalkboard-teacher fa-2x text-success mb-3"></i>
-                            <h5>Expert Mentorship</h5>
-                            <p class="small mb-0">Get guidance from industry professionals with years of experience.</p>
-                        </div>
+                    <h5>Expert Mentorship</h5>
+                    <p class="small mb-0">Get guidance from industry professionals with years of experience in their respective fields.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-box p-4 h-100 text-center">
+                    <div class="feature-icon-large mb-3">
+                        <i class="fas fa-certificate fa-3x text-warning"></i>
                     </div>
-                    <div class="col-md-6 mb-4">
-                        <div class="feature-box p-4 h-100">
-                            <i class="fas fa-certificate fa-2x text-warning mb-3"></i>
-                            <h5>Certification</h5>
-                            <p class="small mb-0">Earn industry-recognized certificates upon course completion.</p>
-                        </div>
+                    <h5>Industry Certification</h5>
+                    <p class="small mb-0">Earn recognized certificates upon course completion that boost your resume.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-box p-4 h-100 text-center">
+                    <div class="feature-icon-large mb-3">
+                        <i class="fas fa-briefcase fa-3x text-info"></i>
                     </div>
-                    <div class="col-md-6 mb-4">
-                        <div class="feature-box p-4 h-100">
-                            <i class="fas fa-briefcase fa-2x text-info mb-3"></i>
-                            <h5>Job Support</h5>
-                            <p class="small mb-0">Comprehensive career support including resume review and interview
-                                prep.</p>
-                        </div>
+                    <h5>Career Support</h5>
+                    <p class="small mb-0">Comprehensive career support including resume review and interview preparation.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-box p-4 h-100 text-center">
+                    <div class="feature-icon-large mb-3">
+                        <i class="fas fa-laptop-code fa-3x text-danger"></i>
                     </div>
+                    <h5>Hands-on Training</h5>
+                    <p class="small mb-0">Practice coding in real-time with live sessions and interactive exercises.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-box p-4 h-100 text-center">
+                    <div class="feature-icon-large mb-3">
+                        <i class="fas fa-users fa-3x text-primary"></i>
+                    </div>
+                    <h5>Community Support</h5>
+                    <p class="small mb-0">Join a community of learners and professionals for peer-to-peer learning.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-box p-4 h-100 text-center">
+                    <div class="feature-icon-large mb-3">
+                        <i class="fas fa-clock fa-3x text-success"></i>
+                    </div>
+                    <h5>Flexible Learning</h5>
+                    <p class="small mb-0">Learn at your own pace with access to recorded sessions and lifetime course updates.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-box p-4 h-100 text-center">
+                    <div class="feature-icon-large mb-3">
+                        <i class="fas fa-rupee-sign fa-3x text-warning"></i>
+                    </div>
+                    <h5>Affordable Pricing</h5>
+                    <p class="small mb-0">Quality education at competitive prices with value for your investment.</p>
                 </div>
             </div>
         </div>
