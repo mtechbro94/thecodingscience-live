@@ -41,6 +41,23 @@ $services = [
 ];
 ?>
 
+<style>
+    .tech-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: #f8f9fa;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .tech-icon:hover {
+        background: #e9ecef;
+        transform: scale(1.1);
+        transition: all 0.3s ease;
+    }
+</style>
+
 <section class="py-5" style="margin-top: 80px;">
     <div class="container">
         <h1 class="mb-4">Live Trainings</h1>
@@ -112,33 +129,77 @@ $services = [
         </div>
 
         <!-- Technology Stack -->
-        <div class="row mt-5">
-            <div class="col-lg-8 mx-auto">
-                <h2 class="text-center mb-4">Technologies We Teach</h2>
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <h6 class="text-primary"><i class="fas fa-code"></i> Frontend</h6>
-                        <p class="small">HTML, CSS, JavaScript, React, Vue, Bootstrap</p>
+        <div class="mt-5">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold mb-3">Technologies We Teach</h2>
+                <p class="text-muted">Master the latest technologies and stay ahead in your career</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-4 col-sm-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="tech-icon mb-3">
+                                <i class="fas fa-code fa-2x text-primary"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Frontend</h5>
+                            <p class="text-muted small mb-0">HTML, CSS, JavaScript, React, Vue, Bootstrap, Tailwind</p>
+                        </div>
                     </div>
-                    <div class="col-md-4 mb-3">
-                        <h6 class="text-success"><i class="fas fa-server"></i> Backend</h6>
-                        <p class="small">Node.js, Python, PHP, Flask, Django, Express</p>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="tech-icon mb-3">
+                                <i class="fas fa-server fa-2x text-success"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Backend</h5>
+                            <p class="text-muted small mb-0">Node.js, Python, PHP, Flask, Django, Express</p>
+                        </div>
                     </div>
-                    <div class="col-md-4 mb-3">
-                        <h6 class="text-info"><i class="fas fa-database"></i> Database</h6>
-                        <p class="small">MySQL, MongoDB, PostgreSQL, Firebase</p>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="tech-icon mb-3">
+                                <i class="fas fa-database fa-2x text-info"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Database</h5>
+                            <p class="text-muted small mb-0">MySQL, MongoDB, PostgreSQL, Firebase, Redis</p>
+                        </div>
                     </div>
-                    <div class="col-md-4 mb-3">
-                        <h6 class="text-warning"><i class="fas fa-cloud"></i> Cloud & DevOps</h6>
-                        <p class="small">AWS, Azure, Docker, Kubernetes, Jenkins</p>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="tech-icon mb-3">
+                                <i class="fas fa-cloud fa-2x text-warning"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Cloud & DevOps</h5>
+                            <p class="text-muted small mb-0">AWS, Azure, Docker, Kubernetes, Jenkins</p>
+                        </div>
                     </div>
-                    <div class="col-md-4 mb-3">
-                        <h6 class="text-danger"><i class="fas fa-brain"></i> Data & AI</h6>
-                        <p class="small">Python, TensorFlow, Pandas, Scikit-learn, ML</p>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="tech-icon mb-3">
+                                <i class="fas fa-brain fa-2x text-danger"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Data & AI</h5>
+                            <p class="text-muted small mb-0">Python, TensorFlow, Pandas, Scikit-learn, ML</p>
+                        </div>
                     </div>
-                    <div class="col-md-4 mb-3">
-                        <h6 class="text-primary"><i class="fas fa-tools"></i> Tools & Platforms</h6>
-                        <p class="small">Git, GitHub, VS Code, Postman, Linux</p>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="tech-icon mb-3">
+                                <i class="fas fa-tools fa-2x text-dark"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Tools & Platforms</h5>
+                            <p class="text-muted small mb-0">Git, GitHub, VS Code, Postman, Linux</p>
+                        </div>
                     </div>
                 </div>
             </div>
