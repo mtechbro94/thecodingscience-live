@@ -1,9 +1,54 @@
 <?php
 // views/home.php
 
-// Fetch Featured Courses (Limit 4)
-$stmt = $pdo->query("SELECT * FROM courses ORDER BY created_at DESC LIMIT 4");
-$courses = $stmt->fetchAll();
+// Featured Courses (same as courses page)
+$featured_courses = [
+    [
+        'name' => 'Crash Course in Computer Science',
+        'summary' => 'Foundation course for technology beginners',
+        'level' => 'Beginner',
+        'price' => 2999,
+        'image' => 'ccc.jpg'
+    ],
+    [
+        'name' => 'Programming with Python',
+        'summary' => 'Learn Python programming from scratch',
+        'level' => 'Beginner to Intermediate',
+        'price' => 3999,
+        'image' => 'pp.jpg'
+    ],
+    [
+        'name' => 'Full Stack Web Development',
+        'summary' => 'Complete web development course',
+        'level' => 'Intermediate',
+        'price' => 7999,
+        'image' => 'fsd.jpg'
+    ],
+    [
+        'name' => 'Data Science from Scratch',
+        'summary' => 'Introduction to data science',
+        'level' => 'Beginner to Intermediate',
+        'price' => 6999,
+        'image' => 'ds.jpg'
+    ],
+    [
+        'name' => 'Machine Learning and AI Foundations',
+        'summary' => 'Foundation ML and AI course',
+        'level' => 'Intermediate to Advanced',
+        'price' => 7999,
+        'image' => 'maf.jpg'
+    ],
+    [
+        'name' => 'Ethical Hacking and Cybersecurity',
+        'summary' => 'Learn ethical hacking and cybersecurity',
+        'level' => 'Beginner to Intermediate',
+        'price' => 6999,
+        'image' => 'EHPT.jpg'
+    ]
+];
+
+// Use first 4 courses for featured section
+$courses = array_slice($featured_courses, 0, 4);
 
 // Fetch Latest Blogs (Limit 3)
 $stmt = $pdo->query("SELECT * FROM blogs WHERE is_published = 1 ORDER BY created_at DESC LIMIT 3");
@@ -193,27 +238,25 @@ if (!empty($hero_bg)) {
             <?php foreach ($courses as $course): ?>
                 <div class="col-md-6 col-lg-3 mb-4">
                     <div class="card h-100 shadow-sm course-card">
+                        <?php if (!empty($course['image'])): ?>
+                            <img src="/assets/images/<?php echo $course['image']; ?>" alt="<?php echo $course['name']; ?>" class="card-img-top" style="height: 150px; object-fit: cover;">
+                        <?php endif; ?>
                         <div class="card-body">
+                            <span class="badge bg-info mb-2"><?php echo $course['level']; ?></span>
                             <h5 class="card-title">
                                 <?php echo $course['name']; ?>
                             </h5>
                             <p class="card-text text-muted small">
-                                <?php
-                                $desc = $course['summary'] ?: $course['description'];
-                                echo substr($desc, 0, 100) . '...';
-                                ?>
+                                <?php echo $course['summary']; ?>
                             </p>
                             <div class="course-meta">
-                                <small><i class="fas fa-clock"></i>
-                                    <?php echo $course['duration']; ?>
-                                </small><br>
                                 <small><i class="fas fa-rupee-sign"></i> ₹
-                                    <?php echo $course['price']; ?>
+                                    <?php echo number_format($course['price']); ?>
                                 </small>
                             </div>
                         </div>
                         <div class="card-footer bg-white">
-                            <a href="/course/<?php echo $course['id']; ?>" class="btn btn-primary btn-sm w-100">View
+                            <a href="/courses" class="btn btn-primary btn-sm w-100">View
                                 Course</a>
                         </div>
                     </div>
