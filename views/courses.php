@@ -194,6 +194,9 @@ function getLevelBadgeClass($level) {
     transition: all 0.3s ease;
     background: linear-gradient(to bottom, #ffffff, #f8fafc);
 }
+.combo-card {
+    overflow: visible;
+}
 .combo-card:hover {
     transform: translateY(-8px);
     box-shadow: 0 20px 40px rgba(0,0,0,0.15) !important;
@@ -208,6 +211,15 @@ function getLevelBadgeClass($level) {
     font-weight: 700;
     font-size: 0.85rem;
     white-space: nowrap;
+    z-index: 10;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+@media (max-width: 576px) {
+    .combo-badge {
+        top: -10px;
+        padding: 0.4rem 1rem;
+        font-size: 0.75rem;
+    }
 }
 .original-price {
     text-decoration: line-through;
