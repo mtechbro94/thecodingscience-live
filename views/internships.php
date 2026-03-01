@@ -129,6 +129,15 @@ $internships = [
     .hero-gradient {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
+    .tech-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: #f8f9fa;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
 </style>
 
 <section class="py-5" style="margin-top: 80px;">
@@ -206,6 +215,83 @@ $internships = [
                     <i class="fas fa-laptop fa-3x text-warning mb-3"></i>
                     <h5>Remote Work</h5>
                     <p class="text-muted mb-0">Work from anywhere in the world</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technologies We Teach Section -->
+        <div class="mt-5">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold mb-3">Technologies We Teach</h2>
+                <p class="text-muted">Master the latest technologies and stay ahead in your career</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-4 col-sm-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="tech-icon mb-3">
+                                <i class="fas fa-code fa-2x text-primary"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Frontend</h5>
+                            <p class="text-muted small mb-0">HTML, CSS, JavaScript, React, Vue, Bootstrap, Tailwind</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="tech-icon mb-3">
+                                <i class="fas fa-server fa-2x text-success"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Backend</h5>
+                            <p class="text-muted small mb-0">Node.js, Python, PHP, Flask, Django, Express</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="tech-icon mb-3">
+                                <i class="fas fa-database fa-2x text-info"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Database</h5>
+                            <p class="text-muted small mb-0">MySQL, MongoDB, PostgreSQL, Firebase, Redis</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="tech-icon mb-3">
+                                <i class="fas fa-cloud fa-2x text-warning"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Cloud & DevOps</h5>
+                            <p class="text-muted small mb-0">AWS, Azure, Docker, Kubernetes, Jenkins</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="tech-icon mb-3">
+                                <i class="fas fa-brain fa-2x text-danger"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Data & AI</h5>
+                            <p class="text-muted small mb-0">Python, TensorFlow, Pandas, Scikit-learn, ML</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="tech-icon mb-3">
+                                <i class="fas fa-tools fa-2x text-dark"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Tools & Platforms</h5>
+                            <p class="text-muted small mb-0">Git, GitHub, VS Code, Postman, Linux</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
