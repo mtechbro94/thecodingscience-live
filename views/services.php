@@ -140,10 +140,10 @@ $services = [
                     <div class="card h-100 border-0 shadow-sm">
                         <div class="card-body text-center p-4">
                             <div class="tech-icon mb-3">
-                                <i class="fas fa-code fa-2x text-primary"></i>
+                                <i class="fas fa-laptop-code fa-2x text-primary"></i>
                             </div>
-                            <h5 class="fw-bold mb-3">Frontend</h5>
-                            <p class="text-muted small mb-0">HTML, CSS, JavaScript, React, Vue, Bootstrap, Tailwind</p>
+                            <h5 class="fw-bold mb-3">Web Development</h5>
+                            <p class="text-muted small mb-0">HTML, CSS, JavaScript, React, Node.js, MongoDB, MySQL</p>
                         </div>
                     </div>
                 </div>
@@ -151,10 +151,10 @@ $services = [
                     <div class="card h-100 border-0 shadow-sm">
                         <div class="card-body text-center p-4">
                             <div class="tech-icon mb-3">
-                                <i class="fas fa-server fa-2x text-success"></i>
+                                <i class="fab fa-python fa-2x text-success"></i>
                             </div>
-                            <h5 class="fw-bold mb-3">Backend</h5>
-                            <p class="text-muted small mb-0">Node.js, Python, PHP, Flask, Django, Express</p>
+                            <h5 class="fw-bold mb-3">Python Programming</h5>
+                            <p class="text-muted small mb-0">Python Basics, Django, Flask, Automation, File Handling</p>
                         </div>
                     </div>
                 </div>
@@ -164,19 +164,8 @@ $services = [
                             <div class="tech-icon mb-3">
                                 <i class="fas fa-database fa-2x text-info"></i>
                             </div>
-                            <h5 class="fw-bold mb-3">Database</h5>
-                            <p class="text-muted small mb-0">MySQL, MongoDB, PostgreSQL, Firebase, Redis</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 col-sm-6">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <div class="tech-icon mb-3">
-                                <i class="fas fa-cloud fa-2x text-warning"></i>
-                            </div>
-                            <h5 class="fw-bold mb-3">Cloud & DevOps</h5>
-                            <p class="text-muted small mb-0">AWS, Azure, Docker, Kubernetes, Jenkins</p>
+                            <h5 class="fw-bold mb-3">Data Science</h5>
+                            <p class="text-muted small mb-0">Data Analysis, Pandas, NumPy, Statistics, Visualization</p>
                         </div>
                     </div>
                 </div>
@@ -186,8 +175,8 @@ $services = [
                             <div class="tech-icon mb-3">
                                 <i class="fas fa-brain fa-2x text-danger"></i>
                             </div>
-                            <h5 class="fw-bold mb-3">Data & AI</h5>
-                            <p class="text-muted small mb-0">Python, TensorFlow, Pandas, Scikit-learn, ML</p>
+                            <h5 class="fw-bold mb-3">AI & Machine Learning</h5>
+                            <p class="text-muted small mb-0">TensorFlow, Neural Networks, NLP, Computer Vision</p>
                         </div>
                     </div>
                 </div>
@@ -195,10 +184,21 @@ $services = [
                     <div class="card h-100 border-0 shadow-sm">
                         <div class="card-body text-center p-4">
                             <div class="tech-icon mb-3">
-                                <i class="fas fa-tools fa-2x text-dark"></i>
+                                <i class="fas fa-shield-alt fa-2x text-warning"></i>
                             </div>
-                            <h5 class="fw-bold mb-3">Tools & Platforms</h5>
-                            <p class="text-muted small mb-0">Git, GitHub, VS Code, Postman, Linux</p>
+                            <h5 class="fw-bold mb-3">Cybersecurity</h5>
+                            <p class="text-muted small mb-0">Ethical Hacking, Network Security, Penetration Testing</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="tech-icon mb-3">
+                                <i class="fas fa-microchip fa-2x text-dark"></i>
+                            </div>
+                            <h5 class="fw-bold mb-3">Computer Science</h5>
+                            <p class="text-muted small mb-0">Data Structures, Algorithms, Networking, Problem Solving</p>
                         </div>
                     </div>
                 </div>
