@@ -163,9 +163,21 @@ function getLevelBadgeClass($level) {
     display: flex;
     flex-direction: column;
 }
-.course-card .card-img-top {
+.course-card .course-image-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 aspect ratio */
+    overflow: hidden;
     border-top-left-radius: 16px;
     border-top-right-radius: 16px;
+}
+.course-card .course-card-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 .course-card .card-body {
     flex: 1;
@@ -294,8 +306,8 @@ function getLevelBadgeClass($level) {
                 <div class="col-md-6 col-lg-4">
                     <div class="card h-100 course-card shadow-sm">
                         <?php if (!empty($course['image'])): ?>
-                            <div class="position-relative" style="height: 160px; overflow: visible; border-top-left-radius: 16px; border-top-right-radius: 16px;">
-                                <img src="/assets/images/<?php echo $course['image']; ?>" alt="<?php echo $course['name']; ?>" class="w-100 h-100" style="object-fit: cover;">
+                            <div class="course-image-wrapper">
+                                <img src="/assets/images/<?php echo $course['image']; ?>" alt="<?php echo $course['name']; ?>" class="course-card-img">
                                 <span class="position-absolute top-0 end-0 m-2 level-badge <?php echo getLevelBadgeClass($course['level']); ?>">
                                     <?php echo $course['level']; ?>
                                 </span>
