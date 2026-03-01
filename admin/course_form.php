@@ -71,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (in_array($ext, $allowed)) {
             $new_filename = uniqid('course_', true) . '.' . $ext;
-            $upload_dir = '../assets/images/';
+            $upload_dir = BASE_PATH . '/assets/images/';
 
             if (!is_dir($upload_dir)) {
                 mkdir($upload_dir, 0755, true);
@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (move_uploaded_file($_FILES['image']['tmp_name'], $upload_dir . $new_filename)) {
                 $image = $new_filename;
             } else {
-                $errors[] = "Failed to upload image";
+                $errors[] = "Failed to upload image. Error: " . error_get_last()['message'];
             }
         } else {
             $errors[] = "Invalid file type. Allowed: " . implode(', ', $allowed);
