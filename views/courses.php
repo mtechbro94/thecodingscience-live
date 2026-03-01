@@ -8,6 +8,9 @@ require_once 'includes/header.php';
 $stmt = $pdo->query("SELECT * FROM courses ORDER BY id ASC");
 $courses = $stmt->fetchAll();
 
+// Debug
+echo '<!-- Courses found: ' . count($courses) . ' -->';
+
 // Decode curriculum for each course
 foreach ($courses as &$course) {
     if (!empty($course['curriculum'])) {
