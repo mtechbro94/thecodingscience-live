@@ -4,9 +4,9 @@
 $internship_id = isset($id) ? (int) $id : 0;
 
 $internships = [
-    1 => ['role' => 'Web Development Intern', 'company' => 'School of Technology and AI Innovations', 'duration' => '3 Months', 'stipend' => 999],
-    2 => ['role' => 'Python Development Intern', 'company' => 'School of Technology and AI Innovations', 'duration' => '3 Months', 'stipend' => 999],
-    3 => ['role' => 'Data Science and AI Intern', 'company' => 'School of Technology and AI Innovations', 'duration' => '3 Months', 'stipend' => 999]
+    1 => ['role' => 'Web Development Trainer', 'company' => 'The Coding Science', 'duration' => '1 Month Internship', 'price' => 2999, 'color' => 'primary'],
+    2 => ['role' => 'Python Trainer', 'company' => 'The Coding Science', 'duration' => '1 Month Internship', 'price' => 2999, 'color' => 'success'],
+    3 => ['role' => 'Data Science & AI Trainer', 'company' => 'The Coding Science', 'duration' => '1 Month Internship', 'price' => 2999, 'color' => 'warning']
 ];
 
 if (!isset($internships[$internship_id])) {
@@ -125,7 +125,7 @@ require_once 'includes/header.php';
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 <div class="card shadow-lg border-0">
-                    <div class="card-header bg-primary text-white p-4 text-center">
+                    <div class="card-header bg-<?php echo $internship['color']; ?> text-white p-4 text-center">
                         <h2 class="mb-0"><i class="fas fa-briefcase me-2"></i> Apply for Internship</h2>
                         <p class="mb-0 mt-2"><?php echo $internship['role']; ?></p>
                     </div>
@@ -139,8 +139,11 @@ require_once 'includes/header.php';
                                     <p class="mb-0"><strong>Duration:</strong> <?php echo $internship['duration']; ?></p>
                                 </div>
                                 <div class="col-md-6">
-                                    <p class="mb-0"><strong>Stipend:</strong> <span class="text-success">₹<?php echo $internship['stipend']; ?>/month</span></p>
+                                    <p class="mb-0"><strong>Fee:</strong> <span class="text-success">₹<?php echo number_format($internship['price']); ?>/month</span></p>
                                 </div>
+                            </div>
+                            <div class="mt-2 text-center">
+                                <span class="badge bg-success"><i class="fas fa-star me-1"></i>Get Full-Time Opportunity After 1 Month!</span>
                             </div>
                         </div>
 

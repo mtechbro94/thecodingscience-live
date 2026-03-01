@@ -4,86 +4,183 @@
 $page_title = "Internships";
 require_once 'includes/header.php';
 
-// Internships List (Mirrors Flask app content_data.py)
+// Internships List
 $internships = [
     [
         'id' => 1,
-        'role' => 'Web Development Intern',
-        'company' => 'School of Technology and AI Innovations',
-        'duration' => '3 Months',
+        'role' => 'Web Development Trainer',
+        'company' => 'The Coding Science',
+        'duration' => '1 Month Internship',
         'location' => 'Remote',
-        'stipend' => 999,
-        'description' => 'Build real-world websites with React, Node.js & MongoDB. Gain hands-on experience with modern web technologies and industry best practices.'
+        'price' => 2999,
+        'description' => 'Become a certified Web Development Trainer! Learn to teach HTML, CSS, JavaScript, React, Node.js & MongoDB. After completing the internship, you\'ll have the opportunity to work full-time with us as a professional trainer.',
+        'icon' => 'fa-globe',
+        'color' => 'primary',
+        'features' => [
+            'Teach modern web development',
+            'Live project experience',
+            'Mentorship from industry experts',
+            'Certificate upon completion',
+            'Chance to work full-time after 1 month'
+        ]
     ],
     [
         'id' => 2,
-        'role' => 'Python Development Intern',
-        'company' => 'School of Technology and AI Innovations',
-        'duration' => '3 Months',
+        'role' => 'Python Trainer',
+        'company' => 'The Coding Science',
+        'duration' => '1 Month Internship',
         'location' => 'Remote',
-        'stipend' => 999,
-        'description' => 'Master backend development with Python. Build APIs, manage databases, and work on real-world projects with experienced mentors.'
+        'price' => 2999,
+        'description' => 'Master Python programming and become a certified Python Trainer! Learn Python fundamentals, Django, Flask, data science basics & AI concepts. After completing the internship, you\'ll have the opportunity to work full-time with us as a professional trainer.',
+        'icon' => 'fa-python',
+        'color' => 'success',
+        'features' => [
+            'Teach Python programming',
+            'Backend development with Django/Flask',
+            'Data Science & AI fundamentals',
+            'Certificate upon completion',
+            'Chance to work full-time after 1 month'
+        ]
     ],
     [
         'id' => 3,
-        'role' => 'Data Science and AI Intern',
-        'company' => 'School of Technology and AI Innovations',
-        'duration' => '3 Months',
+        'role' => 'Data Science & AI Trainer',
+        'company' => 'The Coding Science',
+        'duration' => '1 Month Internship',
         'location' => 'Remote',
-        'stipend' => 999,
-        'description' => 'Work with real datasets and build ML models. Learn machine learning, deep learning, and solve real-world AI problems.'
+        'price' => 2999,
+        'description' => 'Become a certified Data Science & AI Trainer! Learn machine learning, deep learning, data visualization, and AI technologies. After completing the internship, you\'ll have the opportunity to work full-time with us as a professional trainer.',
+        'icon' => 'fa-brain',
+        'color' => 'warning',
+        'features' => [
+            'Teach Data Science & ML',
+            'Hands-on AI projects',
+            'Real-world dataset analysis',
+            'Certificate upon completion',
+            'Chance to work full-time after 1 month'
+        ]
     ]
 ];
 ?>
 
+<style>
+    .internship-card {
+        border: none;
+        border-radius: 20px;
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+    .internship-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15) !important;
+    }
+    .internship-header {
+        padding: 25px;
+        color: white;
+    }
+    .internship-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        background: rgba(255,255,255,0.2);
+    }
+    .feature-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .feature-list li {
+        padding: 8px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .feature-list li:last-child {
+        border-bottom: none;
+    }
+    .feature-list li i {
+        color: #28a745;
+        margin-right: 10px;
+    }
+    .price-tag {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--primary-color);
+    }
+    .fulltime-badge {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 8px 20px;
+        border-radius: 50px;
+        font-weight: 600;
+        display: inline-block;
+    }
+    .apply-btn {
+        padding: 12px 30px;
+        font-weight: 600;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+    }
+    .apply-btn:hover {
+        transform: scale(1.05);
+    }
+    .hero-gradient {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+</style>
+
 <section class="py-5" style="margin-top: 80px;">
     <div class="container">
         <div class="text-center mb-5">
-            <h1 class="mb-3">Internship Opportunities</h1>
-            <p class="lead text-muted">Kickstart your career with our hands-on internship programs.</p>
+            <h1 class="mb-3 fw-bold">Train with Us, Work with Us</h1>
+            <p class="lead text-muted">Become a certified trainer in Web Development, Python, or Data Science & AI. Get paid while you learn, and earn a full-time opportunity after completing your internship!</p>
+            <div class="mt-4">
+                <span class="fulltime-badge">
+                    <i class="fas fa-star me-2"></i>Get Full-Time Opportunity After 1 Month!
+                </span>
+            </div>
         </div>
 
-        <div class="row">
+        <div class="row g-4 justify-content-center">
             <?php foreach ($internships as $internship): ?>
-                <div class="col-md-6 col-lg-4 mb-4">
-                    <div class="card h-100 shadow-sm border-0 hover-lift">
-                        <div class="card-body p-4">
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="icon-box bg-primary-light text-primary rounded-circle p-3 me-3">
-                                    <i class="fas fa-briefcase fa-2x"></i>
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 internship-card shadow-lg">
+                        <div class="internship-header bg-<?php echo $internship['color']; ?>">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="internship-icon">
+                                    <i class="fas <?php echo $internship['icon']; ?>"></i>
                                 </div>
-                                <div>
-                                    <h5 class="card-title fw-bold mb-1">
-                                        <?php echo $internship['role']; ?>
-                                    </h5>
-                                    <p class="text-muted small mb-0">
-                                        <?php echo $internship['company']; ?>
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <span class="badge bg-light text-dark border me-2"><i class="fas fa-clock"></i>
+                                <span class="badge bg-white text-<?php echo $internship['color']; ?> fw-bold">
+                                    <i class="fas fa-clock me-1"></i>
                                     <?php echo $internship['duration']; ?>
                                 </span>
-                                <span class="badge bg-light text-dark border"><i class="fas fa-map-marker-alt"></i>
-                                    <?php echo $internship['location']; ?>
-                                </span>
                             </div>
-
-                            <p class="card-text text-muted">
-                                <?php echo $internship['description']; ?>
-                            </p>
-
-                            <div class="d-flex justify-content-between align-items-center mt-4">
-                                <div>
-                                    <small class="text-muted d-block">Stipend</small>
-                                    <span class="fw-bold text-success">₹
-                                        <?php echo $internship['stipend']; ?>/mo
-                                    </span>
-                                </div>
-                                <a href="/apply-internship/<?php echo $internship['id']; ?>"
-                                    class="btn btn-outline-primary rounded-pill px-4">Apply Now</a>
+                            <h3 class="mt-3 fw-bold"><?php echo $internship['role']; ?></h3>
+                            <p class="mb-0 opacity-75"><i class="fas fa-building me-2"></i><?php echo $internship['company']; ?></p>
+                        </div>
+                        
+                        <div class="card-body p-4">
+                            <p class="text-muted mb-4"><?php echo $internship['description']; ?></p>
+                            
+                            <h6 class="fw-bold mb-3"><i class="fas fa-check-circle text-success me-2"></i>What You'll Learn:</h6>
+                            <ul class="feature-list mb-4">
+                                <?php foreach ($internship['features'] as $feature): ?>
+                                    <li><i class="fas fa-check"></i><?php echo $feature; ?></li>
+                                <?php endforeach; ?>
+                            </ul>
+                            
+                            <div class="text-center mb-4">
+                                <span class="price-tag">₹<?php echo number_format($internship['price']); ?></span>
+                                <span class="text-muted">/month</span>
+                            </div>
+                            
+                            <div class="d-grid">
+                                <a href="/apply-internship/<?php echo $internship['id']; ?>" 
+                                   class="btn btn-<?php echo $internship['color']; ?> apply-btn">
+                                    <i class="fas fa-paper-plane me-2"></i>Apply Now
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -92,9 +189,25 @@ $internships = [
         </div>
 
         <div class="mt-5 text-center bg-light p-5 rounded">
-            <h3>Don't see what you're looking for?</h3>
-            <p class="mb-4">We are always looking for talented individuals. Send us your resume.</p>
-            <a href="/contact" class="btn btn-primary">Contact Us</a>
+            <h3>Why Join The Coding Science?</h3>
+            <p class="mb-4">We provide the best training with real-world projects and expert mentors.</p>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <i class="fas fa-certificate fa-3x text-primary mb-3"></i>
+                    <h5>Get Certified</h5>
+                    <p class="text-muted mb-0">Earn industry-recognized certificates</p>
+                </div>
+                <div class="col-md-4">
+                    <i class="fas fa-user-tie fa-3x text-success mb-3"></i>
+                    <h5>Full-Time Opportunity</h5>
+                    <p class="text-muted mb-0">Work with us after successful internship</p>
+                </div>
+                <div class="col-md-4">
+                    <i class="fas fa-laptop fa-3x text-warning mb-3"></i>
+                    <h5>Remote Work</h5>
+                    <p class="text-muted mb-0">Work from anywhere in the world</p>
+                </div>
+            </div>
         </div>
     </div>
 </section>
