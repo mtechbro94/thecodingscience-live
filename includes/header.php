@@ -115,14 +115,14 @@ require_once __DIR__ . '/functions.php';
                         </a>
                         <div class="dropdown-menu dropdown-menu-end dropdown-mega" aria-labelledby="coursesDropdown">
                             <div class="dropdown-mega-inner">
-                                <h6 class="dropdown-header text-primary">Featured Courses</h6>
-                                <a class="dropdown-item" href="/courses">Full Stack Development</a>
+                                <h6 class="dropdown-header text-primary">Our Courses</h6>
+                                <a class="dropdown-item" href="/courses">Crash Course in Computer Science</a>
                                 <a class="dropdown-item" href="/courses">Programming with Python</a>
+                                <a class="dropdown-item" href="/courses">Full Stack Web Development</a>
                                 <a class="dropdown-item" href="/courses">Data Science from Scratch</a>
-                                <a class="dropdown-item" href="/courses">Ethical Hacking & Penetration Testing</a>
-                                <a class="dropdown-item" href="/courses">Data Analytics and BI Tools</a>
-                                <a class="dropdown-item" href="/courses">Machine Learning & AI Foundations</a>
-                                <div class="dropdown-cta text-center">
+                                <a class="dropdown-item" href="/courses">Machine Learning and AI Foundations</a>
+                                <a class="dropdown-item" href="/courses">Ethical Hacking and Cybersecurity</a>
+                                <div class="dropdown-cta text-center mt-3">
                                     <a href="/courses" class="btn btn-sm btn-primary">View All Courses</a>
                                 </div>
                             </div>
@@ -138,11 +138,11 @@ require_once __DIR__ . '/functions.php';
                         <div class="dropdown-menu dropdown-menu-end dropdown-mega"
                             aria-labelledby="internshipsDropdown">
                             <div class="dropdown-mega-inner">
-                                <h6 class="dropdown-header text-success">Internship Tracks</h6>
-                                <a class="dropdown-item" href="/internships">Web Development Intern</a>
-                                <a class="dropdown-item" href="/internships">Python Development Intern</a>
-                                <a class="dropdown-item" href="/internships">Data Science & AI Intern</a>
-                                <div class="dropdown-cta text-center">
+                                <h6 class="dropdown-header text-success">Internship Programs</h6>
+                                <a class="dropdown-item" href="/internships">Web Development Trainer</a>
+                                <a class="dropdown-item" href="/internships">Python Trainer</a>
+                                <a class="dropdown-item" href="/internships">Data Science & AI Trainer</a>
+                                <div class="dropdown-cta text-center mt-3">
                                     <a href="/internships" class="btn btn-sm btn-success">View All Internships</a>
                                 </div>
                             </div>
