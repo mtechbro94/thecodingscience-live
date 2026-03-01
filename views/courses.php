@@ -294,7 +294,7 @@ function getLevelBadgeClass($level) {
                                     <button type="button" class="btn btn-outline-primary btn-sm py-1 px-2" style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#curriculumModal<?php echo $index; ?>">
                                         <i class="fas fa-list-alt me-1"></i> View Curriculum
                                     </button>
-                                    <a href="/enroll?course=<?php echo urlencode($course['name']); ?>" class="btn btn-primary btn-sm py-1 px-2" style="font-size: 0.75rem;">Enroll Now</a>
+                                    <a href="/enroll?course=<?php echo urlencode($course['name']); ?>" class="btn btn-primary btn-sm py-1 px-3" style="font-size: 0.85rem;">Enroll Now</a>
                                 </div>
                             </div>
                         </div>
