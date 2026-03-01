@@ -122,6 +122,14 @@ function getLevelBadgeClass($level) {
     border-radius: 20px;
     font-weight: 600;
 }
+.level-legend-badge {
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+}
 .combo-card {
     border: 2px solid #e2e8f0;
     border-radius: 20px;
@@ -213,10 +221,9 @@ function getLevelBadgeClass($level) {
 
         <!-- Level Legend -->
         <div class="d-flex justify-content-center gap-3 mb-5 flex-wrap">
-            <span class="level-badge bg-info">Beginner</span>
-            <span class="level-badge bg-success">Beginner to Intermediate</span>
-            <span class="level-badge bg-primary">Intermediate</span>
-            <span class="level-badge bg-warning text-dark">Intermediate to Advanced</span>
+            <span class="level-legend-badge bg-success"><i class="fas fa-star me-1"></i> Beginner</span>
+            <span class="level-legend-badge bg-primary"><i class="fas fa-layer-group me-1"></i> Intermediate</span>
+            <span class="level-legend-badge bg-danger"><i class="fas fa-rocket me-1"></i> Advanced</span>
         </div>
 
         <div class="row g-4">
@@ -226,8 +233,17 @@ function getLevelBadgeClass($level) {
                         <?php if (!empty($course['image'])): ?>
                             <div class="course-image-wrapper">
                                 <img src="/assets/images/<?php echo $course['image']; ?>" alt="<?php echo $course['name']; ?>" class="course-card-img">
-                                <span class="position-absolute top-0 end-0 m-2 level-badge <?php echo getLevelBadgeClass($course['level']); ?>">
-                                    <?php echo $course['level']; ?>
+                                <?php 
+                                $level_text = $course['level'];
+                                $level_class = 'bg-success';
+                                if (strpos($level_text, 'Intermediate') !== false && strpos($level_text, 'Advanced') === false) {
+                                    $level_class = 'bg-primary';
+                                } elseif (strpos($level_text, 'Advanced') !== false) {
+                                    $level_class = 'bg-danger';
+                                }
+                                ?>
+                                <span class="position-absolute top-0 end-0 m-2 level-badge <?php echo $level_class; ?>">
+                                    <?php echo $level_text; ?>
                                 </span>
                             </div>
                         <?php endif; ?>
