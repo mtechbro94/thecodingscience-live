@@ -227,7 +227,7 @@ function getLevelBadgeClass($level) {
     font-size: 0.9rem;
 }
 .combo-price {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 800;
     color: var(--primary-color);
 }
@@ -403,16 +403,16 @@ function getLevelBadgeClass($level) {
                                 <?php endforeach; ?>
                             </div>
                             
-                            <p class="card-text text-muted small text-center mb-4"><?php echo $combo['description']; ?></p>
+                            <p class="card-text text-muted small text-center mb-3"><?php echo $combo['description']; ?></p>
                             
-                            <div class="text-center mb-4">
+                            <div class="text-center mb-3">
                                 <span class="original-price">₹<?php echo number_format($combo['original_price']); ?></span>
                                 <span class="save-badge ms-2">Save ₹<?php echo number_format($combo['original_price'] - $combo['price']); ?></span>
                             </div>
                             
-                            <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex justify-content-between align-items-center pt-3 border-top">
                                 <span class="combo-price">₹<?php echo number_format($combo['price']); ?></span>
-                                <a href="/enroll?combo=<?php echo urlencode($combo['name']); ?>" class="btn btn-primary btn-lg">
+                                <a href="/enroll?combo=<?php echo urlencode($combo['name']); ?>" class="btn btn-<?php echo $combo['badge_color']; ?> btn-sm">
                                     Get This Bundle
                                 </a>
                             </div>
