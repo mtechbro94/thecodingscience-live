@@ -30,6 +30,44 @@ if ($course_id > 0) {
 }
 
 if (!$course) {
+    // For career tracks
+    $track_slug = isset($_GET['track']) ? $_GET['track'] : '';
+    
+    if (!empty($track_slug)) {
+        $stmt = $pdo->prepare("SELECT * FROM career_tracks WHERE slug = ? AND is_active = 1");
+        $stmt->execute([$track_slug]);
+        $track = $stmt->fetch();
+        
+        if ($track) {
+            $stmt = $pdo->prepare("
+                SELECT c.* 
+                FROM courses c 
+                JOIN career_track_courses cc ON c.id = cc.course_id 
+                WHERE cc.track_id = ? 
+                ORDER BY cc.sort_order
+            ");
+            $stmt->execute([$track['id']]);
+            $track_courses = $stmt->fetchAll();
+            
+            $course_names = array_column($track_courses, 'name');
+            $course = [
+                'id' => 0,
+                'name' => $track['name'],
+                'description' => 'Career Track: ' . implode(' + ', $course_names),
+                'price' => $track['price'],
+                'original_price' => $track['original_price'],
+                'image' => $track['image'],
+                'duration' => $track['duration'],
+                'level' => 'Career Track',
+                'is_track' => 1,
+                'track_id' => $track['id'],
+                'track_courses' => $track_courses
+            ];
+        }
+    }
+}
+
+if (!$course) {
     // For combo programs - create a virtual course
     $combo_name = isset($_GET['combo']) ? $_GET['combo'] : '';
     
@@ -126,8 +164,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['enroll_now'])) {
             $stmt->execute([$user['id'], $course_id, $payment_method, $amount_to_pay]);
             $enrollment_id = $pdo->lastInsertId();
         } else {
+            // Career track - enroll in all courses
+            if (isset($course['is_track']) && $course['is_track']) {
+                foreach ($course['track_courses'] as $track_course) {
+                    $check = $pdo->prepare("SELECT id FROM enrollments WHERE user_id = ? AND course_id = ?");
+                    $check->execute([$user['id'], $track_course['id']]);
+                    if (!$check->fetch()) {
+                        $sql = "INSERT INTO enrollments (user_id, course_id, status, payment_method, amount_paid, enrolled_at) VALUES (?, ?, 'pending', ?, ?, NOW())";
+                        $stmt = $pdo->prepare($sql);
+                        $stmt->execute([$user['id'], $track_course['id'], $payment_method, 0]);
+                    }
+                }
+                
+                // Create a pending payment record
+                $sql = "INSERT INTO enrollments (user_id, course_id, status, payment_method, amount_paid, enrolled_at, notes) VALUES (?, 0, 'pending', ?, ?, NOW(), ?)";
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute([$user['id'], $payment_method, $amount_to_pay, 'Career Track: ' . $course['name']]);
+                $enrollment_id = $pdo->lastInsertId();
+            }
             // Combo program - create enrollment for each course
-            if (isset($course['is_combo']) && $course['is_combo']) {
+            elseif (isset($course['is_combo']) && $course['is_combo']) {
                 // For combo, we need to enroll in each course
                 foreach ($course['included_courses'] as $included_course_name) {
                     $stmt = $pdo->prepare("SELECT id FROM courses WHERE name LIKE ?");
