@@ -133,8 +133,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_coupon'])) {
     }
 }
 
-// Check if already enrolled (only for real courses, not combos)
-if (!empty($course_id) && isset($course['is_combo']) && !$course['is_combo']) {
+// Check if already enrolled (only for real courses, not combos/tracks)
+if (!empty($course_id) && !isset($course['is_combo']) && !isset($course['is_track'])) {
     $stmt = $pdo->prepare("SELECT * FROM enrollments WHERE user_id = ? AND course_id = ?");
     $stmt->execute([$user['id'], $course_id]);
     $existing_enrollment = $stmt->fetch();
