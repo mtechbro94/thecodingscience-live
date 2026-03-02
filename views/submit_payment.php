@@ -16,7 +16,7 @@ if ($enrollment_id === 0) {
 $stmt = $pdo->prepare("
     SELECT e.*, c.name as course_name, c.price as course_price 
     FROM enrollments e 
-    JOIN courses c ON e.course_id = c.id 
+    LEFT JOIN courses c ON e.course_id = c.id 
     WHERE e.id = ? AND e.user_id = ?
 ");
 $stmt->execute([$enrollment_id, $user['id']]);
@@ -25,6 +25,12 @@ $enrollment = $stmt->fetch();
 if (!$enrollment) {
     set_flash('danger', 'Enrollment not found.');
     redirect('/dashboard');
+}
+
+// For career tracks/combos with NULL course_id
+if (empty($enrollment['course_name'])) {
+    $enrollment['course_name'] = 'Career Track Bundle';
+    $enrollment['course_price'] = $enrollment['amount_paid'];
 }
 
 if ($enrollment['status'] === 'completed') {
