@@ -152,11 +152,34 @@ function getLevelBadgeClass($level) {
 .original-price {
     text-decoration: line-through;
     color: #94a3b8;
-    font-size: 0.9rem;
+    font-size: 1rem;
+    font-weight: 500;
 }
 .combo-price {
-    font-size: 1.25rem;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #dc2626;
+}
+.combo-price .currency {
+    font-size: 1rem;
+    font-weight: 600;
+    vertical-align: super;
+}
+.combo-original-price {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #6b7280;
+}
+.save-percent {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: white;
+    padding: 0.35rem 0.85rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
     font-weight: 700;
+    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+}
+.combo-price-final {
     color: var(--primary-color);
 }
 .save-badge {
@@ -351,14 +374,18 @@ function getLevelBadgeClass($level) {
                             <p class="card-text text-muted small text-center mb-3"><?php echo htmlspecialchars($track['summary'] ?? ''); ?></p>
                             
                             <div class="text-center mb-3">
-                                <?php if ($track['original_price'] > 0): ?>
-                                    <span class="original-price">₹<?php echo number_format($track['original_price']); ?></span>
-                                    <span class="save-badge ms-2">Save ₹<?php echo number_format($track['original_price'] - $track['price']); ?></span>
+                                <?php if ($track['original_price'] > 0 && $track['original_price'] > $track['price']): 
+                                    $discount_percent = round(($track['original_price'] - $track['price']) / $track['original_price'] * 100);
+                                ?>
+                                    <span class="combo-original-price">₹<?php echo number_format($track['original_price']); ?></span>
+                                    <span class="save-percent ms-2"><?php echo $discount_percent; ?>% OFF</span>
                                 <?php endif; ?>
                             </div>
                             
                             <div class="d-flex justify-content-between align-items-center pt-3 border-top gap-3">
-                                <span class="combo-price">₹<?php echo number_format($track['price']); ?></span>
+                                <div class="combo-price">
+                                    <span class="currency">₹</span><?php echo number_format($track['price']); ?>
+                                </div>
                                 <a href="/enroll?track=<?php echo urlencode($track['slug']); ?>" class="btn btn-<?php echo $track['badge_color']; ?> px-4" style="font-size: 0.9rem; white-space: nowrap;">
                                     Get This Bundle
                                 </a>
