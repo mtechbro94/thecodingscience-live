@@ -160,6 +160,14 @@ switch ($path) {
     case 'admin/coupons.php':
         require 'admin/coupons.php';
         break;
+    case 'admin/career_tracks':
+    case 'admin/career_tracks.php':
+        require 'admin/career_tracks.php';
+        break;
+    case 'admin/career_track_form':
+    case 'admin/career_track_form.php':
+        require 'admin/career_track_form.php';
+        break;
 
 
     case 'blogs':
@@ -196,6 +204,9 @@ switch ($path) {
         } elseif (preg_match('/^apply-internship\/(\d+)$/', $path, $matches)) {
             $id = $matches[1];
             require 'views/apply_internship.php';
+        } elseif (preg_match('/^career-track\/([a-z0-9-]+)$/', $path, $matches)) {
+            $track_slug = $matches[1];
+            require 'views/career_track.php';
         } else {
 
             http_response_code(404);

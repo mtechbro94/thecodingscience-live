@@ -246,4 +246,94 @@ CREATE TABLE `coupons` (
   UNIQUE KEY `code` (`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `combo_programs`
+--
+
+CREATE TABLE `combo_programs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(200) NOT NULL,
+  `slug` varchar(200) NOT NULL,
+  `description` text DEFAULT NULL,
+  `original_price` decimal(10,2) NOT NULL,
+  `price` decimal(10,2) NOT NULL,
+  `badge` varchar(50) DEFAULT NULL,
+  `badge_color` varchar(20) DEFAULT 'primary',
+  `is_active` tinyint(1) DEFAULT 1,
+  `sort_order` int(11) DEFAULT 0,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `slug` (`slug`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `combo_program_courses`
+--
+
+CREATE TABLE `combo_program_courses` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `program_id` int(11) NOT NULL,
+  `course_id` int(11) NOT NULL,
+  `sort_order` int(11) DEFAULT 0,
+  PRIMARY KEY (`id`),
+  KEY `program_id` (`program_id`),
+  KEY `course_id` (`course_id`),
+  FOREIGN KEY (`program_id`) REFERENCES `combo_programs`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`course_id`) REFERENCES `courses`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `career_tracks`
+--
+
+CREATE TABLE `career_tracks` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(200) NOT NULL,
+  `slug` varchar(200) NOT NULL,
+  `description` text DEFAULT NULL,
+  `summary` varchar(255) DEFAULT NULL,
+  `duration` varchar(50) DEFAULT NULL,
+  `original_price` decimal(10,2) NOT NULL DEFAULT 0,
+  `price` decimal(10,2) NOT NULL DEFAULT 0,
+  `badge` varchar(50) DEFAULT NULL,
+  `badge_color` varchar(20) DEFAULT 'primary',
+  `image` varchar(200) DEFAULT NULL,
+  `outcomes` text DEFAULT NULL,
+  `requirements` text DEFAULT NULL,
+  `curriculum` text DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT 1,
+  `is_featured` tinyint(1) DEFAULT 0,
+  `sort_order` int(11) DEFAULT 0,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `slug` (`slug`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4--
+-- Table structure;
+
+-- --------------------------------------------------------
+
+ for table `career_track_courses`
+--
+
+CREATE TABLE `career_track_courses` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `track_id` int(11) NOT NULL,
+  `course_id` int(11) NOT NULL,
+  `sort_order` int(11) DEFAULT 0,
+  `is_required` tinyint(1) DEFAULT 1,
+  PRIMARY KEY (`id`),
+  KEY `track_id` (`track_id`),
+  KEY `course_id` (`course_id`),
+  FOREIGN KEY (`track_id`) REFERENCES `career_tracks`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`course_id`) REFERENCES `courses`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 COMMIT;

@@ -102,6 +102,12 @@ if (!is_admin()) {
                     </a>
                 </li>
                 <li>
+                    <a href="/admin/career_tracks"
+                        class="nav-link <?php echo ($page_title == 'Career Track Programs') ? 'active' : ''; ?>">
+                        <i class="fas fa-road me-2"></i> Career Tracks
+                    </a>
+                </li>
+                <li>
                     <a href="/admin/settings"
                         class="nav-link <?php echo ($page_title == 'Site Settings') ? 'active' : ''; ?>">
                         <i class="fas fa-cog me-2"></i> Site Settings

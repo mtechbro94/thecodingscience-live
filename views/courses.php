@@ -21,36 +21,22 @@ foreach ($courses as &$course) {
 }
 unset($course);
 
-// Combo Programs Data
-$combo_programs = [
-    [
-        'name' => 'Programming Starter Pack',
-        'courses' => ['Crash Course in Computer Science', 'Programming with Python'],
-        'original_price' => 6998,
-        'price' => 4499,
-        'description' => 'A perfect entry point for beginners to understand computer science fundamentals and learn their first programming language.',
-        'badge' => 'Best for Beginners',
-        'badge_color' => 'success'
-    ],
-    [
-        'name' => 'Developer Career Pack',
-        'courses' => ['Programming with Python', 'Full Stack Web Development'],
-        'original_price' => 11998,
-        'price' => 7999,
-        'description' => 'Designed for students who want to become software developers and build real-world web applications.',
-        'badge' => 'Most Popular',
-        'badge_color' => 'primary'
-    ],
-    [
-        'name' => 'AI and Data Science Career Track',
-        'courses' => ['Programming with Python', 'Data Science from Scratch', 'Machine Learning and AI Foundations'],
-        'original_price' => 18997,
-        'price' => 11999,
-        'description' => 'A complete learning pathway that prepares students for careers in artificial intelligence, machine learning, and data science.',
-        'badge' => 'Best Value',
-        'badge_color' => 'warning'
-    ]
-];
+// Career Tracks Data (from database)
+$stmt = $pdo->query("SELECT * FROM career_tracks WHERE is_active = 1 ORDER BY sort_order ASC, created_at DESC");
+$career_tracks = $stmt->fetchAll();
+
+foreach ($career_tracks as &$track) {
+    $stmt = $pdo->prepare("
+        SELECT c.id, c.name, c.price 
+        FROM courses c 
+        JOIN career_track_courses cc ON c.id = cc.course_id 
+        WHERE cc.track_id = ? 
+        ORDER BY cc.sort_order
+    ");
+    $stmt->execute([$track['id']]);
+    $track['courses_list'] = $stmt->fetchAll();
+}
+unset($track);
 
 function getLevelBadgeClass($level) {
     if (strpos($level, 'Beginner') !== false && strpos($level, 'Intermediate') !== false) {
@@ -334,35 +320,46 @@ function getLevelBadgeClass($level) {
         </div>
 
         <div class="row g-4 justify-content-center">
-            <?php foreach ($combo_programs as $index => $combo): ?>
+            <?php if (empty($career_tracks)): ?>
+                <div class="col-12 text-center py-4">
+                    <p class="text-muted">Career track programs coming soon!</p>
+                </div>
+            <?php else: ?>
+            <?php foreach ($career_tracks as $track): ?>
                 <div class="col-md-6 col-lg-4">
                     <div class="card h-100 combo-card shadow-sm position-relative">
-                        <span class="combo-badge bg-<?php echo $combo['badge_color']; ?> text-white">
-                            <i class="fas fa-star me-1"></i> <?php echo $combo['badge']; ?>
+                        <?php if (!empty($track['badge'])): ?>
+                        <span class="combo-badge bg-<?php echo $track['badge_color']; ?> text-white">
+                            <i class="fas fa-star me-1"></i> <?php echo htmlspecialchars($track['badge']); ?>
                         </span>
-                        <div class="card-body p-4 pt-5">
-                            <h5 class="card-title fw-bold text-center mb-3"><?php echo $combo['name']; ?></h5>
+                        <?php endif; ?>
+                        <div class="card-body p-4 <?php echo !empty($track['badge']) ? 'pt-5' : ''; ?>">
+                            <h5 class="card-title fw-bold text-center mb-3"><?php echo htmlspecialchars($track['name']); ?></h5>
                             
                             <div class="mb-4">
                                 <p class="text-muted small mb-2 fw-semibold">Includes:</p>
-                                <?php foreach ($combo['courses'] as $course_name): ?>
-                                    <div class="course-list-item">
-                                        <i class="fas fa-check-circle text-success me-2"></i>
-                                        <?php echo $course_name; ?>
-                                    </div>
-                                <?php endforeach; ?>
+                                <?php if (!empty($track['courses_list'])): ?>
+                                    <?php foreach ($track['courses_list'] as $course_item): ?>
+                                        <div class="course-list-item">
+                                            <i class="fas fa-check-circle text-success me-2"></i>
+                                            <?php echo htmlspecialchars($course_item['name']); ?>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </div>
                             
-                            <p class="card-text text-muted small text-center mb-3"><?php echo $combo['description']; ?></p>
+                            <p class="card-text text-muted small text-center mb-3"><?php echo htmlspecialchars($track['summary'] ?? ''); ?></p>
                             
                             <div class="text-center mb-3">
-                                <span class="original-price">₹<?php echo number_format($combo['original_price']); ?></span>
-                                <span class="save-badge ms-2">Save ₹<?php echo number_format($combo['original_price'] - $combo['price']); ?></span>
+                                <?php if ($track['original_price'] > 0): ?>
+                                    <span class="original-price">₹<?php echo number_format($track['original_price']); ?></span>
+                                    <span class="save-badge ms-2">Save ₹<?php echo number_format($track['original_price'] - $track['price']); ?></span>
+                                <?php endif; ?>
                             </div>
                             
                             <div class="d-flex justify-content-between align-items-center pt-3 border-top gap-3">
-                                <span class="combo-price">₹<?php echo number_format($combo['price']); ?></span>
-                                <a href="/enroll?combo=<?php echo urlencode($combo['name']); ?>" class="btn btn-<?php echo $combo['badge_color']; ?> px-4" style="font-size: 0.9rem; white-space: nowrap;">
+                                <span class="combo-price">₹<?php echo number_format($track['price']); ?></span>
+                                <a href="/enroll?track=<?php echo urlencode($track['slug']); ?>" class="btn btn-<?php echo $track['badge_color']; ?> px-4" style="font-size: 0.9rem; white-space: nowrap;">
                                     Get This Bundle
                                 </a>
                             </div>
@@ -370,6 +367,7 @@ function getLevelBadgeClass($level) {
                     </div>
                 </div>
             <?php endforeach; ?>
+            <?php endif; ?>
         </div>
 
         <!-- Why Choose Combos -->
