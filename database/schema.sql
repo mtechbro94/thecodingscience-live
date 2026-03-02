@@ -83,6 +83,7 @@ CREATE TABLE `enrollments` (
   `razorpay_order_id` varchar(100) DEFAULT NULL,
   `razorpay_payment_id` varchar(100) DEFAULT NULL,
   `razorpay_signature` varchar(255) DEFAULT NULL,
+  `notes` varchar(500) DEFAULT NULL,
   `enrolled_at` datetime DEFAULT current_timestamp(),
   `verified_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
