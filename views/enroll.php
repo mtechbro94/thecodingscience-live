@@ -177,7 +177,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['enroll_now'])) {
                 }
                 
                 // Create a pending payment record
-                $sql = "INSERT INTO enrollments (user_id, course_id, status, payment_method, amount_paid, enrolled_at) VALUES (?, 0, 'pending', ?, ?, NOW())";
+                $sql = "INSERT INTO enrollments (user_id, course_id, status, payment_method, amount_paid, enrolled_at) VALUES (?, NULL, 'pending', ?, ?, NOW())";
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute([$user['id'], $payment_method, $amount_to_pay]);
                 $enrollment_id = $pdo->lastInsertId();
@@ -203,7 +203,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['enroll_now'])) {
                 }
                 
                 // Create a pending payment record
-                $sql = "INSERT INTO enrollments (user_id, course_id, status, payment_method, amount_paid, enrolled_at) VALUES (?, 0, 'pending', ?, ?, NOW())";
+                $sql = "INSERT INTO enrollments (user_id, course_id, status, payment_method, amount_paid, enrolled_at) VALUES (?, NULL, 'pending', ?, ?, NOW())";
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute([$user['id'], $payment_method, $amount_to_pay]);
                 $enrollment_id = $pdo->lastInsertId();

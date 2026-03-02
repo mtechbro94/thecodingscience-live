@@ -74,7 +74,7 @@ CREATE TABLE `courses` (
 CREATE TABLE `enrollments` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
-  `course_id` int(11) NOT NULL,
+  `course_id` int(11) DEFAULT NULL,
   `status` enum('pending','completed','failed','refunded') DEFAULT 'pending',
   `payment_method` varchar(50) DEFAULT NULL,
   `payment_id` varchar(100) DEFAULT NULL,
