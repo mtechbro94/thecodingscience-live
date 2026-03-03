@@ -52,36 +52,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Handle Image Upload
     $image = $is_edit ? ($blog['image'] ?? null) : null;
-    // DEBUG: Log upload attempt
-    error_log("Image upload check: " . print_r($_FILES['image'] ?? [], true));
-    if (isset($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE) {
-        $file_error = $_FILES['image']['error'];
-        
-        if ($file_error === UPLOAD_ERR_INI_SIZE) {
-            $errors[] = "Image is too large. Maximum size is 2MB.";
-        } elseif ($file_error === UPLOAD_ERR_FORM_SIZE) {
-            $errors[] = "Image exceeds the maximum allowed file size.";
-        } elseif ($file_error === UPLOAD_ERR_PARTIAL) {
-            $errors[] = "Image was only partially uploaded.";
-        } elseif ($file_error === UPLOAD_ERR_OK) {
-            $allowed = ['jpg', 'jpeg', 'png', 'webp'];
-            $filename = $_FILES['image']['name'];
-            $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+    
+    if (isset($_FILES['image']) && is_array($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        $allowed = ['jpg', 'jpeg', 'png', 'webp'];
+        $filename = $_FILES['image']['name'];
+        $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
 
-            if (in_array($ext, $allowed)) {
-                $new_filename = uniqid('blog_', true) . '.' . $ext;
-                $upload_dir = __DIR__ . '/../assets/images/';
-                if (!is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
-                
-                if (move_uploaded_file($_FILES['image']['tmp_name'], $upload_dir . $new_filename)) {
-                    $image = $new_filename;
-                } else {
-                    $errors[] = "Failed to upload image. Check directory permissions.";
-                }
-            } else {
-                $errors[] = "Invalid file type. Allowed: jpg, jpeg, png, webp";
+        if (in_array($ext, $allowed)) {
+            $new_filename = uniqid('blog_', true) . '.' . $ext;
+            $upload_dir = dirname(__DIR__) . '/assets/images/';
+            
+            if (!is_dir($upload_dir)) {
+                mkdir($upload_dir, 0755, true);
             }
+            
+            if (!is_writable($upload_dir)) {
+                $errors[] = "Upload directory is not writable. Contact admin.";
+                error_log("Upload dir not writable: " . $upload_dir);
+            } elseif (move_uploaded_file($_FILES['image']['tmp_name'], $upload_dir . $new_filename)) {
+                $image = $new_filename;
+            } else {
+                $errors[] = "Failed to upload image.";
+                error_log("move_uploaded_file failed");
+            }
+        } else {
+            $errors[] = "Invalid file type. Allowed: jpg, jpeg, png, webp";
         }
+    } elseif (isset($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE && $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
+        $errors[] = "Image upload error code: " . $_FILES['image']['error'];
     }
 
     if (empty($errors)) {
