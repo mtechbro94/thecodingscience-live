@@ -1,6 +1,10 @@
 <?php
 // admin/blog_form.php
 
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+error_log("blog_form.php started - ID: " . ($_GET['id'] ?? 'new'));
+
 require_once dirname(__DIR__) . '/includes/db.php';
 require_once BASE_PATH . '/includes/functions.php';
 
@@ -32,6 +36,7 @@ if ($is_edit) {
 
 // Handle Form Submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    error_log("Processing POST request");
     $title = sanitize($_POST['title'] ?? '');
     $slug = sanitize($_POST['slug'] ?? generate_slug($title));
     $excerpt = sanitize($_POST['excerpt'] ?? '');
@@ -46,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($content)) $errors[] = "Content is required";
 
     // Handle Image Upload
-    $image = $blog['image'] ?? null;
+    $image = $is_edit ? ($blog['image'] ?? null) : null;
     // DEBUG: Log upload attempt
     error_log("Image upload check: " . print_r($_FILES['image'] ?? [], true));
     if (isset($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE) {
@@ -269,9 +274,7 @@ if (isset($image) && !empty($image)): ?>
         element: document.getElementById('markdownEditor'),
         spellChecker: false,
         autosave: {
-            enabled: true,
-            uniqueId: "blog_editor_<?php echo $blog_id; ?>",
-            delay: 10,
+            enabled: false
         },
         height: "400px",
         placeholder: "Write your masterpiece here...",
