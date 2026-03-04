@@ -119,7 +119,12 @@ switch ($path) {
 
     case 'social-init':
     case 'social-init.php':
-        require 'social_init.php';
+        if (file_exists('social_init.php')) {
+            require 'social_init.php';
+        } else {
+            set_flash('danger', 'Social login is temporarily unavailable.');
+            redirect('/login');
+        }
         break;
 
 
