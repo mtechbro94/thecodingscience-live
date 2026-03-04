@@ -33,11 +33,11 @@ require_once 'includes/header.php';
         <div class="row">
             <?php foreach ($blogs as $blog): ?>
                 <div class="col-md-6 col-lg-4 mb-4">
-                    <div class="card h-100 shadow-sm border-0 hover-lift">
-                        <div class="overflow-hidden" style="height: 220px;">
-                            <img src="<?php echo get_image_url($blog['image']); ?>" class="card-img-top"
+                    <div class="card h-100 shadow-sm border-0 hover-lift" style="overflow: hidden; border-radius: 12px;">
+                        <div style="height: 220px; overflow: hidden;">
+                            <img src="<?php echo get_image_url($blog['image']); ?>"
                                 alt="<?php echo htmlspecialchars($blog['title']); ?>"
-                                style="width: 100%; height: 100%; object-fit: cover;">
+                                style="width: 100%; height: 100%; object-fit: cover; display: block;">
                         </div>
 
                         <div class="card-body p-4">
