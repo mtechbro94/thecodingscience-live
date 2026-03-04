@@ -28,8 +28,24 @@ define('DB_USER', getenv('DB_USER') ?: 'root');
 define('DB_PASS', getenv('DB_PASS') ?: '');
 
 // Site Configuration
+$config_site_url = getenv('SITE_URL') ?: 'https://thecodingscience.com';
+
+// Dynamic Site URL Fallback for Local Development
+if (isset($_SERVER['HTTP_HOST'])) {
+    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
+    $current_host = $_SERVER['HTTP_HOST'];
+    $current_url = $protocol . $current_host;
+
+    // If we are on localhost but config points to live, use local URL
+    if (strpos($current_host, 'localhost') !== false || strpos($current_host, '127.0.0.1') !== false) {
+        if (strpos($config_site_url, 'thecodingscience.com') !== false) {
+            $config_site_url = $current_url;
+        }
+    }
+}
+
 define('SITE_NAME', getenv('SITE_NAME') ?: 'The Coding Science');
-define('SITE_URL', getenv('SITE_URL') ?: 'https://thecodingscience.com');
+define('SITE_URL', rtrim($config_site_url, '/'));
 define('CONTACT_EMAIL', 'csdsofficial249@gmail.com');
 define('ACADEMY_EMAIL', 'academy@thecodingscience.com');
 define('SUPPORT_EMAIL', 'support@thecodingscience.com');

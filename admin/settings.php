@@ -17,7 +17,14 @@ $errors = [];
 
 // Handle Form Submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    foreach ($_POST['settings'] as $key => $value) {
+    // Check if POST data was discarded (usually due to post_max_size)
+    if (empty($_POST) && $_SERVER['CONTENT_LENGTH'] > 0) {
+        $max_post = ini_get('post_max_size');
+        set_flash('danger', "The form data was too large for the server. Maximum allowed size is $max_post. Please try smaller files.");
+        redirect('/admin/settings');
+    }
+
+    foreach ($_POST['settings'] ?? [] as $key => $value) {
         try {
             $stmt = $pdo->prepare("INSERT INTO site_settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value` = ?");
             $stmt->execute([$key, $value, $value]);
@@ -28,38 +35,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Handle Image Uploads
     $upload_dir = __DIR__ . '/../assets/images/';
-    if (!is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
+    if (!is_dir($upload_dir))
+        mkdir($upload_dir, 0755, true);
 
     $image_fields = ['site_logo', 'site_favicon', 'hero_background'];
     $upload_errors = [];
     $upload_success = [];
-    
+
     foreach ($image_fields as $field) {
         $file_info = $_FILES[$field] ?? null;
-        
+
         if ($file_info && $file_info['error'] === UPLOAD_ERR_OK) {
             $allowed = ['jpg', 'jpeg', 'png', 'gif', 'ico', 'webp', 'svg'];
             $filename = $file_info['name'];
             $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-            
+
             if (in_array($ext, $allowed)) {
                 $new_filename = ($field === 'site_favicon' ? 'favicon.' . $ext : ($field === 'site_logo' ? 'logo.' . $ext : 'hero-bg.' . $ext));
                 $target_path = $upload_dir . $new_filename;
-                
-                if (copy($file_info['tmp_name'], $target_path)) {
+
+                if (move_uploaded_file($file_info['tmp_name'], $target_path)) {
                     $stmt = $pdo->prepare("INSERT INTO site_settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value` = ?");
                     $stmt->execute([$field, $new_filename, $new_filename]);
                     $upload_success[] = "$field uploaded: $new_filename";
                 } else {
-                    $upload_errors[] = "Failed to copy $field. Check folder permissions.";
+                    $upload_errors[] = "Failed to move $field. Check folder permissions.";
                 }
             } else {
                 $upload_errors[] = "Invalid file type for $field: $ext";
             }
         } else if ($file_info && $file_info['error'] !== UPLOAD_ERR_NO_FILE) {
-            $upload_errors[] = "Upload error for $field: code " . $file_info['error'];
+            $error_msg = "Upload error for $field: ";
+            switch ($file_info['error']) {
+                case UPLOAD_ERR_INI_SIZE:
+                case UPLOAD_ERR_FORM_SIZE:
+                    $error_msg .= "File is too large. Max allowed: " . ini_get('upload_max_filesize');
+                    break;
+                case UPLOAD_ERR_PARTIAL:
+                    $error_msg .= "File was only partially uploaded.";
+                    break;
+                case UPLOAD_ERR_NO_TMP_DIR:
+                    $error_msg .= "Missing temporary folder.";
+                    break;
+                default:
+                    $error_msg .= "Error code " . $file_info['error'];
+            }
+            $upload_errors[] = $error_msg;
         }
-        
+
         // Handle remove checkbox
         if (isset($_POST['remove_' . $field])) {
             $stmt = $pdo->prepare("INSERT INTO site_settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value` = ?");
@@ -101,10 +124,11 @@ require_once __DIR__ . '/includes/header.php';
                         <label class="form-label">Site Logo</label>
                         <?php if (!empty($current_settings['site_logo'])): ?>
                             <div class="mb-2">
-                                <img src="/assets/images/<?php echo htmlspecialchars($current_settings['site_logo']); ?>" 
-                                     alt="Logo" style="max-height: 60px;" class="border rounded p-1">
+                                <img src="/assets/images/<?php echo htmlspecialchars($current_settings['site_logo']); ?>"
+                                    alt="Logo" style="max-height: 60px;" class="border rounded p-1">
                                 <div class="form-check mt-2">
-                                    <input class="form-check-input" type="checkbox" name="remove_site_logo" id="remove_site_logo">
+                                    <input class="form-check-input" type="checkbox" name="remove_site_logo"
+                                        id="remove_site_logo">
                                     <label class="form-check-label text-danger" for="remove_site_logo">Remove</label>
                                 </div>
                             </div>
@@ -116,10 +140,11 @@ require_once __DIR__ . '/includes/header.php';
                         <label class="form-label">Favicon</label>
                         <?php if (!empty($current_settings['site_favicon'])): ?>
                             <div class="mb-2">
-                                <img src="/assets/images/<?php echo htmlspecialchars($current_settings['site_favicon']); ?>" 
-                                     alt="Favicon" style="max-height: 32px;" class="border rounded p-1">
+                                <img src="/assets/images/<?php echo htmlspecialchars($current_settings['site_favicon']); ?>"
+                                    alt="Favicon" style="max-height: 32px;" class="border rounded p-1">
                                 <div class="form-check mt-2">
-                                    <input class="form-check-input" type="checkbox" name="remove_site_favicon" id="remove_site_favicon">
+                                    <input class="form-check-input" type="checkbox" name="remove_site_favicon"
+                                        id="remove_site_favicon">
                                     <label class="form-check-label text-danger" for="remove_site_favicon">Remove</label>
                                 </div>
                             </div>
@@ -172,10 +197,12 @@ require_once __DIR__ . '/includes/header.php';
                         <label class="form-label">Hero Background Image</label>
                         <?php if (!empty($current_settings['hero_background'])): ?>
                             <div class="mb-2">
-                                <img src="/assets/images/<?php echo htmlspecialchars($current_settings['hero_background']); ?>" 
-                                     alt="Hero Background" style="max-height: 150px; max-width: 100%;" class="border rounded p-1">
+                                <img src="/assets/images/<?php echo htmlspecialchars($current_settings['hero_background']); ?>"
+                                    alt="Hero Background" style="max-height: 150px; max-width: 100%;"
+                                    class="border rounded p-1">
                                 <div class="form-check mt-2">
-                                    <input class="form-check-input" type="checkbox" name="remove_hero_background" id="remove_hero_background">
+                                    <input class="form-check-input" type="checkbox" name="remove_hero_background"
+                                        id="remove_hero_background">
                                     <label class="form-check-label text-danger" for="remove_hero_background">Remove</label>
                                 </div>
                             </div>
@@ -234,15 +261,15 @@ require_once __DIR__ . '/includes/header.php';
                 <div class="card-body">
                     <div class="mb-3">
                         <label class="form-label">Google Search Console Verification Meta Tag</label>
-                        <input type="text" class="form-control" name="settings[google_search_console_verification]" 
-                            value="<?php echo htmlspecialchars($current_settings['google_search_console_verification'] ?? ''); ?>" 
+                        <input type="text" class="form-control" name="settings[google_search_console_verification]"
+                            value="<?php echo htmlspecialchars($current_settings['google_search_console_verification'] ?? ''); ?>"
                             placeholder="e.g., xyz123abc...">
                         <small class="text-muted">Get this from Google Search Console → Settings → Verification</small>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Google Analytics 4 Measurement ID</label>
-                        <input type="text" class="form-control" name="settings[google_analytics_id]" 
-                            value="<?php echo htmlspecialchars($current_settings['google_analytics_id'] ?? ''); ?>" 
+                        <input type="text" class="form-control" name="settings[google_analytics_id]"
+                            value="<?php echo htmlspecialchars($current_settings['google_analytics_id'] ?? ''); ?>"
                             placeholder="e.g., G-XXXXXXXXXX">
                         <small class="text-muted">Get this from Google Analytics → Admin → Data Streams</small>
                     </div>
