@@ -66,6 +66,7 @@ require_once __DIR__ . '/includes/header.php';
                         <th>Trainer</th>
                         <th>Duration</th>
                         <th>Level</th>
+                        <th>Featured</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -108,6 +109,13 @@ require_once __DIR__ . '/includes/header.php';
                             <td><span class="badge bg-secondary">
                                     <?php echo htmlspecialchars($course['level']); ?>
                                 </span></td>
+                            <td>
+                                <?php if ($course['is_featured']): ?>
+                                    <span class="badge bg-warning text-dark"><i class="fas fa-star"></i> Featured</span>
+                                <?php else: ?>
+                                    <span class="badge bg-light text-muted">No</span>
+                                <?php endif; ?>
+                            </td>
                             <td>
                                 <div class="btn-group btn-group-sm">
                                     <a href="/course/<?php echo $course['id']; ?>" class="btn btn-outline-info"

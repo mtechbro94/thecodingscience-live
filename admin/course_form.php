@@ -4,9 +4,6 @@
 require_once dirname(__DIR__) . '/includes/db.php';
 require_once BASE_PATH . '/includes/functions.php';
 
-
-
-
 if (!is_admin()) {
     redirect('/');
 }
@@ -49,6 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $level = sanitize($_POST['level'] ?? '');
     $trainer_id = !empty($_POST['trainer_id']) ? (int) $_POST['trainer_id'] : null;
     $curriculum = $_POST['curriculum'] ?? '[]'; // JSON string
+    $is_featured = isset($_POST['is_featured']) ? 1 : 0;
 
     // Validation
     if (empty($name))
@@ -91,15 +89,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             if ($is_edit) {
                 // Update
-                $sql = "UPDATE courses SET name = ?, description = ?, summary = ?, price = ?, duration = ?, level = ?, trainer_id = ?, image = ?, curriculum = ? WHERE id = ?";
+                $sql = "UPDATE courses SET name = ?, description = ?, summary = ?, price = ?, duration = ?, level = ?, trainer_id = ?, image = ?, curriculum = ?, is_featured = ? WHERE id = ?";
                 $stmt = $pdo->prepare($sql);
-                $stmt->execute([$name, $description, $summary, $price, $duration, $level, $trainer_id, $image, $curriculum, $course_id]);
+                $stmt->execute([$name, $description, $summary, $price, $duration, $level, $trainer_id, $image, $curriculum, $is_featured, $course_id]);
                 set_flash('success', 'Course updated successfully.');
             } else {
                 // Insert
-                $sql = "INSERT INTO courses (name, description, summary, price, duration, level, trainer_id, image, curriculum, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+                $sql = "INSERT INTO courses (name, description, summary, price, duration, level, trainer_id, image, curriculum, is_featured, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
                 $stmt = $pdo->prepare($sql);
-                $stmt->execute([$name, $description, $summary, $price, $duration, $level, $trainer_id, $image, $curriculum]);
+                $stmt->execute([$name, $description, $summary, $price, $duration, $level, $trainer_id, $image, $curriculum, $is_featured]);
                 set_flash('success', 'Course created successfully.');
             }
             redirect('/admin/courses');
@@ -228,6 +226,14 @@ require_once __DIR__ . '/includes/header.php';
                                 </option>
                             <?php endforeach; ?>
                         </select>
+                    </div>
+
+                    <div class="mb-3 border-top pt-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="is_featured" id="is_featured" <?php echo ($course['is_featured'] ?? 0) ? 'checked' : ''; ?>>
+                            <label class="form-check-label fw-bold" for="is_featured">Featured Course</label>
+                        </div>
+                        <small class="text-muted">Featured courses appear prominently on the home page.</small>
                     </div>
                 </div>
             </div>

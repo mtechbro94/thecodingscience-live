@@ -1,54 +1,15 @@
 <?php
 // views/home.php
 
-// Featured Courses (same as courses page)
-$featured_courses = [
-    [
-        'name' => 'Crash Course in Computer Science',
-        'summary' => 'Foundation course for technology beginners',
-        'level' => 'Beginner',
-        'price' => 2999,
-        'image' => 'ccc.jpg'
-    ],
-    [
-        'name' => 'Programming with Python',
-        'summary' => 'Learn Python programming from scratch',
-        'level' => 'Beginner to Intermediate',
-        'price' => 3999,
-        'image' => 'pp.jpg'
-    ],
-    [
-        'name' => 'Full Stack Web Development',
-        'summary' => 'Complete web development course',
-        'level' => 'Intermediate',
-        'price' => 7999,
-        'image' => 'fsd.jpg'
-    ],
-    [
-        'name' => 'Data Science from Scratch',
-        'summary' => 'Introduction to data science',
-        'level' => 'Beginner to Intermediate',
-        'price' => 6999,
-        'image' => 'ds.jpg'
-    ],
-    [
-        'name' => 'Machine Learning and AI Foundations',
-        'summary' => 'Foundation ML and AI course',
-        'level' => 'Intermediate to Advanced',
-        'price' => 7999,
-        'image' => 'maf.jpg'
-    ],
-    [
-        'name' => 'Ethical Hacking and Cybersecurity',
-        'summary' => 'Learn ethical hacking and cybersecurity',
-        'level' => 'Beginner to Intermediate',
-        'price' => 6999,
-        'image' => 'EHPT.jpg'
-    ]
-];
+// Fetch Featured Courses from Database
+$stmt = $pdo->query("SELECT * FROM courses WHERE is_featured = 1 ORDER BY created_at DESC LIMIT 4");
+$courses = $stmt->fetchAll();
 
-// Use first 4 courses for featured section
-$courses = array_slice($featured_courses, 0, 4);
+// If no featured courses, fetch 4 latest courses
+if (empty($courses)) {
+    $stmt = $pdo->query("SELECT * FROM courses ORDER BY created_at DESC LIMIT 4");
+    $courses = $stmt->fetchAll();
+}
 
 // Fetch Latest Blogs (Limit 3)
 $stmt = $pdo->query("SELECT * FROM blogs WHERE is_published = 1 ORDER BY created_at DESC LIMIT 3");
@@ -59,7 +20,7 @@ require_once 'includes/header.php';
 ?>
 
 <!-- Hero Section -->
-<?php 
+<?php
 $hero_bg = get_setting('hero_background', '');
 $hero_style = '';
 if (!empty($hero_bg)) {
@@ -186,44 +147,39 @@ if (!empty($hero_bg)) {
         </h2>
         <div class="row">
             <div class="col-lg-3 col-md-6 mb-4">
-                <div class="feature-box">
-                    <div class="feature-icon">
-                        <i class="fas fa-user-tie fa-2x text-primary"></i>
+                <div class="feature-box text-center p-4">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-user-tie fa-3x text-primary"></i>
                     </div>
-                    <h4>Industry Expert Trainers</h4>
-                    <p>Learn from experienced professionals with 10+ years in the tech industry. Our trainers work on
-                        real-world projects.</p>
+                    <h4>Industry Experts</h4>
+                    <p>Learn from experienced professionals with 10+ years in the tech industry.</p>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6 mb-4">
-                <div class="feature-box">
-                    <div class="feature-icon">
-                        <i class="fas fa-code fa-2x text-success"></i>
+                <div class="feature-box text-center p-4">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-code fa-3x text-success"></i>
                     </div>
-                    <h4>Hands-On Projects</h4>
-                    <p>Build real-world applications from day one. Portfolio-ready projects that showcase your skills to
-                        employers.</p>
+                    <h4>Hands-On Training</h4>
+                    <p>Build real-world applications and portfolio-ready projects from day one.</p>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6 mb-4">
-                <div class="feature-box">
-                    <div class="feature-icon">
-                        <i class="fas fa-building fa-2x text-info"></i>
+                <div class="feature-box text-center p-4">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-building fa-3x text-info"></i>
                     </div>
-                    <h4>Tie ups with MNCs</h4>
-                    <p>We have partnerships with leading multinational companies for internships, placements, and
-                        industry exposure.
-                    </p>
+                    <h4>MNC Partnerships</h4>
+                    <p>Tie-ups with leading companies for internships and placement assistance.</p>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6 mb-4">
-                <div class="feature-box">
-                    <div class="feature-icon">
-                        <i class="fas fa-stream fa-2x text-danger"></i>
+                <div class="feature-box text-center p-4">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-stream fa-3x text-danger"></i>
                     </div>
                     <h4>Flexible Learning</h4>
-                    <p>Live classes, recorded sessions, and self-paced learning options. Learn at your own pace and
-                        schedule.</p>
+                    <p>Live classes, recordings, and self-paced options to suit your schedule.</p>
                 </div>
             </div>
         </div>
@@ -233,74 +189,115 @@ if (!empty($hero_bg)) {
 <!-- Featured Courses Section -->
 <section class="py-5 section-muted" id="courses">
     <div class="container">
-        <h2 class="text-center mb-5">Featured Courses</h2>
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <h2 class="mb-0">Featured Courses</h2>
+            <a href="/courses" class="btn btn-outline-primary rounded-pill px-4">See All</a>
+        </div>
         <div class="row">
             <?php foreach ($courses as $course): ?>
                 <div class="col-md-6 col-lg-3 mb-4">
-                    <div class="card h-100 shadow-sm course-card">
-                        <?php if (!empty($course['image'])): ?>
-                            <img src="/assets/images/<?php echo $course['image']; ?>" alt="<?php echo $course['name']; ?>" class="card-img-top" style="height: 150px; object-fit: cover;">
-                        <?php endif; ?>
-                        <div class="card-body">
-                            <span class="badge bg-info mb-2"><?php echo $course['level']; ?></span>
-                            <h5 class="card-title">
-                                <?php echo $course['name']; ?>
-                            </h5>
-                            <p class="card-text text-muted small">
-                                <?php echo $course['summary']; ?>
-                            </p>
-                            <div class="course-meta">
-                                <small><i class="fas fa-rupee-sign"></i> ₹
-                                    <?php echo number_format($course['price']); ?>
-                                </small>
+                    <div class="card h-100 shadow-sm border-0 course-card hover-lift overflow-hidden">
+                        <div class="position-relative">
+                            <img src="<?php echo get_image_url($course['image']); ?>"
+                                alt="<?php echo htmlspecialchars($course['name']); ?>" class="card-img-top"
+                                style="height: 200px; object-fit: cover;">
+                            <div class="position-absolute top-0 end-0 m-3">
+                                <span
+                                    class="badge bg-primary rounded-pill shadow-sm px-3"><?php echo htmlspecialchars($course['level']); ?></span>
                             </div>
                         </div>
-                        <div class="card-footer bg-white">
-                            <a href="/courses" class="btn btn-primary btn-sm w-100">View
-                                Course</a>
+                        <div class="card-body p-4">
+                            <h5 class="card-title fw-bold mb-2">
+                                <?php echo htmlspecialchars($course['name']); ?>
+                            </h5>
+                            <p class="card-text text-muted small mb-4">
+                                <?php echo htmlspecialchars(substr($course['summary'], 0, 100)) . (strlen($course['summary']) > 100 ? '...' : ''); ?>
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center mt-auto">
+                                <div class="course-price">
+                                    <span
+                                        class="text-primary fw-bold h5 mb-0">₹<?php echo number_format($course['price']); ?></span>
+                                </div>
+                                <div class="course-duration small text-muted">
+                                    <i class="far fa-clock me-1"></i>
+                                    <?php echo htmlspecialchars($course['duration'] ?: 'Self-paced'); ?>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white border-0 p-4 pt-0">
+                            <a href="/course/<?php echo $course['id']; ?>" class="btn btn-primary w-100 rounded-pill">View
+                                Details</a>
                         </div>
                     </div>
                 </div>
             <?php endforeach; ?>
         </div>
-        <div class="text-center mt-5">
-            <a href="/courses" class="btn btn-primary btn-lg">Explore All Courses</a>
-        </div>
     </div>
 </section>
 
 <!-- Student Success Stories -->
-<section class="py-5 section-highlight">
+<section class="py-5">
     <div class="container">
         <h2 class="text-center mb-5">Student Success Stories</h2>
         <div class="row">
             <div class="col-md-4 mb-4">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body">
-                        <p class="small text-muted">“The Coding Science helped me switch from a non-tech background to a
+                <div class="card h-100 shadow-sm border-0 bg-light">
+                    <div class="card-body p-4">
+                        <div class="mb-3 text-warning">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                        <p class="text-muted italic">“The Coding Science helped me switch from a non-tech background to
+                            a
                             full-time web developer in just a few months.”</p>
-                        <h6 class="mt-3 mb-0">Ayesha Khan</h6>
-                        <small class="text-muted">Front-end Developer, Bangalore</small>
+                        <div class="d-flex align-items-center mt-4">
+                            <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                                style="width: 40px; height: 40px;">AK</div>
+                            <div>
+                                <h6 class="mb-0">Ayesha Khan</h6>
+                                <small class="text-muted">Software Developer</small>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="col-md-4 mb-4">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body">
-                        <p class="small text-muted">“The projects and mentorship were exactly what I needed to crack my
+                <div class="card h-100 shadow-sm border-0 bg-light">
+                    <div class="card-body p-4">
+                        <div class="mb-3 text-warning">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                        <p class="text-muted">“The projects and mentorship were exactly what I needed to crack my
                             first Data Science internship.”</p>
-                        <h6 class="mt-3 mb-0">Rohit Sharma</h6>
-                        <small class="text-muted">Data Science Intern, Pune</small>
+                        <div class="d-flex align-items-center mt-4">
+                            <div class="avatar bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                                style="width: 40px; height: 40px;">RS</div>
+                            <div>
+                                <h6 class="mb-0">Rohit Sharma</h6>
+                                <small class="text-muted">Data Scientist</small>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="col-md-4 mb-4">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body">
-                        <p class="small text-muted">“Live classes, doubt support and career guidance made the learning
+                <div class="card h-100 shadow-sm border-0 bg-light">
+                    <div class="card-body p-4">
+                        <div class="mb-3 text-warning">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                        <p class="text-muted">“Live classes, doubt support and career guidance made the learning
                             journey smooth and focused.”</p>
-                        <h6 class="mt-3 mb-0">Simran Gupta</h6>
-                        <small class="text-muted">AI & ML Enthusiast, Jammu & Kashmir</small>
+                        <div class="d-flex align-items-center mt-4">
+                            <div class="avatar bg-info text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                                style="width: 40px; height: 40px;">SG</div>
+                            <div>
+                                <h6 class="mb-0">Simran Gupta</h6>
+                                <small class="text-muted">AI Engineer</small>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -309,13 +306,65 @@ if (!empty($hero_bg)) {
 </section>
 
 <!-- CTA Section -->
-<section class="py-5 bg-primary">
-    <div class="container text-center">
-        <h2 class="mb-4 text-light">Ready to Transform Your Career?</h2>
-        <p class="lead mb-4 text-light">Join thousands of students who have successfully launched their tech careers.
-        </p>
-        <a href="/contact" class="btn btn-light btn-lg">Get in Touch Today</a>
+<section class="py-5 bg-primary position-relative overflow-hidden">
+    <div class="container text-center py-4 position-relative z-index-1">
+        <h2 class="mb-4 text-white fw-bold">Ready to Transform Your Career?</h2>
+        <p class="lead mb-5 text-white-50">Join thousands of students who have successfully launched their tech careers
+            with us.</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="/courses" class="btn btn-light btn-lg rounded-pill px-5">Browse Courses</a>
+            <a href="/contact" class="btn btn-outline-light btn-lg rounded-pill px-5">Contact Us</a>
+        </div>
     </div>
 </section>
+
+<style>
+    .course-card {
+        transition: all 0.3s ease;
+    }
+
+    .hover-lift:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 1rem 3rem rgba(0, 0, 0, .175) !important;
+    }
+
+    .hero-section {
+        background-size: cover;
+        background-position: center;
+        height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: white;
+        position: relative;
+    }
+
+    .hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .feature-box {
+        border-radius: 15px;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        background: white;
+        transition: all 0.3s ease;
+    }
+
+    .feature-box:hover {
+        border-color: var(--bs-primary);
+        transform: translateY(-5px);
+    }
+</style>
 
 <?php require_once 'includes/footer.php'; ?>
