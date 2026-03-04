@@ -225,7 +225,7 @@ if (!empty($hero_bg)) {
                             </div>
                         </div>
                         <div class="card-footer bg-white border-0 p-4 pt-0">
-                            <a href="/course/<?php echo $course['id']; ?>" class="btn btn-primary w-100 rounded-pill">View
+                            <a href="/courses" class="btn btn-primary w-100 rounded-pill">View
                                 Details</a>
                         </div>
                     </div>
