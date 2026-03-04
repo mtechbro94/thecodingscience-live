@@ -12,3 +12,17 @@ RewriteRule ^ %1 [L,R=301]
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^ index.php [L]
+
+# Increase PHP upload limits (if supported by server)
+<IfModule mod_php7.c>
+    php_value upload_max_filesize 32M
+    php_value post_max_size 32M
+    php_value max_execution_time 300
+    php_value max_input_time 300
+</IfModule>
+<IfModule mod_php.c>
+    php_value upload_max_filesize 32M
+    php_value post_max_size 32M
+    php_value max_execution_time 300
+    php_value max_input_time 300
+</IfModule>

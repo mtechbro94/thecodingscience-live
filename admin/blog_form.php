@@ -36,8 +36,14 @@ if ($is_edit) {
 
 // Handle Form Submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    error_log("Processing POST request");
-    $title = sanitize($_POST['title'] ?? '');
+    // Detect if post_max_size was exceeded (empty $_POST but content-length > 0)
+    if (empty($_POST) && isset($_SERVER['CONTENT_LENGTH']) && $_SERVER['CONTENT_LENGTH'] > 0) {
+        $post_max = ini_get('post_max_size');
+        $errors[] = "The total request size exceeds the server limit ($post_max). Please try with a smaller image.";
+        error_log("POST size exceeded post_max_size: " . $_SERVER['CONTENT_LENGTH']);
+    } else {
+        error_log("Processing POST request");
+        $title = sanitize($_POST['title'] ?? '');
     $slug = sanitize($_POST['slug'] ?? generate_slug($title));
     $excerpt = sanitize($_POST['excerpt'] ?? '');
     $content = $_POST['content'] ?? '';
@@ -99,6 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } catch (PDOException $e) {
             $errors[] = "Database Error: " . $e->getMessage();
         }
+    }
     }
 }
 
@@ -163,6 +170,7 @@ if (isset($image) && !empty($image)): ?>
 <?php endif; ?>
 
 <form method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="MAX_FILE_SIZE" value="10485760"> <!-- 10MB Limit hint for PHP -->
     <div class="row">
         <div class="col-md-8">
             <div class="card shadow-sm mb-4">
@@ -251,7 +259,7 @@ if (isset($image) && !empty($image)): ?>
                     <?php if (!empty($blog['image'])): ?>
                         <img src="<?php echo get_image_url($blog['image']); ?>" class="img-fluid rounded mb-3 shadow-sm">
                     <?php endif; ?>
-                    <input class="form-control" type="file" name="image" accept="image/*">
+                    <input class="form-control" type="file" name="image" id="blogImage" accept="image/*">
                 </div>
             </div>
 
@@ -268,6 +276,18 @@ if (isset($image) && !empty($image)): ?>
 <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
+    // File size validation
+    document.getElementById('blogImage').addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            const size = this.files[0].size;
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            if (size > maxSize) {
+                alert("File is too large! Maximum allowed size is 10MB. This file is " + (size / (1024 * 1024)).toFixed(2) + "MB.");
+                this.value = ''; // Clear the input
+            }
+        }
+    });
+
     const easyMDE = new EasyMDE({
         element: document.getElementById('markdownEditor'),
         spellChecker: false,
