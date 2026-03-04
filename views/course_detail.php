@@ -93,7 +93,7 @@ require_once 'includes/header.php';
                                                 aria-expanded="<?php echo $index === 0 ? 'true' : 'false'; ?>"
                                                 aria-controls="collapse<?php echo $index; ?>">
                                                 <div class="d-flex justify-content-between w-100 me-3">
-                                                    <span><strong><?php echo htmlspecialchars($item['title']); ?></strong></span>
+                                                    <span><strong><?php echo htmlspecialchars($item['module']); ?></strong></span>
                                                     <?php if (isset($item['topics']) && is_array($item['topics'])): ?>
                                                         <span
                                                             class="badge bg-light text-dark rounded-pill"><?php echo count($item['topics']); ?>
