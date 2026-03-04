@@ -24,7 +24,8 @@ require_once 'includes/header.php';
 $hero_bg = get_setting('hero_background', '');
 $hero_style = '';
 if (!empty($hero_bg)) {
-    $hero_style = 'background-image: url(/assets/images/' . htmlspecialchars($hero_bg) . '?v=' . time() . ');';
+    $img_url = '/assets/images/' . htmlspecialchars($hero_bg) . '?v=' . time();
+    $hero_style = 'background-image: url(' . $img_url . ') !important; background-size: cover !important; background-position: center !important;';
 }
 ?>
 <section class="hero-section" style="<?php echo $hero_style; ?>">

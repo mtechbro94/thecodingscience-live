@@ -295,7 +295,9 @@ nav.navbar-custom:hover {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--primary-color) 0%, #312e81 100%);
+    /* Fallback gradient - overridden by inline background-image when set */
+    background-color: var(--primary-color);
+    background-image: linear-gradient(135deg, var(--primary-color) 0%, #312e81 100%);
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -332,7 +334,6 @@ nav.navbar-custom:hover {
     letter-spacing: -1px;
     color: #ffffff;
     text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-}
 }
 
 .hero-subtitle {
