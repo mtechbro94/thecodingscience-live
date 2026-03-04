@@ -102,13 +102,17 @@ require_once __DIR__ . '/includes/header.php';
                             </td>
                             <td>
                                 <div class="d-flex align-items-center">
-                                    <?php if (!empty($blog['author_image'])): ?>
-                                        <img src="/assets/images/profiles/<?php echo htmlspecialchars($blog['author_image']); ?>" 
-                                             alt="<?php echo htmlspecialchars($blog['author_name']); ?>"
-                                             class="rounded-circle me-2"
-                                             style="width: 28px; height: 28px; object-fit: cover;">
+                                    <?php
+                                    $author_data = [
+                                        'profile_image' => $blog['author_image'],
+                                        'name' => $blog['author_name'] ?? $blog['author']
+                                    ];
+                                    if (!empty($blog['author_image'])): ?>
+                                        <img src="<?php echo get_avatar($author_data); ?>"
+                                            alt="<?php echo htmlspecialchars($author_data['name']); ?>"
+                                            class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover;">
                                     <?php endif; ?>
-                                    <?php echo htmlspecialchars($blog['author_name'] ?? $blog['author']); ?>
+                                    <?php echo htmlspecialchars($author_data['name']); ?>
                                 </div>
                             </td>
                             <td>

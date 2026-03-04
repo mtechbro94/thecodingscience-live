@@ -76,14 +76,18 @@ require_once 'includes/header.php';
 
                 <div class="d-flex align-items-center mb-4 text-muted">
                     <div class="d-flex align-items-center me-4">
-                        <?php if (!empty($blog['author_image'])): ?>
-                            <img src="/assets/images/profiles/<?php echo htmlspecialchars($blog['author_image']); ?>" 
-                                 alt="<?php echo htmlspecialchars($blog['author_name']); ?>"
-                                 class="rounded-circle me-2"
-                                 style="width: 40px; height: 40px; object-fit: cover;">
+                        <?php
+                        $author_data = [
+                            'profile_image' => $blog['author_image'],
+                            'name' => $blog['author_name']
+                        ];
+                        if (!empty($blog['author_image'])): ?>
+                            <img src="<?php echo get_avatar($author_data); ?>"
+                                alt="<?php echo htmlspecialchars($blog['author_name']); ?>" class="rounded-circle me-2"
+                                style="width: 40px; height: 40px; object-fit: cover;">
                         <?php else: ?>
-                            <div class="bg-success text-white rounded-circle me-2 d-flex align-items-center justify-content-center"
-                                 style="width: 40px; height: 40px; font-size: 16px;">
+                            <div class="bg-primary text-white rounded-circle me-2 d-flex align-items-center justify-content-center"
+                                style="width: 40px; height: 40px; font-size: 16px;">
                                 <?php echo strtoupper(substr($blog['author_name'] ?? 'A', 0, 1)); ?>
                             </div>
                         <?php endif; ?>

@@ -85,6 +85,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
     
+    }
+    
+    // Handle Profile Details Update
+    if (isset($_POST['update_details'])) {
+        $name = sanitize($_POST['name'] ?? '');
+        $phone = sanitize($_POST['phone'] ?? '');
+        
+        if (empty($name)) {
+            $errors[] = "Name is required.";
+        }
+        
+        if (empty($errors)) {
+            $stmt = $pdo->prepare("UPDATE users SET name = ?, phone = ? WHERE id = ?");
+            if ($stmt->execute([$name, $phone, $user['id']])) {
+                $_SESSION['user_name'] = $name;
+                set_flash('success', 'Profile details updated successfully!');
+                redirect('/profile');
+            } else {
+                set_flash('danger', 'Failed to update profile details.');
+            }
+        } else {
+            foreach ($errors as $error) {
+                set_flash('danger', $error);
+            }
+        }
+    }
+
     if (!empty($filename) || !empty($errors)) {
         redirect('/profile');
     }
@@ -178,7 +205,7 @@ require_once 'includes/header.php';
                             <a href="/logout" class="btn btn-outline-danger">
                                 <i class="fas fa-sign-out-alt me-2"></i> Logout
                             </a>
-                            <button class="btn btn-primary" onclick="alert('Full profile editing is coming soon!')">
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
                                 <i class="fas fa-edit me-2"></i> Edit Account Details
                             </button>
                         </div>
@@ -240,6 +267,34 @@ require_once 'includes/header.php';
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-primary" onclick="saveCroppedImage()">Save Photo</button>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form action="/profile" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Account Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" name="name" class="form-control" value="<?php echo htmlspecialchars($userData['name']); ?>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Phone Number</label>
+                        <input type="text" name="phone" class="form-control" value="<?php echo htmlspecialchars($userData['phone'] ?? ''); ?>">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" name="update_details" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

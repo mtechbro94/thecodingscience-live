@@ -48,15 +48,19 @@ require_once 'includes/header.php';
                                 <?php echo htmlspecialchars($blog['excerpt']); ?>
                             </p>
                             <div class="d-flex align-items-center">
-                                <?php if (!empty($blog['author_image'])): ?>
-                                    <img src="/assets/images/profiles/<?php echo htmlspecialchars($blog['author_image']); ?>" 
-                                         alt="<?php echo htmlspecialchars($blog['author_name']); ?>"
-                                         class="rounded-circle me-2"
-                                         style="width: 32px; height: 32px; object-fit: cover;">
+                                <?php
+                                $author_data = [
+                                    'profile_image' => $blog['author_image'],
+                                    'name' => $blog['author_name'] ?? $blog['author']
+                                ];
+                                if (!empty($blog['author_image'])): ?>
+                                    <img src="<?php echo get_avatar($author_data); ?>"
+                                        alt="<?php echo htmlspecialchars($author_data['name']); ?>" class="rounded-circle me-2"
+                                        style="width: 32px; height: 32px; object-fit: cover;">
                                 <?php else: ?>
-                                    <div class="bg-secondary text-white rounded-circle me-2 d-flex align-items-center justify-content-center"
-                                         style="width: 32px; height: 32px; font-size: 0.875rem;">
-                                        <?php echo strtoupper(substr($blog['author_name'] ?? $blog['author'], 0, 1)); ?>
+                                    <div class="bg-primary text-white rounded-circle me-2 d-flex align-items-center justify-content-center"
+                                        style="width: 32px; height: 32px; font-size: 0.875rem;">
+                                        <?php echo strtoupper(substr($author_data['name'] ?? 'A', 0, 1)); ?>
                                     </div>
                                 <?php endif; ?>
                                 <span class="text-muted small">
