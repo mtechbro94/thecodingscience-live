@@ -103,6 +103,14 @@ function generate_slug($title)
 }
 
 /**
+ * Generate a 6-digit OTP
+ */
+function generate_otp()
+{
+    return str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+}
+
+/**
  * Get a site setting by key
  */
 function get_setting($key, $default = '')
@@ -290,16 +298,16 @@ function render_markdown($text)
 function validate_coupon($code, $total_amount, $pdo)
 {
     $code = strtoupper(trim($code));
-    
+
     try {
         $stmt = $pdo->prepare("SELECT * FROM coupons WHERE code = ? AND is_active = 1");
         $stmt->execute([$code]);
         $coupon = $stmt->fetch();
-        
+
         if (!$coupon) {
             return ['success' => false, 'message' => 'Invalid coupon code'];
         }
-        
+
         // Check expiry
         $now = new DateTime();
         if ($coupon['valid_from'] && new DateTime($coupon['valid_from']) > $now) {
@@ -308,26 +316,26 @@ function validate_coupon($code, $total_amount, $pdo)
         if ($coupon['valid_until'] && new DateTime($coupon['valid_until']) < $now) {
             return ['success' => false, 'message' => 'Coupon has expired'];
         }
-        
+
         // Check minimum purchase
         if ($coupon['min_purchase'] > 0 && $total_amount < $coupon['min_purchase']) {
             return ['success' => false, 'message' => 'Minimum purchase of ₹' . number_format($coupon['min_purchase']) . ' required'];
         }
-        
+
         // Check max uses
         if ($coupon['max_uses'] !== null && $coupon['used_count'] >= $coupon['max_uses']) {
             return ['success' => false, 'message' => 'Coupon usage limit reached'];
         }
-        
+
         // Calculate discount
         if ($coupon['discount_type'] === 'percentage') {
             $discount = ($total_amount * $coupon['discount_value']) / 100;
         } else {
             $discount = min($coupon['discount_value'], $total_amount);
         }
-        
+
         $final_amount = $total_amount - $discount;
-        
+
         return [
             'success' => true,
             'coupon' => $coupon,
@@ -335,7 +343,7 @@ function validate_coupon($code, $total_amount, $pdo)
             'original_amount' => $total_amount,
             'final_amount' => $final_amount
         ];
-        
+
     } catch (PDOException $e) {
         return ['success' => false, 'message' => 'Error validating coupon'];
     }

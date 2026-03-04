@@ -64,6 +64,10 @@ switch ($path) {
         require 'views/register.php';
         break;
 
+    case 'verify-otp':
+        require 'views/verify_otp.php';
+        break;
+
     case 'logout':
         require 'views/logout.php';
         break;

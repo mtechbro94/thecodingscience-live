@@ -28,8 +28,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($user && password_verify($password, $user['password_hash'])) {
             // Check if user account is active
             if (empty($user['is_active']) || $user['is_active'] == 0) {
-                set_flash('danger', 'Your account has been deactivated. Please contact support.');
-                redirect('/login');
+                if (!empty($user['otpcode'])) {
+                    $_SESSION['pending_verification_email'] = $user['email'];
+                    set_flash('warning', 'Please verify your email address to continue.');
+                    redirect('/verify-otp');
+                } else {
+                    set_flash('danger', 'Your account has been deactivated. Please contact support.');
+                    redirect('/login');
+                }
             }
 
             // Check if trainer is approved

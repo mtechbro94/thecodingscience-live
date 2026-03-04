@@ -58,23 +58,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $password_hash = password_hash($password, PASSWORD_DEFAULT);
 
         try {
+            $otp = generate_otp();
+            $expiry = date('Y-m-d H:i:s', strtotime('+15 minutes'));
+            $is_active = 0;
+
             if ($role === 'trainer') {
-                // Register Trainer (Needs approval)
-                $sql = "INSERT INTO users (name, email, phone, password_hash, role, education, experience, expertise, bio, is_approved, created_at) 
-                        VALUES (?, ?, ?, ?, 'trainer', ?, ?, ?, ?, 0, NOW())";
+                // Register Trainer (Needs approval + OTP)
+                $sql = "INSERT INTO users (name, email, phone, password_hash, role, education, experience, expertise, bio, is_approved, is_active, otpcode, otp_expiry, created_at) 
+                        VALUES (?, ?, ?, ?, 'trainer', ?, ?, ?, ?, 0, 0, ?, ?, NOW())";
                 $stmt = $pdo->prepare($sql);
-                $stmt->execute([$name, $email, $phone, $password_hash, $education, $experience, $expertise, $bio]);
-
-                set_flash('success', 'Trainer registration successful! Your account is pending approval.');
+                $stmt->execute([$name, $email, $phone, $password_hash, $education, $experience, $expertise, $bio, $otp, $expiry]);
             } else {
-                // Register Student
-                $sql = "INSERT INTO users (name, email, phone, password_hash, role, created_at) VALUES (?, ?, ?, ?, 'student', NOW())";
+                // Register Student (Needs OTP)
+                $sql = "INSERT INTO users (name, email, phone, password_hash, role, is_active, otpcode, otp_expiry, created_at) 
+                        VALUES (?, ?, ?, ?, 'student', 0, ?, ?, NOW())";
                 $stmt = $pdo->prepare($sql);
-                $stmt->execute([$name, $email, $phone, $password_hash]);
-
-                set_flash('success', 'Registration successful! Please login.');
+                $stmt->execute([$name, $email, $phone, $password_hash, $otp, $expiry]);
             }
-            redirect('/login');
+
+            // Send OTP Email
+            $subject = "Verify Your Email - " . SITE_NAME;
+            $message = "
+                <h2>Welcome to " . SITE_NAME . "!</h2>
+                <p>Thank you for registering. Please use the following One-Time Password (OTP) to verify your email address:</p>
+                <h1 style='color: #0d6efd; letter-spacing: 5px;'>" . $otp . "</h1>
+                <p>This OTP is valid for 15 minutes.</p>
+                <p>If you did not request this, please ignore this email.</p>
+            ";
+
+            if (send_email($email, $subject, $message)) {
+                $_SESSION['pending_verification_email'] = $email;
+                set_flash('info', 'Verification code sent to your email. Please check your inbox.');
+                redirect('/verify-otp');
+            } else {
+                set_flash('danger', 'Failed to send verification email. Please contact support.');
+            }
         } catch (PDOException $e) {
             set_flash('danger', 'Registration failed: ' . $e->getMessage());
         }
