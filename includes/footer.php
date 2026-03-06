@@ -98,10 +98,8 @@
 
         <!-- Copyright -->
         <div class="footer-bottom mt-5 pt-4 border-top border-secondary text-center">
-            <p class="mb-0 text-muted small">
-                &copy; <?php echo date('Y'); ?> <span
-                    class="text-white fw-bold"><?php echo get_setting('site_name', SITE_NAME); ?></span>. All rights
-                reserved. | Developed by The Coding Science Team
+            <p class="mb-0 text-light small">
+                &copy; <?php echo date('Y'); ?> <span class="text-white fw-bold"><?php echo get_setting('site_name', SITE_NAME); ?></span>. All rights reserved. | Developed by <span class="text-white fw-bold">The Coding Science Team</span>
             </p>
         </div>
     </div>
