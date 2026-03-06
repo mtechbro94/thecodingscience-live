@@ -68,30 +68,22 @@
                 </div>
 
                 <div class="footer-social-wrapper">
-                    <?php if (get_setting('facebook_url')): ?>
-                        <a href="<?php echo get_setting('facebook_url'); ?>" class="footer-social-circle facebook"
-                            target="_blank" title="Facebook">
-                            <i class="fab fa-facebook-f"></i>
-                        </a>
-                    <?php endif; ?>
-                    <?php if (get_setting('linkedin_url')): ?>
-                        <a href="<?php echo get_setting('linkedin_url'); ?>" class="footer-social-circle linkedin"
-                            target="_blank" title="LinkedIn">
-                            <i class="fab fa-linkedin-in"></i>
-                        </a>
-                    <?php endif; ?>
-                    <?php if (get_setting('instagram_url')): ?>
-                        <a href="<?php echo get_setting('instagram_url'); ?>" class="footer-social-circle instagram"
-                            target="_blank" title="Instagram">
-                            <i class="fab fa-instagram"></i>
-                        </a>
-                    <?php endif; ?>
-                    <?php if (get_setting('youtube_url')): ?>
-                        <a href="<?php echo get_setting('youtube_url'); ?>" class="footer-social-circle youtube"
-                            target="_blank" title="YouTube">
-                            <i class="fab fa-youtube"></i>
-                        </a>
-                    <?php endif; ?>
+                    <a href="<?php echo get_setting('facebook_url') ?: '#'; ?>" class="footer-social-circle facebook"
+                        target="_blank" title="Facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="<?php echo get_setting('linkedin_url') ?: '#'; ?>" class="footer-social-circle linkedin"
+                        target="_blank" title="LinkedIn">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a href="<?php echo get_setting('instagram_url') ?: '#'; ?>" class="footer-social-circle instagram"
+                        target="_blank" title="Instagram">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="<?php echo get_setting('youtube_url') ?: '#'; ?>" class="footer-social-circle youtube"
+                        target="_blank" title="YouTube">
+                        <i class="fab fa-youtube"></i>
+                    </a>
                 </div>
             </div>
         </div>
@@ -99,7 +91,9 @@
         <!-- Copyright -->
         <div class="footer-bottom mt-5 pt-4 border-top border-secondary text-center">
             <p class="mb-0 text-light small">
-                &copy; <?php echo date('Y'); ?> <span class="text-white fw-bold"><?php echo get_setting('site_name', SITE_NAME); ?></span>. All rights reserved. | Developed by <span class="text-white fw-bold">The Coding Science Team</span>
+                &copy; <?php echo date('Y'); ?> <span
+                    class="text-white fw-bold"><?php echo get_setting('site_name', SITE_NAME); ?></span>. All rights
+                reserved. | Developed by <span class="text-white fw-bold">The Coding Science Team</span>
             </p>
         </div>
     </div>
