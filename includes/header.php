@@ -35,8 +35,7 @@ require_once __DIR__ . '/functions.php';
     <!-- AOS Animations CSS -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <!-- Custom CSS (with cache busting) -->
-    <link rel="stylesheet"
-        href="/assets/css/style.css?v=<?php echo filemtime(__DIR__ . '/../assets/css/style.css'); ?>">
+    <link rel="stylesheet" href="/assets/css/style.css?v=<?php echo time(); ?>">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="<?php echo isset($og_type) ? $og_type : 'website'; ?>">

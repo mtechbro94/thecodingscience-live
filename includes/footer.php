@@ -5,7 +5,7 @@
     <div class="container">
         <div class="row gy-4">
             <!-- Column 1: Brand & About -->
-            <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="col-lg-4 col-md-6 mb-4">
                 <h5 class="footer-title mb-4">
                     <?php echo get_setting('site_name', SITE_NAME); ?>
                 </h5>
@@ -18,7 +18,7 @@
             </div>
 
             <!-- Column 2: What We Offer -->
-            <div class="col-lg-2 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="200">
+            <div class="col-lg-2 col-md-6 mb-4">
                 <h5 class="footer-title mb-4">What We Offer</h5>
                 <ul class="list-unstyled footer-offer-list">
                     <li class="mb-3">
@@ -37,7 +37,7 @@
             </div>
 
             <!-- Column 3: Quick Links -->
-            <div class="col-lg-2 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="300">
+            <div class="col-lg-2 col-md-6 mb-4">
                 <h5 class="footer-title mb-4">Quick Links</h5>
                 <ul class="list-unstyled footer-links">
                     <li><a href="/" class="footer-link-item"><i class="fas fa-chevron-right me-2 small"></i>Home</a>
@@ -54,7 +54,7 @@
             </div>
 
             <!-- Column 4: Contact & Socials -->
-            <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="400">
+            <div class="col-lg-4 col-md-6 mb-4">
                 <h5 class="footer-title mb-4">Connect With Us</h5>
                 <div class="footer-contact-info mb-4">
                     <p class="mb-2">
@@ -97,12 +97,11 @@
         </div>
 
         <!-- Copyright -->
-        <div class="footer-bottom mt-5 pt-4 border-top border-secondary text-center" data-aos="fade-in"
-            data-aos-delay="500">
+        <div class="footer-bottom mt-5 pt-4 border-top border-secondary text-center">
             <p class="mb-0 text-muted small">
                 &copy; <?php echo date('Y'); ?> <span
                     class="text-white fw-bold"><?php echo get_setting('site_name', SITE_NAME); ?></span>. All rights
-                reserved.
+                reserved. | Developed by The Coding Science Team
             </p>
         </div>
     </div>
@@ -128,8 +127,8 @@ $whatsapp_number_clean = preg_replace('/[^0-9]/', '', $whatsapp_number);
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<!-- Custom JS (with cache busting) -->
-<script src="/assets/js/main.js?v=<?php echo filemtime(__DIR__ . '/../assets/js/main.js'); ?>"></script>
+<!-- Custom JS (with stronger cache busting) -->
+<script src="/assets/js/main.js?v=<?php echo time(); ?>"></script>
 
 <!-- Initialize AOS -->
 <script>
