@@ -100,12 +100,12 @@ $whatsapp_number_clean = preg_replace('/[^0-9]/', '', $whatsapp_number);
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<!-- Custom JS -->
-<script src="/assets/js/main.js"></script>
+<!-- Custom JS (with cache busting) -->
+<script src="/assets/js/main.js?v=<?php echo filemtime(__DIR__ . '/../assets/js/main.js'); ?>"></script>
 
 <!-- Initialize AOS -->
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function  () {
         AOS.init({
             duration: 800,
             easing: 'ease-in-out',

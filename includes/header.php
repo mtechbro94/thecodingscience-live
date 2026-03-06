@@ -13,14 +13,14 @@ require_once __DIR__ . '/functions.php';
     </title>
 
     <!-- Favicon -->
-    <?php 
+    <?php
     $favicon = get_setting('site_favicon', '');
     $favicon_url = !empty($favicon) ? '/assets/images/' . htmlspecialchars($favicon) : '/assets/images/favicon.ico';
     $favicon_ext = pathinfo($favicon, PATHINFO_EXTENSION);
     $favicon_type = in_array($favicon_ext, ['png', 'gif', 'webp']) ? 'image/' . $favicon_ext : 'image/x-icon';
     ?>
     <link rel="icon" type="<?php echo $favicon_type; ?>" href="<?php echo $favicon_url; ?>">
-    
+
     <!-- Canonical URL -->
     <link rel="canonical" href="<?php echo isset($og_url) ? $og_url : SITE_URL . $_SERVER['REQUEST_URI']; ?>">
 
@@ -32,7 +32,11 @@ require_once __DIR__ . '/functions.php';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/assets/css/style.css">
+    <!-- AOS Animations CSS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Custom CSS (with cache busting) -->
+    <link rel="stylesheet"
+        href="/assets/css/style.css?v=<?php echo filemtime(__DIR__ . '/../assets/css/style.css'); ?>">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="<?php echo isset($og_type) ? $og_type : 'website'; ?>">
@@ -41,11 +45,10 @@ require_once __DIR__ . '/functions.php';
         content="<?php echo isset($og_title) ? htmlspecialchars($og_title) : (isset($page_title) ? $page_title : get_setting('site_name', SITE_NAME)); ?>">
     <meta property="og:description"
         content="<?php echo isset($og_description) ? htmlspecialchars($og_description) : 'Transform your career with specialized industry-led training in Web Development, Python, and AI.'; ?>">
-    <meta property="og:image"
-        content="<?php 
-            $logo = get_setting('site_logo', '');
-            echo isset($og_image) ? $og_image : (!empty($logo) ? SITE_URL . '/assets/images/' . $logo : SITE_URL . '/assets/images/logo.png'); 
-        ?>">
+    <meta property="og:image" content="<?php
+    $logo = get_setting('site_logo', '');
+    echo isset($og_image) ? $og_image : (!empty($logo) ? SITE_URL . '/assets/images/' . $logo : SITE_URL . '/assets/images/logo.png');
+    ?>">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
@@ -54,11 +57,10 @@ require_once __DIR__ . '/functions.php';
         content="<?php echo isset($og_title) ? htmlspecialchars($og_title) : (isset($page_title) ? $page_title : get_setting('site_name', SITE_NAME)); ?>">
     <meta property="twitter:description"
         content="<?php echo isset($og_description) ? htmlspecialchars($og_description) : 'Transform your career with specialized industry-led training in Web Development, Python, and AI.'; ?>">
-    <meta property="twitter:image"
-        content="<?php 
-            $logo = get_setting('site_logo', '');
-            echo isset($og_image) ? $og_image : (!empty($logo) ? SITE_URL . '/assets/images/' . $logo : SITE_URL . '/assets/images/logo.png'); 
-        ?>">
+    <meta property="twitter:image" content="<?php
+    $logo = get_setting('site_logo', '');
+    echo isset($og_image) ? $og_image : (!empty($logo) ? SITE_URL . '/assets/images/' . $logo : SITE_URL . '/assets/images/logo.png');
+    ?>">
 
     <?php if (isset($extra_css))
         echo $extra_css; ?>
@@ -74,7 +76,7 @@ require_once __DIR__ . '/functions.php';
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-0TMYFTPESW"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
+        function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
         gtag('config', 'G-0TMYFTPESW');
     </script>
@@ -86,7 +88,7 @@ require_once __DIR__ . '/functions.php';
     <nav class="navbar navbar-expand-lg fixed-top navbar-custom">
         <div class="container-fluid px-4">
             <a class="navbar-brand" href="/">
-                <?php 
+                <?php
                 $logo = get_setting('site_logo', '');
                 if (!empty($logo)): ?>
                     <img src="/assets/images/<?php echo htmlspecialchars($logo); ?>" alt="Logo" class="navbar-logo me-2">
