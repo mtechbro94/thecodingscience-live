@@ -177,6 +177,14 @@ switch ($path) {
     case 'admin/career_track_form.php':
         require 'admin/career_track_form.php';
         break;
+    case 'admin/success_stories':
+    case 'admin/success_stories.php':
+        require 'admin/success_stories.php';
+        break;
+    case 'admin/success_story_form':
+    case 'admin/success_story_form.php':
+        require 'admin/success_story_form.php';
+        break;
 
 
     case 'blogs':

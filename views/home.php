@@ -29,7 +29,7 @@ if (!empty($hero_bg)) {
 }
 ?>
 <section class="hero-section" style="<?php echo $hero_style; ?>">
-    <div class="hero-overlay">
+    <div class="hero-overlay" data-aos="fade-up">
         <h1><?php echo get_setting('hero_title', 'School of Technology and AI Innovations'); ?></h1>
         <p class="hero-subtitle">
             <?php echo get_setting('hero_subtitle', 'Empowering the Youth of Jammu and Kashmir to lead the world in AI, Data Science and Emerging Technologies'); ?>
@@ -44,7 +44,7 @@ if (!empty($hero_bg)) {
 <section class="py-5 bg-light about-section">
     <div class="container">
         <div class="row align-items-center gy-4">
-            <div class="col-lg-6">
+            <div class="col-lg-6" data-aos="fade-right">
                 <h2 class="about-heading mb-3">About
                     <?php echo SITE_NAME; ?>
                 </h2>
@@ -63,7 +63,7 @@ if (!empty($hero_bg)) {
                             plans</span></li>
                 </ul>
             </div>
-            <div class="col-lg-6">
+            <div class="col-lg-6" data-aos="fade-left">
                 <div class="card shadow-lg about-card">
                     <div class="card-body p-4 p-lg-5">
                         <h4 class="card-title about-card-title mb-3"><i class="fas fa-eye text-primary me-2"></i>Our
@@ -143,11 +143,11 @@ if (!empty($hero_bg)) {
 <!-- Why Choose Us Section -->
 <section class="py-5 bg-light">
     <div class="container">
-        <h2 class="text-center mb-5">Why Choose
+        <h2 class="text-center mb-5" data-aos="fade-up">Why Choose
             <?php echo SITE_NAME; ?>?
         </h2>
         <div class="row">
-            <div class="col-lg-3 col-md-6 mb-4">
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="100">
                 <div class="feature-box text-center p-4">
                     <div class="feature-icon mb-3">
                         <i class="fas fa-user-tie fa-3x text-primary"></i>
@@ -156,7 +156,7 @@ if (!empty($hero_bg)) {
                     <p>Learn from experienced professionals with 10+ years in the tech industry.</p>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6 mb-4">
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="200">
                 <div class="feature-box text-center p-4">
                     <div class="feature-icon mb-3">
                         <i class="fas fa-code fa-3x text-success"></i>
@@ -165,7 +165,7 @@ if (!empty($hero_bg)) {
                     <p>Build real-world applications and portfolio-ready projects from day one.</p>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6 mb-4">
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="300">
                 <div class="feature-box text-center p-4">
                     <div class="feature-icon mb-3">
                         <i class="fas fa-building fa-3x text-info"></i>
@@ -174,7 +174,7 @@ if (!empty($hero_bg)) {
                     <p>Tie-ups with leading companies for internships and placement assistance.</p>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6 mb-4">
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="400">
                 <div class="feature-box text-center p-4">
                     <div class="feature-icon mb-3">
                         <i class="fas fa-stream fa-3x text-danger"></i>
@@ -190,13 +190,13 @@ if (!empty($hero_bg)) {
 <!-- Featured Courses Section -->
 <section class="py-5 section-muted" id="courses">
     <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-5" data-aos="fade-up">
             <h2 class="mb-0">Featured Courses</h2>
             <a href="/courses" class="btn btn-outline-primary rounded-pill px-4">See All</a>
         </div>
         <div class="row">
             <?php foreach ($courses as $course): ?>
-                <div class="col-md-6 col-lg-3 mb-4">
+                <div class="col-md-6 col-lg-3 mb-4" data-aos="fade-up">
                     <div class="card h-100 shadow-sm border-0 course-card hover-lift overflow-hidden">
                         <div class="position-relative">
                             <img src="<?php echo get_image_url($course['image']); ?>"
@@ -237,71 +237,49 @@ if (!empty($hero_bg)) {
 </section>
 
 <!-- Student Success Stories -->
+<?php
+// Fetch Active Success Stories
+try {
+    $stmt = $pdo->query("SELECT * FROM success_stories WHERE is_active = 1 ORDER BY sort_order ASC, created_at DESC");
+    $dynamic_stories = $stmt->fetchAll();
+} catch (PDOException $e) {
+    $dynamic_stories = [];
+}
+?>
 <section class="py-5">
     <div class="container">
         <h2 class="text-center mb-5">Student Success Stories</h2>
         <div class="row">
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 shadow-sm border-0 bg-light">
-                    <div class="card-body p-4">
-                        <div class="mb-3 text-warning">
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                class="fas fa-star"></i><i class="fas fa-star"></i>
-                        </div>
-                        <p class="text-muted italic">“The Coding Science helped me switch from a non-tech background to
-                            a
-                            full-time web developer in just a few months.”</p>
-                        <div class="d-flex align-items-center mt-4">
-                            <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3"
-                                style="width: 40px; height: 40px;">AK</div>
-                            <div>
-                                <h6 class="mb-0">Ayesha Khan</h6>
-                                <small class="text-muted">Software Developer</small>
+            <?php if (empty($dynamic_stories)): ?>
+                <div class="col-12 text-center text-muted">
+                    <p>No success stories to display at the moment.</p>
+                </div>
+            <?php else: ?>
+                <?php foreach ($dynamic_stories as $story): ?>
+                    <div class="col-md-4 mb-4" data-aos="fade-up">
+                        <div class="card h-100 shadow-sm border-0 bg-light">
+                            <div class="card-body p-4">
+                                <div class="mb-3 text-warning">
+                                    <?php for ($i = 0; $i < $story['rating']; $i++): ?>
+                                        <i class="fas fa-star"></i>
+                                    <?php endfor; ?>
+                                </div>
+                                <p class="text-muted italic">“<?php echo htmlspecialchars($story['content']); ?>”</p>
+                                <div class="d-flex align-items-center mt-4">
+                                    <div class="avatar <?php echo $story['avatar_bg']; ?> text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                                        style="width: 40px; height: 40px;">
+                                        <?php echo strtoupper(substr($story['name'], 0, 1)); ?>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0"><?php echo htmlspecialchars($story['name']); ?></h6>
+                                        <small class="text-muted"><?php echo htmlspecialchars($story['title']); ?></small>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 shadow-sm border-0 bg-light">
-                    <div class="card-body p-4">
-                        <div class="mb-3 text-warning">
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                class="fas fa-star"></i><i class="fas fa-star"></i>
-                        </div>
-                        <p class="text-muted">“The projects and mentorship were exactly what I needed to crack my
-                            first Data Science internship.”</p>
-                        <div class="d-flex align-items-center mt-4">
-                            <div class="avatar bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3"
-                                style="width: 40px; height: 40px;">RS</div>
-                            <div>
-                                <h6 class="mb-0">Rohit Sharma</h6>
-                                <small class="text-muted">Data Scientist</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 shadow-sm border-0 bg-light">
-                    <div class="card-body p-4">
-                        <div class="mb-3 text-warning">
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
-                                class="fas fa-star"></i><i class="fas fa-star"></i>
-                        </div>
-                        <p class="text-muted">“Live classes, doubt support and career guidance made the learning
-                            journey smooth and focused.”</p>
-                        <div class="d-flex align-items-center mt-4">
-                            <div class="avatar bg-info text-white rounded-circle d-flex align-items-center justify-content-center me-3"
-                                style="width: 40px; height: 40px;">SG</div>
-                            <div>
-                                <h6 class="mb-0">Simran Gupta</h6>
-                                <small class="text-muted">AI Engineer</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </div>
     </div>
 </section>

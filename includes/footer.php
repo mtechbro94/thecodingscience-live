@@ -80,6 +80,20 @@
     </div>
 </footer>
 
+<!-- WhatsApp Floating Widget -->
+<?php
+$whatsapp_number = get_setting('contact_phone', CONTACT_PHONE);
+// Remove any non-numeric characters for the link
+$whatsapp_number_clean = preg_replace('/[^0-9]/', '', $whatsapp_number);
+?>
+<a href="https://wa.me/<?php echo $whatsapp_number_clean; ?>" class="whatsapp-float" target="_blank"
+    rel="noopener noreferrer" title="Chat with us on WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+</a>
+
+<!-- AOS Animation Library -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -88,6 +102,18 @@
 
 <!-- Custom JS -->
 <script src="/assets/js/main.js"></script>
+
+<!-- Initialize AOS -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true,
+            offset: 50
+        });
+    });
+</script>
 
 <?php if (isset($extra_js))
     echo $extra_js; ?>

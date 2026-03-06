@@ -113,18 +113,23 @@ if (!is_admin()) {
                         <i class="fas fa-cog me-2"></i> Site Settings
                     </a>
                 </li>
+                <li>
+                    <a href="/admin/success_stories"
+                        class="nav-link <?php echo (strpos($page_title, 'Success Story') !== false) ? 'active' : ''; ?>">
+                        <i class="fas fa-star me-2"></i> Success Stories
+                    </a>
+                </li>
 
             </ul>
             <hr>
             <div class="dropdown">
                 <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
                     id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                    <?php 
+                    <?php
                     $profile_img = $_SESSION['user_profile_image'] ?? null;
                     if ($profile_img): ?>
-                        <img src="/assets/images/profiles/<?php echo htmlspecialchars($profile_img); ?>" 
-                             alt="Profile" class="rounded-circle me-2"
-                             style="width: 32px; height: 32px; object-fit: cover;">
+                        <img src="/assets/images/profiles/<?php echo htmlspecialchars($profile_img); ?>" alt="Profile"
+                            class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
                     <?php else: ?>
                         <div class="avatar-circle bg-primary text-white me-2 d-flex align-items-center justify-content-center"
                             style="width: 32px; height: 32px; border-radius: 50%;">

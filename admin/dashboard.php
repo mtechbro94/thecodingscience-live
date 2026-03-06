@@ -39,6 +39,10 @@ $stats['pending_trainers'] = $stmt->fetchColumn();
 $stmt = $pdo->query("SELECT SUM(amount_paid) FROM enrollments WHERE status = 'completed'");
 $stats['revenue'] = $stmt->fetchColumn() ?: 0;
 
+// Total Success Stories
+$stmt = $pdo->query("SELECT COUNT(*) FROM success_stories");
+$stats['success_stories'] = $stmt->fetchColumn() ?: 0;
+
 // Recent Enrollments
 $stmt = $pdo->query("
     SELECT e.*, u.name as user_name, c.name as course_name 
@@ -128,6 +132,21 @@ $recent_enrollments = $stmt->fetchAll();
             </div>
         </div>
     </div>
+    <div class="col-md-3 mb-4">
+        <div class="card border-0 shadow-sm bg-danger text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase mb-1">Success Stories</h6>
+                        <h2 class="mb-0">
+                            <?php echo $stats['success_stories']; ?>
+                        </h2>
+                    </div>
+                    <i class="fas fa-star fa-2x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Recent Activity -->
@@ -201,6 +220,9 @@ $recent_enrollments = $stmt->fetchAll();
                     </a>
                     <a href="/admin/messages" class="btn btn-outline-info">
                         <i class="fas fa-envelope me-2"></i> View Messages
+                    </a>
+                    <a href="/admin/success_stories" class="btn btn-outline-primary">
+                        <i class="fas fa-star me-2"></i> Manage Success Stories
                     </a>
                 </div>
             </div>
