@@ -1,81 +1,109 @@
 </main>
 
-<!-- Footer -->
-<footer class="bg-dark text-light py-5">
+<!-- Modern Footer -->
+<footer class="footer-modern py-5">
     <div class="container">
-        <div class="row">
-            <div class="col-md-4 mb-4">
-                <h5>
+        <div class="row gy-4">
+            <!-- Column 1: Brand & About -->
+            <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="100">
+                <h5 class="footer-title mb-4">
                     <?php echo get_setting('site_name', SITE_NAME); ?>
                 </h5>
-
-                <p><strong>About Us:</strong> The Coding Science is a technology startup focused on online education,
-                    trainings, and internships designed to bridge the gap between academia and industry.</p>
+                <p class="footer-description mb-4">
+                    The Coding Science is a technology startup focused on online education, trainings, and internships
+                    designed to bridge the gap between academia and industry.
+                </p>
                 <p class="small text-muted mb-0"><em>Making quality tech education accessible and inclusive for
                         all.</em></p>
             </div>
-            <div class="col-md-4 mb-4">
-                <h5>What We Offer</h5>
-                <ul class="list-unstyled small">
-                    <li class="mb-2">
+
+            <!-- Column 2: What We Offer -->
+            <div class="col-lg-2 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="200">
+                <h5 class="footer-title mb-4">What We Offer</h5>
+                <ul class="list-unstyled footer-offer-list">
+                    <li class="mb-3">
                         <i class="fas fa-globe text-primary me-2"></i>
-                        <strong>Online Learning:</strong> Study from anywhere at your own pace
+                        <span>Online Learning</span>
                     </li>
-                    <li class="mb-2">
+                    <li class="mb-3">
                         <i class="fas fa-language text-primary me-2"></i>
-                        <strong>Regional Languages:</strong> Kashmiri, Hindi, Punjabi & more
+                        <span>Regional Languages</span>
                     </li>
-                    <li>
+                    <li class="mb-3">
                         <i class="fas fa-briefcase text-primary me-2"></i>
-                        <strong>Industry Skills:</strong> Practical, real-world career preparation
+                        <span>Industry Skills</span>
                     </li>
                 </ul>
             </div>
-            <div class="col-md-4 mb-4">
-                <h5>Quick Links & Contact</h5>
-                <ul class="list-unstyled small mb-3 footer-links">
-                    <li><a href="/" class="text-decoration-none"><strong>Home</strong></a></li>
-                    <li><a href="/courses" class="text-decoration-none"><strong>Courses</strong></a></li>
-                    <li><a href="/services" class="text-decoration-none"><strong>Live Trainings</strong></a></li>
-                    <li><a href="/internships" class="text-decoration-none"><strong>Internships</strong></a></li>
-                    <li><a href="/contact" class="text-decoration-none"><strong>Contact</strong></a></li>
-                </ul>
-                <p class="small mb-2">
-                    <i class="fas fa-envelope me-2"></i> <strong>
-                        <?php echo get_setting('contact_email', CONTACT_EMAIL); ?>
-                    </strong><br>
-                    <i class="fas fa-phone me-2"></i> <strong>
-                        <?php echo get_setting('contact_phone', CONTACT_PHONE); ?>
-                    </strong>
-                </p>
 
-                <div class="mt-2">
-                    <?php if (get_setting('facebook_url')): ?>
-                        <a href="<?php echo get_setting('facebook_url'); ?>" class="text-light me-3" target="_blank"><i
-                                class="fab fa-facebook fa-lg"></i></a>
-                    <?php endif; ?>
-                    <?php if (get_setting('linkedin_url')): ?>
-                        <a href="<?php echo get_setting('linkedin_url'); ?>" class="text-light me-3" target="_blank"><i
-                                class="fab fa-linkedin fa-lg"></i></a>
-                    <?php endif; ?>
-                    <?php if (get_setting('instagram_url')): ?>
-                        <a href="<?php echo get_setting('instagram_url'); ?>" class="text-light me-3" target="_blank"><i
-                                class="fab fa-instagram fa-lg"></i></a>
-                    <?php endif; ?>
-                    <?php if (get_setting('youtube_url')): ?>
-                        <a href="<?php echo get_setting('youtube_url'); ?>" class="text-light" target="_blank"><i
-                                class="fab fa-youtube fa-lg"></i></a>
-                    <?php endif; ?>
+            <!-- Column 3: Quick Links -->
+            <div class="col-lg-2 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="300">
+                <h5 class="footer-title mb-4">Quick Links</h5>
+                <ul class="list-unstyled footer-links">
+                    <li><a href="/" class="footer-link-item"><i class="fas fa-chevron-right me-2 small"></i>Home</a>
+                    </li>
+                    <li><a href="/courses" class="footer-link-item"><i
+                                class="fas fa-chevron-right me-2 small"></i>Courses</a></li>
+                    <li><a href="/services" class="footer-link-item"><i class="fas fa-chevron-right me-2 small"></i>Live
+                            Trainings</a></li>
+                    <li><a href="/internships" class="footer-link-item"><i
+                                class="fas fa-chevron-right me-2 small"></i>Internships</a></li>
+                    <li><a href="/contact" class="footer-link-item"><i
+                                class="fas fa-chevron-right me-2 small"></i>Contact</a></li>
+                </ul>
+            </div>
+
+            <!-- Column 4: Contact & Socials -->
+            <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="400">
+                <h5 class="footer-title mb-4">Connect With Us</h5>
+                <div class="footer-contact-info mb-4">
+                    <p class="mb-2">
+                        <i class="fas fa-envelope me-2 text-primary"></i>
+                        <strong><?php echo get_setting('contact_email', CONTACT_EMAIL); ?></strong>
+                    </p>
+                    <p class="mb-0">
+                        <i class="fas fa-phone me-2 text-primary"></i>
+                        <strong><?php echo get_setting('contact_phone', CONTACT_PHONE); ?></strong>
+                    </p>
                 </div>
 
+                <div class="footer-social-wrapper">
+                    <?php if (get_setting('facebook_url')): ?>
+                        <a href="<?php echo get_setting('facebook_url'); ?>" class="footer-social-circle facebook"
+                            target="_blank" title="Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                    <?php endif; ?>
+                    <?php if (get_setting('linkedin_url')): ?>
+                        <a href="<?php echo get_setting('linkedin_url'); ?>" class="footer-social-circle linkedin"
+                            target="_blank" title="LinkedIn">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    <?php endif; ?>
+                    <?php if (get_setting('instagram_url')): ?>
+                        <a href="<?php echo get_setting('instagram_url'); ?>" class="footer-social-circle instagram"
+                            target="_blank" title="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    <?php endif; ?>
+                    <?php if (get_setting('youtube_url')): ?>
+                        <a href="<?php echo get_setting('youtube_url'); ?>" class="footer-social-circle youtube"
+                            target="_blank" title="YouTube">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
-        <hr class="bg-light">
-        <div class="text-center">
-            <p class="mb-0">&copy; <?php echo date('Y'); ?>
-                <?php echo get_setting('site_name', SITE_NAME); ?>. All rights reserved.
-            </p>
 
+        <!-- Copyright -->
+        <div class="footer-bottom mt-5 pt-4 border-top border-secondary text-center" data-aos="fade-in"
+            data-aos-delay="500">
+            <p class="mb-0 text-muted small">
+                &copy; <?php echo date('Y'); ?> <span
+                    class="text-white fw-bold"><?php echo get_setting('site_name', SITE_NAME); ?></span>. All rights
+                reserved.
+            </p>
         </div>
     </div>
 </footer>
@@ -105,7 +133,7 @@ $whatsapp_number_clean = preg_replace('/[^0-9]/', '', $whatsapp_number);
 
 <!-- Initialize AOS -->
 <script>
-    document.addEventListener('DOMContentLoaded', function  () {
+    document.addEventListener('DOMContentLoaded', function () {
         AOS.init({
             duration: 800,
             easing: 'ease-in-out',
