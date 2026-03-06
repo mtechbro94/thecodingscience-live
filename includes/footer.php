@@ -5,7 +5,7 @@
     <div class="container">
         <div class="row gy-4">
             <!-- Column 1: Brand & About -->
-            <div class="col-lg-4 col-md-6 mb-4">
+            <div class="col-lg-3 col-md-6 mb-4">
                 <h5 class="footer-title mb-4">
                     <?php echo get_setting('site_name', SITE_NAME); ?>
                 </h5>
