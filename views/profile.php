@@ -11,7 +11,7 @@ $user = current_user();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $errors = [];
     $filename = null;
-    
+
     // Check for cropped base64 image first
     if (!empty($_POST['cropped_image'])) {
         $base64_data = $_POST['cropped_image'];
@@ -20,11 +20,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!in_array($ext, ['jpeg', 'jpg', 'png', 'webp'])) {
                 $errors[] = "Invalid image format.";
             }
-            
+
             if (empty($errors)) {
                 $filename = 'profile_' . $user['id'] . '_' . time() . '.jpg';
                 $upload_path = BASE_PATH . '/assets/images/profiles/' . $filename;
-                
+
                 $image_data = base64_decode(preg_replace('/^data:image\/\w+;base64,/', '', $base64_data));
                 if (file_put_contents($upload_path, $image_data) === false) {
                     $errors[] = "Failed to save image.";
@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $errors[] = "Invalid image data.";
         }
-    } 
+    }
     // Regular file upload
     elseif (isset($_FILES['profile_photo'])) {
         $file = $_FILES['profile_photo'];
@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     }
-    
+
     if (empty($errors) && $filename) {
         // Fetch old image to delete later
         $stmt = $pdo->prepare("SELECT profile_image FROM users WHERE id = ?");
@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($stmt->execute([$filename, $user['id']])) {
             // Update session
             $_SESSION['user_profile_image'] = $filename;
-            
+
             // Delete old image if exists
             if ($old_image && file_exists(BASE_PATH . '/assets/images/profiles/' . $old_image)) {
                 unlink(BASE_PATH . '/assets/images/profiles/' . $old_image);
@@ -84,18 +84,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             set_flash('danger', $error);
         }
     }
-    
-    }
-    
+
     // Handle Profile Details Update
     if (isset($_POST['update_details'])) {
         $name = sanitize($_POST['name'] ?? '');
         $phone = sanitize($_POST['phone'] ?? '');
-        
+
         if (empty($name)) {
             $errors[] = "Name is required.";
         }
-        
+
         if (empty($errors)) {
             $stmt = $pdo->prepare("UPDATE users SET name = ?, phone = ? WHERE id = ?");
             if ($stmt->execute([$name, $phone, $user['id']])) {
@@ -151,7 +149,7 @@ require_once 'includes/header.php';
                                         </div>
                                     <?php endif; ?>
 
-                                <button
+                                    <button
                                         class="btn btn-sm btn-dark position-absolute bottom-0 end-0 rounded-circle p-2"
                                         onclick="document.getElementById('profile_photo_input').click()"
                                         title="Update Photo" style="width: 40px; height: 40px;">
@@ -173,15 +171,20 @@ require_once 'includes/header.php';
                             <div class="col-md-8">
                                 <div class="info-group mb-4">
                                     <label class="text-muted small text-uppercase fw-bold mb-1">Full Name</label>
-                                    <p class="h5"><?php echo htmlspecialchars($user['name']); ?></p>
+                                    <p class="h5">
+                                        <?php echo htmlspecialchars($user['name']); ?>
+                                    </p>
                                 </div>
                                 <div class="info-group mb-4">
                                     <label class="text-muted small text-uppercase fw-bold mb-1">Email Address</label>
-                                    <p class="h5"><?php echo htmlspecialchars($user['email']); ?></p>
+                                    <p class="h5">
+                                        <?php echo htmlspecialchars($user['email']); ?>
+                                    </p>
                                 </div>
                                 <div class="info-group mb-4">
                                     <label class="text-muted small text-uppercase fw-bold mb-1">Phone Number</label>
-                                    <p class="h5"><?php echo htmlspecialchars($userData['phone'] ?? 'Not provided'); ?>
+                                    <p class="h5">
+                                        <?php echo htmlspecialchars($userData['phone'] ?? 'Not provided'); ?>
                                     </p>
                                 </div>
                                 <div class="info-group">
@@ -235,7 +238,7 @@ require_once 'includes/header.php';
         max-height: 400px;
         background: #f8f9fa;
     }
-    
+
     #image_to_crop {
         max-width: 100%;
     }
@@ -254,12 +257,17 @@ require_once 'includes/header.php';
                     <img id="image_to_crop" src="">
                 </div>
                 <div class="mt-3 text-center">
-                    <p class="text-muted small mb-2">Use the handles to adjust. Square crop recommended for profile photo.</p>
+                    <p class="text-muted small mb-2">Use the handles to adjust. Square crop recommended for profile
+                        photo.</p>
                     <div class="btn-group">
-                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="cropper.setAspectRatio(1)">1:1</button>
-                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="cropper.setAspectRatio(4/3)">4:3</button>
-                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="cropper.setAspectRatio(16/9)">16:9</button>
-                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="cropper.setAspectRatio(null)">Free</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm"
+                            onclick="cropper.setAspectRatio(1)">1:1</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm"
+                            onclick="cropper.setAspectRatio(4/3)">4:3</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm"
+                            onclick="cropper.setAspectRatio(16/9)">16:9</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm"
+                            onclick="cropper.setAspectRatio(null)">Free</button>
                     </div>
                 </div>
             </div>
@@ -283,11 +291,13 @@ require_once 'includes/header.php';
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Full Name</label>
-                        <input type="text" name="name" class="form-control" value="<?php echo htmlspecialchars($userData['name']); ?>" required>
+                        <input type="text" name="name" class="form-control"
+                            value="<?php echo htmlspecialchars($userData['name']); ?>" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Phone Number</label>
-                        <input type="text" name="phone" class="form-control" value="<?php echo htmlspecialchars($userData['phone'] ?? ''); ?>">
+                        <input type="text" name="phone" class="form-control"
+                            value="<?php echo htmlspecialchars($userData['phone'] ?? ''); ?>">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -304,35 +314,35 @@ require_once 'includes/header.php';
 
 <script>
     let cropper = null;
-    
+
     function handleImageSelect(input) {
         if (input.files && input.files[0]) {
             const file = input.files[0];
             const reader = new FileReader();
-            
-            reader.onload = function(e) {
+
+            reader.onload = function (e) {
                 const image = document.getElementById('image_to_crop');
                 image.src = e.target.result;
-                
+
                 if (cropper) {
                     cropper.destroy();
                 }
-                
+
                 cropper = new Cropper(image, {
                     aspectRatio: 1,
                     viewMode: 1,
                     autoCropArea: 0.8,
                     responsive: true
                 });
-                
+
                 const modal = new bootstrap.Modal(document.getElementById('cropModal'));
                 modal.show();
             };
-            
+
             reader.readAsDataURL(file);
         }
     }
-    
+
     function saveCroppedImage() {
         if (cropper) {
             const canvas = cropper.getCroppedCanvas({
@@ -341,14 +351,14 @@ require_once 'includes/header.php';
                 imageSmoothingEnabled: true,
                 imageSmoothingQuality: 'high'
             });
-            
+
             const croppedDataUrl = canvas.toDataURL('image/jpeg', 0.9);
             document.getElementById('cropped_image_data').value = croppedDataUrl;
-            
+
             // Create form and submit
             const form = document.getElementById('photo_form');
             const fileInput = document.getElementById('profile_photo_input');
-            
+
             // Convert data URL to blob and create a file
             fetch(croppedDataUrl)
                 .then(res => res.blob())
@@ -357,7 +367,7 @@ require_once 'includes/header.php';
                     const dataTransfer = new DataTransfer();
                     dataTransfer.items.add(file);
                     fileInput.files = dataTransfer.files;
-                    
+
                     bootstrap.Modal.getInstance(document.getElementById('cropModal')).hide();
                     form.submit();
                 });
