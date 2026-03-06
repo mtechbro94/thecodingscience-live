@@ -12,7 +12,14 @@ if (empty($courses)) {
 }
 
 // Fetch Latest Blogs (Limit 3)
-$stmt = $pdo->query("SELECT * FROM blogs WHERE is_published = 1 ORDER BY created_at DESC LIMIT 3");
+$stmt = $pdo->query("
+    SELECT b.*, u.profile_image AS author_image 
+    FROM blogs b 
+    LEFT JOIN users u ON b.author_id = u.id 
+    WHERE b.is_published = 1 
+    ORDER BY b.created_at DESC 
+    LIMIT 3
+");
 $blogs = $stmt->fetchAll();
 
 $page_title = "Home";
@@ -115,10 +122,17 @@ if (!empty($hero_bg)) {
                         <div class="card-footer bg-white border-0 px-4 pb-4">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div class="d-flex align-items-center">
-                                    <div
-                                        class="avatar px-2 py-1 bg-primary text-white rounded-circle me-2 font-weight-bold">
-                                        <?php echo strtoupper(substr($blog['author'], 0, 1)); ?>
-                                    </div>
+                                    <?php if (!empty($blog['author_image'])): ?>
+                                        <img src="<?php echo get_image_url($blog['author_image'], 'profile'); ?>"
+                                            alt="<?php echo htmlspecialchars($blog['author']); ?>"
+                                            class="rounded-circle me-2 shadow-sm"
+                                            style="width: 32px; height: 32px; object-fit: cover;">
+                                    <?php else: ?>
+                                        <div class="avatar px-2 py-1 bg-primary text-white rounded-circle me-2 font-weight-bold d-flex align-items-center justify-content-center"
+                                            style="width:32px; height:32px;">
+                                            <?php echo strtoupper(substr($blog['author'], 0, 1)); ?>
+                                        </div>
+                                    <?php endif; ?>
                                     <small class="text-dark font-weight-bold">
                                         <?php echo htmlspecialchars($blog['author']); ?>
                                     </small>
