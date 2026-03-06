@@ -18,20 +18,23 @@
             </div>
 
             <!-- Column 2: What We Offer -->
-            <div class="col-lg-2 col-md-6 mb-4">
+            <div class="col-lg-3 col-md-6 mb-4">
                 <h5 class="footer-title mb-4">What We Offer</h5>
                 <ul class="list-unstyled footer-offer-list">
-                    <li class="mb-3">
-                        <i class="fas fa-globe text-primary me-2"></i>
-                        <span>Online Learning</span>
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="fas fa-laptop-code text-primary mt-1 me-3"></i>
+                        <span><strong>Interactive Learning</strong><br><small class="text-secondary">Engaging online
+                                live & recorded sessions</small></span>
                     </li>
-                    <li class="mb-3">
-                        <i class="fas fa-language text-primary me-2"></i>
-                        <span>Regional Languages</span>
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="fas fa-language text-primary mt-1 me-3"></i>
+                        <span><strong>Regional Accessibility</strong><br><small class="text-secondary">Learn comfortably
+                                in local languages</small></span>
                     </li>
-                    <li class="mb-3">
-                        <i class="fas fa-briefcase text-primary me-2"></i>
-                        <span>Industry Skills</span>
+                    <li class="mb-3 d-flex align-items-start">
+                        <i class="fas fa-rocket text-primary mt-1 me-3"></i>
+                        <span><strong>Industry-Ready Skills</strong><br><small class="text-secondary">Curriculum
+                                designed for modern careers</small></span>
                     </li>
                 </ul>
             </div>
