@@ -1531,27 +1531,39 @@ section[style*="margin-top: 100px"] .alert {
     color: #fff;
 }
 
-.footer-social-circle.facebook:hover {
+.footer-social-circle.facebook {
     background: #1877f2;
     border-color: #1877f2;
+}
+
+.footer-social-circle.facebook:hover {
     box-shadow: 0 5px 15px rgba(24, 119, 242, 0.4);
 }
 
-.footer-social-circle.linkedin:hover {
+.footer-social-circle.linkedin {
     background: #0077b5;
     border-color: #0077b5;
+}
+
+.footer-social-circle.linkedin:hover {
     box-shadow: 0 5px 15px rgba(0, 119, 181, 0.4);
 }
 
-.footer-social-circle.instagram:hover {
+.footer-social-circle.instagram {
     background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
     border-color: transparent;
+}
+
+.footer-social-circle.instagram:hover {
     box-shadow: 0 5px 15px rgba(220, 39, 67, 0.4);
 }
 
-.footer-social-circle.youtube:hover {
+.footer-social-circle.youtube {
     background: #ff0000;
     border-color: #ff0000;
+}
+
+.footer-social-circle.youtube:hover {
     box-shadow: 0 5px 15px rgba(255, 0, 0, 0.4);
 }
 
