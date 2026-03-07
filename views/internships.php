@@ -94,6 +94,9 @@ require_once 'includes/header.php';
                 <?php foreach ($teaching_internships as $internship): ?>
                     <div class="col-md-6 col-lg-4 d-flex">
                         <div class="card h-100 internship-card">
+                            <?php if (!empty($internship['image'])): ?>
+                                <img src="<?php echo htmlspecialchars($internship['image']); ?>" alt="<?php echo htmlspecialchars($internship['title']); ?>" class="card-img-top" style="height: 200px; object-fit: cover;">
+                            <?php endif; ?>
                             <div class="internship-header bg-primary text-center">
                                 <div class="internship-icon mx-auto">
                                     <i class="fas fa-users-class"></i>
@@ -133,6 +136,9 @@ require_once 'includes/header.php';
                 <?php foreach ($industrial_internships as $internship): ?>
                     <div class="col-md-6 col-lg-4 d-flex">
                         <div class="card h-100 internship-card">
+                            <?php if (!empty($internship['image'])): ?>
+                                <img src="<?php echo htmlspecialchars($internship['image']); ?>" alt="<?php echo htmlspecialchars($internship['title']); ?>" class="card-img-top" style="height: 200px; object-fit: cover;">
+                            <?php endif; ?>
                             <div class="internship-header bg-success text-center">
                                 <div class="internship-icon mx-auto">
                                     <i class="fas fa-laptop-code"></i>
