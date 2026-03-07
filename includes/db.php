@@ -93,6 +93,16 @@ try {
             ('Simran Gupta', 'AI Engineer', 'Live classes, doubt support and career guidance made the learning journey smooth and focused.', 5, 'bg-info', 3)");
     }
 
+    // Remove image column from internships table if it exists (cleanup)
+    try {
+        $checkImageColumn = $pdo->query("SHOW COLUMNS FROM internships LIKE 'image'")->rowCount();
+        if ($checkImageColumn > 0) {
+            $pdo->exec("ALTER TABLE `internships` DROP COLUMN `image`");
+        }
+    } catch (Exception $e) {
+        // Column might already be removed, that's fine
+    }
+
 } catch (\PDOException $e) {
 
     // In production, log this instead of showing it

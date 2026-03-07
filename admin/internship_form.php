@@ -8,16 +8,6 @@ if (!is_admin()) {
     redirect('/');
 }
 
-// Ensure internships table has image column
-try {
-    $checkColumn = $pdo->query("SHOW COLUMNS FROM internships LIKE 'image'")->rowCount();
-    if ($checkColumn === 0) {
-        $pdo->exec("ALTER TABLE `internships` ADD COLUMN `image` VARCHAR(255) DEFAULT NULL AFTER `skills_covered`");
-    }
-} catch (Exception $e) {
-    error_log("Failed to add image column: " . $e->getMessage());
-}
-
 $page_title = "Manage Internship";
 $internship = [];
 $errors = [];
@@ -51,7 +41,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $category = sanitize($_POST['category'] ?? 'industrial');
     $google_form_link = filter_var($_POST['google_form_link'] ?? '', FILTER_VALIDATE_URL);
     $is_active = isset($_POST['is_active']) ? 1 : 0;
-    $image = $_FILES['image'] ?? null;
 
     // Validation
     if (empty($title)) {
