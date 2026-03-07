@@ -20,81 +20,132 @@ require_once 'includes/header.php';
         transition: all 0.3s ease;
         overflow: hidden;
         background-color: #fff;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
     }
     .internship-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 8px 30px rgba(0,0,0,0.15) !important;
+        transform: translateY(-12px);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.15) !important;
     }
     .internship-header {
-        padding: 35px 20px;
+        padding: 40px 25px;
         color: white;
         border-top-left-radius: 15px;
         border-top-right-radius: 15px;
         position: relative;
+        overflow: hidden;
     }
-    .internship-header::after {
+    .internship-header::before {
         content: '';
         position: absolute;
-        bottom: -15px;
-        left: 0;
-        right: 0;
-        height: 15px;
-        background: inherit;
-        border-radius: 0 0 15px 15px;
-        opacity: 0.1;
+        top: -50%;
+        right: -50%;
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.1);
+        transition: all 0.3s ease;
     }
-    .internship-header.bg-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-    .internship-header.bg-success { background: linear-gradient(135deg, #2AF598 0%, #009245 100%); }
-    .internship-header.bg-info { background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%); }
-    .internship-header.bg-warning { background: linear-gradient(135deg, #f7b733 0%, #fc4a1a 100%); }
-    .internship-header.bg-danger { background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%); }
+    .internship-card:hover .internship-header::before {
+        top: -30%;
+        right: -30%;
+    }
+    .internship-header.bg-primary { 
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+    }
+    .internship-header.bg-success { 
+        background: linear-gradient(135deg, #2AF598 0%, #009245 100%); 
+    }
+    .internship-header-content {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+    }
     .internship-icon {
-        width: 70px;
-        height: 70px;
+        width: 80px;
+        height: 80px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 32px;
-        background: rgba(255,255,255,0.2);
-        margin-bottom: 15px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        font-size: 40px;
+        background: rgba(255,255,255,0.25);
+        margin: 0 auto 20px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        transition: all 0.3s ease;
+    }
+    .internship-card:hover .internship-icon {
+        transform: scale(1.1) rotate(5deg);
+        background: rgba(255,255,255,0.35);
+    }
+    .internship-header h3 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+    .internship-meta {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        color: rgba(255,255,255,0.9);
+        font-size: 0.95rem;
+        margin-top: 12px;
+        font-weight: 500;
     }
     .internship-card .card-body {
-        padding: 25px;
+        padding: 30px;
         flex-grow: 1;
         display: flex;
         flex-direction: column;
     }
     .internship-card .card-body p {
         line-height: 1.6;
+        color: #555;
+        margin-bottom: 20px;
+    }
+    .internship-card .card-body h6 {
+        color: #333;
+        margin-bottom: 12px;
+        font-size: 0.95rem;
     }
     .skills-list {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
+        margin-bottom: 20px;
     }
     .skills-list .badge {
-        padding: 7px 12px;
-        border-radius: 20px;
+        padding: 8px 14px;
+        border-radius: 25px;
         font-weight: 500;
+        font-size: 0.85rem;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
+        animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: scale(0.9); }
+        to { opacity: 1; transform: scale(1); }
     }
     .apply-btn {
-        padding: 12px 30px;
+        padding: 14px 32px;
         font-weight: 600;
         border-radius: 50px;
         transition: all 0.3s ease;
         background-color: var(--primary-color);
         border-color: var(--primary-color);
         margin-top: auto;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        letter-spacing: 0.5px;
     }
     .apply-btn:hover {
         opacity: 0.9;
         transform: translateY(-3px);
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.25);
     }
     .section-title {
         font-size: 2.5rem;
@@ -107,14 +158,6 @@ require_once 'includes/header.php';
     .lead-text {
         font-size: 1.15rem;
         color: #6c757d;
-    }
-    .internship-meta {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        color: rgba(255,255,255,0.9);
-        font-size: 0.95rem;
-        margin-top: 10px;
     }
 </style>
 
@@ -133,11 +176,16 @@ require_once 'includes/header.php';
                     <div class="col-md-6 col-lg-4 d-flex">
                         <div class="card h-100 internship-card">
                             <div class="internship-header bg-primary text-center">
-                                <div class="internship-icon mx-auto">
-                                    <i class="fas fa-users-class"></i>
+                                <div class="internship-header-content">
+                                    <div class="internship-icon mx-auto">
+                                        <i class="fas fa-chalkboard-user"></i>
+                                    </div>
+                                    <h3><?php echo htmlspecialchars($internship['title']); ?></h3>
+                                    <div class="internship-meta">
+                                        <i class="fas fa-clock"></i>
+                                        <span><?php echo htmlspecialchars($internship['duration']); ?></span>
+                                    </div>
                                 </div>
-                                <h3 class="h5 fw-bold mb-1"><?php echo htmlspecialchars($internship['title']); ?></h3>
-                                <p class="opacity-75 mb-0"><i class="fas fa-clock me-1"></i><?php echo htmlspecialchars($internship['duration']); ?></p>
                             </div>
                             <div class="card-body p-4">
                                 <p class="text-muted mb-3"><?php echo htmlspecialchars($internship['description']); ?></p>
@@ -172,11 +220,16 @@ require_once 'includes/header.php';
                     <div class="col-md-6 col-lg-4 d-flex">
                         <div class="card h-100 internship-card">
                             <div class="internship-header bg-success text-center">
-                                <div class="internship-icon mx-auto">
-                                    <i class="fas fa-laptop-code"></i>
+                                <div class="internship-header-content">
+                                    <div class="internship-icon mx-auto">
+                                        <i class="fas fa-industry"></i>
+                                    </div>
+                                    <h3><?php echo htmlspecialchars($internship['title']); ?></h3>
+                                    <div class="internship-meta">
+                                        <i class="fas fa-clock"></i>
+                                        <span><?php echo htmlspecialchars($internship['duration']); ?></span>
+                                    </div>
                                 </div>
-                                <h3 class="h5 fw-bold mb-1"><?php echo htmlspecialchars($internship['title']); ?></h3>
-                                <p class="opacity-75 mb-0"><i class="fas fa-clock me-1"></i><?php echo htmlspecialchars($internship['duration']); ?></p>
                             </div>
                             <div class="card-body p-4">
                                 <p class="text-muted mb-3"><?php echo htmlspecialchars($internship['description']); ?></p>
