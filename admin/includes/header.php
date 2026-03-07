@@ -110,7 +110,13 @@ if (!is_admin()) {
                 <li>
                     <a href="/admin/internships"
                         class="nav-link <?php echo (strpos($page_title, 'Internships') !== false) ? 'active' : ''; ?>">
-                        <i class="fas fa-briefcase me-2"></i> Internships
+                        <i class="fas fa-briefcase me-2"></i> Student Internships
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/trainer_positions"
+                        class="nav-link <?php echo (strpos($page_title, 'Trainer') !== false) ? 'active' : ''; ?>">
+                        <i class="fas fa-chalkboard-teacher me-2"></i> Trainer Positions
                     </a>
                 </li>
                 <li>
