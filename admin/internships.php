@@ -54,7 +54,6 @@ require_once __DIR__ . '/includes/header.php';
                         <th>Category</th>
                         <th>Duration</th>
                         <th>Active</th>
-                        <th>Image</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -81,9 +80,6 @@ require_once __DIR__ . '/includes/header.php';
                                 <?php else: ?>
                                     <span class="badge bg-danger">No</span>
                                 <?php endif; ?>
-                            </td>
-                            <td>
-                                <img src="<?php echo htmlspecialchars($internship['image']); ?>" alt="<?php echo htmlspecialchars($internship['title']); ?>" style="width: 100px; height: auto;">
                             </td>
                             <td>
                                 <div class="btn-group btn-group-sm">

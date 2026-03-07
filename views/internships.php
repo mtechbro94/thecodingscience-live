@@ -24,13 +24,25 @@ require_once 'includes/header.php';
     }
     .internship-card:hover {
         transform: translateY(-8px);
-        box-shadow: 0 8px 30px rgba(0,0,0,0.1) !important;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15) !important;
     }
     .internship-header {
-        padding: 20px;
+        padding: 35px 20px;
         color: white;
         border-top-left-radius: 15px;
         border-top-right-radius: 15px;
+        position: relative;
+    }
+    .internship-header::after {
+        content: '';
+        position: absolute;
+        bottom: -15px;
+        left: 0;
+        right: 0;
+        height: 15px;
+        background: inherit;
+        border-radius: 0 0 15px 15px;
+        opacity: 0.1;
     }
     .internship-header.bg-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
     .internship-header.bg-success { background: linear-gradient(135deg, #2AF598 0%, #009245 100%); }
@@ -38,45 +50,71 @@ require_once 'includes/header.php';
     .internship-header.bg-warning { background: linear-gradient(135deg, #f7b733 0%, #fc4a1a 100%); }
     .internship-header.bg-danger { background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%); }
     .internship-icon {
-        width: 60px;
-        height: 60px;
+        width: 70px;
+        height: 70px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 28px;
+        font-size: 32px;
         background: rgba(255,255,255,0.2);
         margin-bottom: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .internship-card .card-body {
+        padding: 25px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    .internship-card .card-body p {
+        line-height: 1.6;
+    }
+    .skills-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
     }
     .skills-list .badge {
-        margin: 3px;
         padding: 7px 12px;
         border-radius: 20px;
         font-weight: 500;
-        background-color: #e9ecef;
-        color: #495057;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
     }
     .apply-btn {
-        padding: 10px 25px;
+        padding: 12px 30px;
         font-weight: 600;
         border-radius: 50px;
         transition: all 0.3s ease;
         background-color: var(--primary-color);
         border-color: var(--primary-color);
+        margin-top: auto;
     }
     .apply-btn:hover {
         opacity: 0.9;
         transform: translateY(-3px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
     .section-title {
         font-size: 2.5rem;
         font-weight: 700;
         color: #343a40;
         margin-bottom: 40px;
+        text-transform: capitalize;
+        letter-spacing: -0.5px;
     }
     .lead-text {
         font-size: 1.15rem;
         color: #6c757d;
+    }
+    .internship-meta {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: rgba(255,255,255,0.9);
+        font-size: 0.95rem;
+        margin-top: 10px;
     }
 </style>
 
@@ -94,9 +132,6 @@ require_once 'includes/header.php';
                 <?php foreach ($teaching_internships as $internship): ?>
                     <div class="col-md-6 col-lg-4 d-flex">
                         <div class="card h-100 internship-card">
-                            <?php if (!empty($internship['image'])): ?>
-                                <img src="<?php echo htmlspecialchars($internship['image']); ?>" alt="<?php echo htmlspecialchars($internship['title']); ?>" class="card-img-top" style="height: 200px; object-fit: cover;">
-                            <?php endif; ?>
                             <div class="internship-header bg-primary text-center">
                                 <div class="internship-icon mx-auto">
                                     <i class="fas fa-users-class"></i>
@@ -136,9 +171,6 @@ require_once 'includes/header.php';
                 <?php foreach ($industrial_internships as $internship): ?>
                     <div class="col-md-6 col-lg-4 d-flex">
                         <div class="card h-100 internship-card">
-                            <?php if (!empty($internship['image'])): ?>
-                                <img src="<?php echo htmlspecialchars($internship['image']); ?>" alt="<?php echo htmlspecialchars($internship['title']); ?>" class="card-img-top" style="height: 200px; object-fit: cover;">
-                            <?php endif; ?>
                             <div class="internship-header bg-success text-center">
                                 <div class="internship-icon mx-auto">
                                     <i class="fas fa-laptop-code"></i>

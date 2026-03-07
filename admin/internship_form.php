@@ -66,54 +66,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!empty($_POST['google_form_link']) && !$google_form_link) {
         $errors[] = "Invalid Google Form Link URL.";
     }
-    // Validate image file if uploaded
-    if ($image && $image['error'] !== UPLOAD_ERR_NO_FILE) {
-        if ($image['error'] !== UPLOAD_ERR_OK) {
-            $errors[] = "Error uploading image. Please try again.";
-        } else {
-            $allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-            if (!in_array($image['type'], $allowed_types)) {
-                $errors[] = "Invalid image file type. Please upload JPG, PNG, GIF, or WebP.";
-            }
-        }
-    }
 
 
     if (empty($errors)) {
         try {
-            $image_url = null;
-            
-            // Handle image upload
-            if ($image && $image['error'] === UPLOAD_ERR_OK) {
-                $upload_dir = BASE_PATH . '/assets/images/internships/';
-                
-                // Create directory if it doesn't exist
-                if (!is_dir($upload_dir)) {
-                    mkdir($upload_dir, 0755, true);
-                }
-                
-                $image_name = uniqid() . '-' . basename($image['name']);
-                $upload_path = $upload_dir . $image_name;
-
-                if (move_uploaded_file($image['tmp_name'], $upload_path)) {
-                    $image_url = '/assets/images/internships/' . $image_name;
-                } else {
-                    throw new Exception("Failed to upload the image.");
-                }
-            }
-
             if ($is_edit) {
-                // Update - use new image if uploaded, otherwise keep existing
-                $final_image = $image_url ?? $internship['image'] ?? null;
-                $sql = "UPDATE internships SET title = ?, description = ?, duration = ?, skills_covered = ?, category = ?, google_form_link = ?, is_active = ?, image = ?, updated_at = NOW() WHERE id = ?";
+                // Update
+                $sql = "UPDATE internships SET title = ?, description = ?, duration = ?, skills_covered = ?, category = ?, google_form_link = ?, is_active = ?, updated_at = NOW() WHERE id = ?";
                 $stmt = $pdo->prepare($sql);
-                $stmt->execute([$title, $description, $duration, $skills_covered, $category, $google_form_link, $is_active, $final_image, $internship_id]);
+                $stmt->execute([$title, $description, $duration, $skills_covered, $category, $google_form_link, $is_active, $internship_id]);
                 set_flash('success', 'Internship updated successfully.');
             } else {
-                // Insert - use new image URL
-                $sql = "INSERT INTO internships (title, description, duration, skills_covered, category, google_form_link, is_active, image, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
+                // Insert
+                $sql = "INSERT INTO internships (title, description, duration, skills_covered, category, google_form_link, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
                 $stmt = $pdo->prepare($sql);
-                $stmt->execute([$title, $description, $duration, $skills_covered, $category, $google_form_link, $is_active, $image_url]);
+                $stmt->execute([$title, $description, $duration, $skills_covered, $category, $google_form_link, $is_active]);
                 set_flash('success', 'Internship created successfully.');
             }
             redirect('/admin/internships');
@@ -154,7 +121,7 @@ require_once __DIR__ . '/includes/header.php';
     </div>
 <?php endif; ?>
 
-<form method="POST" enctype="multipart/form-data" class="mb-5">
+<form method="POST" class="mb-5">
     <div class="row">
         <div class="col-md-8">
             <div class="card shadow-sm mb-4">
@@ -202,18 +169,6 @@ require_once __DIR__ . '/includes/header.php';
                         <input type="url" class="form-control" name="google_form_link" placeholder="https://docs.google.com/forms/d/e/..."
                             value="<?php echo htmlspecialchars($internship['google_form_link'] ?? ($_POST['google_form_link'] ?? '')); ?>">
                         <small class="text-muted">The direct link to the Google Form for application.</small>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="image" class="form-label">Internship Image</label>
-                        <?php if ($is_edit && !empty($internship['image'])): ?>
-                            <div class="mb-2">
-                                <img src="<?php echo htmlspecialchars($internship['image']); ?>" alt="Current Image" style="max-width: 200px; height: auto;">
-                                <p class="text-muted">Current Image</p>
-                            </div>
-                        <?php endif; ?>
-                        <input type="file" class="form-control" id="image" name="image" accept="image/*">
-                        <small class="text-muted">Upload a new image to replace the existing one (if editing).</small>
                     </div>
 
                     <div class="mb-3 border-top pt-3">
