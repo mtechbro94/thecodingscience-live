@@ -63,17 +63,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($errors)) {
         try {
+            if ($image && $image['error'] === UPLOAD_ERR_OK) {
+                $upload_dir = BASE_PATH . '/assets/images/internships/';
+                $image_name = uniqid() . '-' . basename($image['name']);
+                $upload_path = $upload_dir . $image_name;
+
+                if (move_uploaded_file($image['tmp_name'], $upload_path)) {
+                    $image_url = '/assets/images/internships/' . $image_name;
+                } else {
+                    $errors[] = "Failed to upload the image.";
+                }
+            }
+
             if ($is_edit) {
                 // Update
-                $sql = "UPDATE internships SET title = ?, description = ?, duration = ?, skills_covered = ?, category = ?, google_form_link = ?, is_active = ?, updated_at = NOW() WHERE id = ?";
+                $sql = "UPDATE internships SET title = ?, description = ?, duration = ?, skills_covered = ?, category = ?, google_form_link = ?, is_active = ?, image = ?, updated_at = NOW() WHERE id = ?";
                 $stmt = $pdo->prepare($sql);
-                $stmt->execute([$title, $description, $duration, $skills_covered, $category, $google_form_link, $is_active, $internship_id]);
+                $stmt->execute([$title, $description, $duration, $skills_covered, $category, $google_form_link, $is_active, $image_url ?? $internship['image'], $internship_id]);
                 set_flash('success', 'Internship updated successfully.');
             } else {
                 // Insert
-                $sql = "INSERT INTO internships (title, description, duration, skills_covered, category, google_form_link, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
+                $sql = "INSERT INTO internships (title, description, duration, skills_covered, category, google_form_link, is_active, image, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
                 $stmt = $pdo->prepare($sql);
-                $stmt->execute([$title, $description, $duration, $skills_covered, $category, $google_form_link, $is_active]);
+                $stmt->execute([$title, $description, $duration, $skills_covered, $category, $google_form_link, $is_active, $image_url ?? null]);
                 set_flash('success', 'Internship created successfully.');
             }
             redirect('/admin/internships');
