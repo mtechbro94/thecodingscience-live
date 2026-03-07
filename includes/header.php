@@ -139,10 +139,10 @@ require_once __DIR__ . '/functions.php';
                         <div class="dropdown-menu dropdown-menu-end dropdown-mega"
                             aria-labelledby="internshipsDropdown">
                             <div class="dropdown-mega-inner">
-                                <h6 class="dropdown-header text-success">Internship Programs</h6>
-                                <a class="dropdown-item" href="/internships">Web Development Trainer</a>
-                                <a class="dropdown-item" href="/internships">Python Trainer</a>
-                                <a class="dropdown-item" href="/internships">Data Science & AI Trainer</a>
+                                <h6 class="dropdown-header text-success">Student Internship Programs</h6>
+                                <a class="dropdown-item" href="/internships">Web Development Internship</a>
+                                <a class="dropdown-item" href="/internships">Full Stack Development Internship</a>
+                                <a class="dropdown-item" href="/internships">Data Science & AI Internship</a>
                                 <div class="dropdown-cta text-center mt-3">
                                     <a href="/internships" class="btn btn-sm btn-success">View All Internships</a>
                                 </div>
