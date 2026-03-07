@@ -169,6 +169,7 @@ CREATE TABLE `internships` (
   `skills_covered` text DEFAULT NULL, -- JSON string or comma-separated
   `category` enum('teaching','industrial') NOT NULL DEFAULT 'industrial',
   `google_form_link` varchar(500) DEFAULT NULL,
+  `image` varchar(255) DEFAULT NULL AFTER `skills_covered`,
   `is_active` tinyint(1) DEFAULT 1,
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
@@ -336,12 +337,12 @@ CREATE TABLE `career_tracks` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `slug` (`slug`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4--
--- Table structure;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
- for table `career_track_courses`
+--
+-- Table structure for table `career_track_courses`
 --
 
 CREATE TABLE `career_track_courses` (
