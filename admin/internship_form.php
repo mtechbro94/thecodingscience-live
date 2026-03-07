@@ -52,7 +52,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $google_form_link = filter_var($_POST['google_form_link'] ?? '', FILTER_VALIDATE_URL);
     $is_active = isset($_POST['is_active']) ? 1 : 0;
     $image = $_FILES['image'] ?? null;
-    $image_url = null; // Initialize image URL variable
 
     // Validation
     if (empty($title)) {
@@ -67,13 +66,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!empty($_POST['google_form_link']) && !$google_form_link) {
         $errors[] = "Invalid Google Form Link URL.";
     }
-    if ($image && !is_image($image)) {
-        $errors[] = "Invalid image file.";
+    // Validate image file if uploaded
+    if ($image && $image['error'] !== UPLOAD_ERR_NO_FILE) {
+        if ($image['error'] !== UPLOAD_ERR_OK) {
+            $errors[] = "Error uploading image. Please try again.";
+        } else {
+            $allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            if (!in_array($image['type'], $allowed_types)) {
+                $errors[] = "Invalid image file type. Please upload JPG, PNG, GIF, or WebP.";
+            }
+        }
     }
 
 
     if (empty($errors)) {
         try {
+            $image_url = null;
+            
+            // Handle image upload
             if ($image && $image['error'] === UPLOAD_ERR_OK) {
                 $upload_dir = BASE_PATH . '/assets/images/internships/';
                 
@@ -88,21 +98,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (move_uploaded_file($image['tmp_name'], $upload_path)) {
                     $image_url = '/assets/images/internships/' . $image_name;
                 } else {
-                    $errors[] = "Failed to upload the image.";
+                    throw new Exception("Failed to upload the image.");
                 }
             }
 
             if ($is_edit) {
-                // Update
+                // Update - use new image if uploaded, otherwise keep existing
+                $final_image = $image_url ?? $internship['image'] ?? null;
                 $sql = "UPDATE internships SET title = ?, description = ?, duration = ?, skills_covered = ?, category = ?, google_form_link = ?, is_active = ?, image = ?, updated_at = NOW() WHERE id = ?";
                 $stmt = $pdo->prepare($sql);
-                $stmt->execute([$title, $description, $duration, $skills_covered, $category, $google_form_link, $is_active, $image_url ?? $internship['image'], $internship_id]);
+                $stmt->execute([$title, $description, $duration, $skills_covered, $category, $google_form_link, $is_active, $final_image, $internship_id]);
                 set_flash('success', 'Internship updated successfully.');
             } else {
-                // Insert
+                // Insert - use new image URL
                 $sql = "INSERT INTO internships (title, description, duration, skills_covered, category, google_form_link, is_active, image, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
                 $stmt = $pdo->prepare($sql);
-                $stmt->execute([$title, $description, $duration, $skills_covered, $category, $google_form_link, $is_active, $image_url ?? null]);
+                $stmt->execute([$title, $description, $duration, $skills_covered, $category, $google_form_link, $is_active, $image_url]);
                 set_flash('success', 'Internship created successfully.');
             }
             redirect('/admin/internships');
