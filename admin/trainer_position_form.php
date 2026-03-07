@@ -91,6 +91,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 require_once 'includes/header.php';
 ?>
 
+<!-- EasyMDE Markdown Editor -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde@2.18.0/dist/easymde.min.css">
+<script src="https://cdn.jsdelivr.net/npm/easymde@2.18.0/dist/easymde.min.js"></script>
+
 <div class="container mt-5 mb-5" style="max-width: 900px;">
     <h2 class="mb-4"><i class="fas fa-briefcase"></i> <?php echo $page_title; ?></h2>
 
@@ -144,10 +148,18 @@ require_once 'includes/header.php';
                 </div>
 
                 <div class="mb-3">
-                    <label for="description" class="form-label">Position Description *</label>
-                    <textarea class="form-control" id="description" name="description" rows="4" required
-                        placeholder="Describe the role, responsibilities, and what makes this position unique"><?php echo $position ? htmlspecialchars($position['description']) : ''; ?></textarea>
+                    <label for="description" class="form-label">Position Description * (Markdown Supported)</label>
+                    <textarea id="description" name="description" required><?php echo $position ? $position['description'] : ''; ?></textarea>
                 </div>
+                <script>
+                    var mde = new EasyMDE({
+                        element: document.getElementById("description"),
+                        spellChecker: false,
+                        autoDownloadFontAwesome: false,
+                        toolbar: ["bold", "italic", "heading", "|" , "quote", "unordered-list", "ordered-list", "|" , "link", "image", "|" , "preview", "side-by-side", "fullscreen", "|" , "guide"],
+                        placeholder: "Describe the role, responsibilities, and what makes this position unique. Use markdown for formatting."
+                    });
+                </script>
 
                 <!-- Requirements -->
                 <h5 class="card-title mt-5 mb-3">Requirements & Expertise</h5>

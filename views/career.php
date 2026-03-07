@@ -197,6 +197,50 @@ require_once 'includes/header.php';
         text-transform: uppercase;
         letter-spacing: 1px;
     }
+    /* Markdown Styling */
+    .position-card .card-body h2,
+    .position-card .card-body h3,
+    .position-card .card-body h4 {
+        color: #333;
+        margin-top: 15px;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+    .position-card .card-body h2 {
+        font-size: 1.3rem;
+    }
+    .position-card .card-body h3 {
+        font-size: 1.15rem;
+    }
+    .position-card .card-body h4 {
+        font-size: 1rem;
+    }
+    .position-card .card-body ul,
+    .position-card .card-body ol {
+        margin-left: 20px;
+        margin-bottom: 15px;
+    }
+    .position-card .card-body li {
+        margin-bottom: 8px;
+        color: #666;
+    }
+    .position-card .card-body strong {
+        color: #333;
+        font-weight: 600;
+    }
+    .position-card .card-body em {
+        font-style: italic;
+        color: #555;
+    }
+    .position-card .card-body blockquote {
+        border-left: 4px solid #667eea;
+        margin-left: 0;
+        margin-bottom: 15px;
+        color: #666;
+        background: rgba(102, 126, 234, 0.05);
+        padding: 12px 15px;
+        border-radius: 4px;
+    }
     .requirements-list {
         list-style: none;
         padding: 0;
@@ -422,7 +466,7 @@ require_once 'includes/header.php';
                                 </div>
                             </div>
                             <div class="card-body">
-                                <p><?php echo htmlspecialchars($position['description']); ?></p>
+                                <div><?php echo markdown_to_html($position['description']); ?></div>
                                 
                                 <?php if ($position['minimum_experience']): ?>
                                     <h6>Experience Required:</h6>
