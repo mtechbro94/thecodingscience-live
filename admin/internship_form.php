@@ -42,6 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $google_form_link = filter_var($_POST['google_form_link'] ?? '', FILTER_VALIDATE_URL);
     $is_active = isset($_POST['is_active']) ? 1 : 0;
     $image = $_FILES['image'] ?? null;
+    $image_url = null; // Initialize image URL variable
 
     // Validation
     if (empty($title)) {
@@ -65,6 +66,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             if ($image && $image['error'] === UPLOAD_ERR_OK) {
                 $upload_dir = BASE_PATH . '/assets/images/internships/';
+                
+                // Create directory if it doesn't exist
+                if (!is_dir($upload_dir)) {
+                    mkdir($upload_dir, 0755, true);
+                }
+                
                 $image_name = uniqid() . '-' . basename($image['name']);
                 $upload_path = $upload_dir . $image_name;
 
@@ -122,7 +129,7 @@ require_once __DIR__ . '/includes/header.php';
     </div>
 <?php endif; ?>
 
-<form method="POST" class="mb-5">
+<form method="POST" enctype="multipart/form-data" class="mb-5">
     <div class="row">
         <div class="col-md-8">
             <div class="card shadow-sm mb-4">
@@ -174,7 +181,14 @@ require_once __DIR__ . '/includes/header.php';
 
                     <div class="mb-3">
                         <label for="image" class="form-label">Internship Image</label>
+                        <?php if ($is_edit && !empty($internship['image'])): ?>
+                            <div class="mb-2">
+                                <img src="<?php echo htmlspecialchars($internship['image']); ?>" alt="Current Image" style="max-width: 200px; height: auto;">
+                                <p class="text-muted">Current Image</p>
+                            </div>
+                        <?php endif; ?>
                         <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                        <small class="text-muted">Upload a new image to replace the existing one (if editing).</small>
                     </div>
 
                     <div class="mb-3 border-top pt-3">
