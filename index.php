@@ -185,6 +185,14 @@ switch ($path) {
     case 'admin/success_story_form.php':
         require 'admin/success_story_form.php';
         break;
+    case 'admin/internships':
+    case 'admin/internships.php':
+        require 'admin/internships.php';
+        break;
+    case 'admin/internship_form':
+    case 'admin/internship_form.php':
+        require 'admin/internship_form.php';
+        break;
 
 
     case 'blogs':
