@@ -140,9 +140,17 @@ require_once __DIR__ . '/functions.php';
                             aria-labelledby="internshipsDropdown">
                             <div class="dropdown-mega-inner">
                                 <h6 class="dropdown-header text-success">Student Internship Programs</h6>
-                                <a class="dropdown-item" href="/internships">Web Development Internship</a>
-                                <a class="dropdown-item" href="/internships">Full Stack Development Internship</a>
-                                <a class="dropdown-item" href="/internships">Data Science & AI Internship</a>
+                                <?php
+                                // Fetch and display active internships dynamically
+                                $student_internships = get_internships_by_category('industrial');
+                                if (!empty($student_internships)):
+                                    foreach ($student_internships as $internship):
+                                        echo '<a class="dropdown-item" href="/internships">' . htmlspecialchars($internship['title']) . '</a>';
+                                    endforeach;
+                                else:
+                                    echo '<span class="dropdown-item disabled">No internships available</span>';
+                                endif;
+                                ?>
                                 <div class="dropdown-cta text-center mt-3">
                                     <a href="/internships" class="btn btn-sm btn-success">View All Internships</a>
                                 </div>
