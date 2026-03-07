@@ -150,7 +150,7 @@ require_once __DIR__ . '/functions.php';
                         </div>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/services">Live Trainings</a>
+                        <a class="nav-link" href="/career">Career</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/contact">Contact</a>
