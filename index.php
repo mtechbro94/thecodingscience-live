@@ -36,10 +36,6 @@ switch ($path) {
         require 'views/about.php';
         break;
 
-    case 'services':
-        require 'views/services.php';
-        break;
-
     case 'courses':
         require 'views/courses.php';
         break;
