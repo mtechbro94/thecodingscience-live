@@ -363,4 +363,33 @@ function use_coupon($code, $pdo)
         return false;
     }
 }
-?>
+
+/**
+ * Get active internships, optionally filtered by category
+ * @param string|null $category 'teaching', 'industrial', or null for all
+ * @return array
+ */
+function get_internships_by_category($category = null)
+{
+    global $pdo; // Assuming $pdo is available globally from db.php
+
+    $sql = "SELECT * FROM internships WHERE is_active = 1";
+    $params = [];
+
+    if ($category) {
+        $sql .= " AND category = ?";
+        $params[] = $category;
+    }
+
+    $sql .= " ORDER BY created_at DESC";
+
+    try {
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        // Log the error or handle it appropriately
+        error_log("Error fetching internships: " . $e->getMessage());
+        return [];
+    }
+}

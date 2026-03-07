@@ -218,9 +218,6 @@ switch ($path) {
             require 'views/social_login.php';
         } elseif (preg_match('/^social-callback\/([a-z]+)$/', $path, $match)) {
             require 'views/social_callback.php';
-        } elseif (preg_match('/^apply-internship\/(\d+)$/', $path, $matches)) {
-            $id = $matches[1];
-            require 'views/apply_internship.php';
         } elseif (preg_match('/^career-track\/([a-z0-9-]+)$/', $path, $matches)) {
             $track_slug = $matches[1];
             require 'views/career_track.php';

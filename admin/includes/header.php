@@ -108,6 +108,12 @@ if (!is_admin()) {
                     </a>
                 </li>
                 <li>
+                    <a href="/admin/internships"
+                        class="nav-link <?php echo (strpos($page_title, 'Internships') !== false) ? 'active' : ''; ?>">
+                        <i class="fas fa-briefcase me-2"></i> Internships
+                    </a>
+                </li>
+                <li>
                     <a href="/admin/settings"
                         class="nav-link <?php echo ($page_title == 'Site Settings') ? 'active' : ''; ?>">
                         <i class="fas fa-cog me-2"></i> Site Settings

@@ -158,6 +158,26 @@ CREATE TABLE `contact_messages` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `internships`
+--
+
+CREATE TABLE `internships` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(200) NOT NULL,
+  `description` text DEFAULT NULL,
+  `duration` varchar(50) DEFAULT NULL,
+  `skills_covered` text DEFAULT NULL, -- JSON string or comma-separated
+  `category` enum('teaching','industrial') NOT NULL DEFAULT 'industrial',
+  `google_form_link` varchar(500) DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT 1,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `internship_applications`
 --
 
