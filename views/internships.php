@@ -178,7 +178,7 @@ require_once 'includes/header.php';
                             <div class="internship-header bg-primary text-center">
                                 <div class="internship-header-content">
                                     <div class="internship-icon mx-auto">
-                                        <i class="fas fa-chalkboard-user"></i>
+                                        <i class="fas fa-book-open"></i>
                                     </div>
                                     <h3><?php echo htmlspecialchars($internship['title']); ?></h3>
                                     <div class="internship-meta">
