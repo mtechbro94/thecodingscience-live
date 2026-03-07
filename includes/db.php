@@ -103,6 +103,53 @@ try {
         // Column might already be removed, that's fine
     }
 
+    // Check if trainer_positions table exists, create if not
+    $trainerPositionsTableExists = $pdo->query("SHOW TABLES LIKE 'trainer_positions'")->rowCount() > 0;
+
+    if (!$trainerPositionsTableExists) {
+        $pdo->exec("CREATE TABLE IF NOT EXISTS `trainer_positions` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `title` varchar(200) NOT NULL,
+            `description` text DEFAULT NULL,
+            `expertise_required` varchar(500) DEFAULT NULL,
+            `minimum_experience` int(11) DEFAULT NULL,
+            `location` varchar(200) DEFAULT NULL,
+            `employment_type` enum('Full-time','Part-time','Freelance','Contractual') NOT NULL DEFAULT 'Full-time',
+            `stipend_info` text DEFAULT NULL,
+            `growth_opportunities` text DEFAULT NULL,
+            `requirement_details` text DEFAULT NULL,
+            `application_link` varchar(500) DEFAULT NULL,
+            `is_active` tinyint(1) DEFAULT 1,
+            `created_at` datetime DEFAULT current_timestamp(),
+            `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+    }
+
+    // Check if trainer_applications table exists, create if not
+    $trainerApplicationsTableExists = $pdo->query("SHOW TABLES LIKE 'trainer_applications'")->rowCount() > 0;
+
+    if (!$trainerApplicationsTableExists) {
+        $pdo->exec("CREATE TABLE IF NOT EXISTS `trainer_applications` (
+            `id` int(11) NOT NULL AUTO_INCREMENT,
+            `position_id` int(11) NOT NULL,
+            `name` varchar(120) NOT NULL,
+            `email` varchar(120) NOT NULL,
+            `phone` varchar(20) NOT NULL,
+            `experience_years` int(11) DEFAULT NULL,
+            `education` varchar(255) DEFAULT NULL,
+            `expertise` text DEFAULT NULL,
+            `portfolio_url` varchar(255) DEFAULT NULL,
+            `resume` varchar(255) DEFAULT NULL,
+            `cover_letter` text DEFAULT NULL,
+            `status` enum('pending','accepted','rejected') DEFAULT 'pending',
+            `applied_at` datetime DEFAULT current_timestamp(),
+            PRIMARY KEY (`id`),
+            KEY `position_id` (`position_id`),
+            CONSTRAINT `fk_trainer_app_position` FOREIGN KEY (`position_id`) REFERENCES `trainer_positions` (`id`) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+    }
+
 } catch (\PDOException $e) {
 
     // In production, log this instead of showing it

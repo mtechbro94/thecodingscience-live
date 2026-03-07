@@ -52,6 +52,10 @@ switch ($path) {
         require 'views/internships.php';
         break;
 
+    case 'career':
+        require 'views/career.php';
+        break;
+
     case 'contact':
         require 'views/contact.php';
         break;
@@ -192,6 +196,14 @@ switch ($path) {
     case 'admin/internship_form':
     case 'admin/internship_form.php':
         require 'admin/internship_form.php';
+        break;
+    case 'admin/trainer_positions':
+    case 'admin/trainer_positions.php':
+        require 'admin/trainer_positions.php';
+        break;
+    case 'admin/trainer_position_form':
+    case 'admin/trainer_position_form.php':
+        require 'admin/trainer_position_form.php';
         break;
 
 

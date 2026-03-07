@@ -357,4 +357,53 @@ CREATE TABLE `career_track_courses` (
   FOREIGN KEY (`course_id`) REFERENCES `courses`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `trainer_positions`
+--
+
+CREATE TABLE `trainer_positions` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(200) NOT NULL,
+  `description` text DEFAULT NULL,
+  `expertise_required` varchar(500) DEFAULT NULL,
+  `minimum_experience` int(11) DEFAULT NULL,
+  `location` varchar(200) DEFAULT NULL,
+  `employment_type` enum('Full-time','Part-time','Freelance','Contractual') NOT NULL DEFAULT 'Full-time',
+  `stipend_info` text DEFAULT NULL,
+  `growth_opportunities` text DEFAULT NULL,
+  `requirement_details` text DEFAULT NULL,
+  `application_link` varchar(500) DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT 1,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `trainer_applications`
+--
+
+CREATE TABLE `trainer_applications` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `position_id` int(11) NOT NULL,
+  `name` varchar(120) NOT NULL,
+  `email` varchar(120) NOT NULL,
+  `phone` varchar(20) NOT NULL,
+  `experience_years` int(11) DEFAULT NULL,
+  `education` varchar(255) DEFAULT NULL,
+  `expertise` text DEFAULT NULL,
+  `portfolio_url` varchar(255) DEFAULT NULL,
+  `resume` varchar(255) DEFAULT NULL,
+  `cover_letter` text DEFAULT NULL,
+  `status` enum('pending','accepted','rejected') DEFAULT 'pending',
+  `applied_at` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `position_id` (`position_id`),
+  CONSTRAINT `fk_trainer_app_position` FOREIGN KEY (`position_id`) REFERENCES `trainer_positions` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 COMMIT;

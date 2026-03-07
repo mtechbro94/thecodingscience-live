@@ -8,7 +8,7 @@ if (!is_admin()) {
     redirect('/');
 }
 
-$page_title = "Internships";
+$page_title = "Student Internships";
 
 // Handle Actions
 if (isset($_GET['action']) && isset($_GET['id'])) {
@@ -25,8 +25,8 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
     redirect('/admin/internships');
 }
 
-// Fetch Internships
-$stmt = $pdo->prepare("SELECT * FROM internships ORDER BY created_at DESC");
+// Fetch Internships (Industrial only for students)
+$stmt = $pdo->prepare("SELECT * FROM internships WHERE category = 'industrial' ORDER BY created_at DESC");
 $stmt->execute();
 $internships = $stmt->fetchAll();
 
@@ -35,7 +35,10 @@ require_once __DIR__ . '/includes/header.php';
 ?>
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Internship Management</h1>
+    <div>
+        <h1 class="h2">Student Internship Management</h1>
+        <p class="text-muted">Manage internship opportunities for students</p>
+    </div>
     <div class="btn-toolbar mb-2 mb-md-0">
         <a href="/admin/internship_form" class="btn btn-sm btn-primary">
             <i class="fas fa-plus"></i> Add New Internship
