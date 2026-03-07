@@ -41,6 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $category = sanitize($_POST['category'] ?? 'industrial');
     $google_form_link = filter_var($_POST['google_form_link'] ?? '', FILTER_VALIDATE_URL);
     $is_active = isset($_POST['is_active']) ? 1 : 0;
+    $image = $_FILES['image'] ?? null;
 
     // Validation
     if (empty($title)) {
@@ -54,6 +55,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     if (!empty($_POST['google_form_link']) && !$google_form_link) {
         $errors[] = "Invalid Google Form Link URL.";
+    }
+    if ($image && !is_image($image)) {
+        $errors[] = "Invalid image file.";
     }
 
 
@@ -154,6 +158,11 @@ require_once __DIR__ . '/includes/header.php';
                         <input type="url" class="form-control" name="google_form_link" placeholder="https://docs.google.com/forms/d/e/..."
                             value="<?php echo htmlspecialchars($internship['google_form_link'] ?? ($_POST['google_form_link'] ?? '')); ?>">
                         <small class="text-muted">The direct link to the Google Form for application.</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Internship Image</label>
+                        <input type="file" class="form-control" id="image" name="image" accept="image/*">
                     </div>
 
                     <div class="mb-3 border-top pt-3">
