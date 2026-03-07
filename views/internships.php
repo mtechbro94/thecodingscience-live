@@ -159,6 +159,36 @@ require_once 'includes/header.php';
         font-size: 1.15rem;
         color: #6c757d;
     }
+    .internship-info-card {
+        border: 0;
+        border-radius: 15px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    .internship-info-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
+    }
+    .internship-info-card.primary {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        border-left: 5px solid #667eea;
+    }
+    .internship-info-card.success {
+        background: linear-gradient(135deg, rgba(42, 245, 152, 0.1) 0%, rgba(0, 146, 69, 0.1) 100%);
+        border-left: 5px solid #2AF598;
+    }
+    .internship-info-card h5 {
+        color: #333;
+        font-weight: 700;
+    }
+    .internship-info-card .fa-3x {
+        opacity: 0.9;
+    }
+    .internship-info-card ul li {
+        color: #555;
+        line-height: 1.8;
+        margin-bottom: 8px;
+    }
 </style>
 
 <section class="py-5" style="margin-top: 80px;">
@@ -170,6 +200,28 @@ require_once 'includes/header.php';
 
         <!-- Teaching Internships Section -->
         <h2 class="text-center section-title mb-4"><i class="fas fa-chalkboard-teacher me-2"></i>Teaching Internships</h2>
+        
+        <!-- Teaching Internships Info Card -->
+        <div class="row g-4 justify-content-center mb-5">
+            <div class="col-md-8">
+                <div class="alert alert-info border-0 rounded-3 internship-info-card primary">
+                    <div class="row align-items-center p-2">
+                        <div class="col-auto">
+                            <i class="fas fa-graduation-cap fa-3x text-primary"></i>
+                        </div>
+                        <div class="col">
+                            <h5 class="mb-2"><strong>Perfect for Passionate Trainers & Educators</strong></h5>
+                            <p class="mb-2">Join our team as a trainer and make an impact! This is your opportunity to:</p>
+                            <ul class="mb-0 small">
+                                <li><strong>First Month:</strong> Earn stipend-based compensation while you adapt to our teaching style</li>
+                                <li><strong>Performance-based Growth:</strong> Exceptional trainers are offered permanent positions based on performance</li>
+                                <li><strong>Grow with Us:</strong> Build your career and establish yourself as an industry expert</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <?php if (!empty($teaching_internships)): ?>
             <div class="row g-4 justify-content-center mb-5">
                 <?php foreach ($teaching_internships as $internship): ?>
@@ -214,6 +266,28 @@ require_once 'includes/header.php';
 
         <!-- Industrial Internships Section -->
         <h2 class="text-center section-title mb-4 mt-5"><i class="fas fa-industry me-2"></i>Industrial Internships</h2>
+        
+        <!-- Industrial Internships Info Card -->
+        <div class="row g-4 justify-content-center mb-5">
+            <div class="col-md-8">
+                <div class="alert alert-success border-0 rounded-3 internship-info-card success">
+                    <div class="row align-items-center p-2">
+                        <div class="col-auto">
+                            <i class="fas fa-laptop-code fa-3x text-success"></i>
+                        </div>
+                        <div class="col">
+                            <h5 class="mb-2"><strong>Hands-On Learning for Students</strong></h5>
+                            <p class="mb-2">Gain real-world experience and build your professional portfolio! Our industrial internships offer:</p>
+                            <ul class="mb-0 small">
+                                <li><strong>Project-Based Learning:</strong> Work on real-world projects relevant to your chosen technology</li>
+                                <li><strong>Hands-On Practice:</strong> Get practical experience with the latest tools and technologies</li>
+                                <li><strong>Industry Mentorship:</strong> Learn best practices from experienced professionals in your field</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <?php if (!empty($industrial_internships)): ?>
             <div class="row g-4 justify-content-center">
                 <?php foreach ($industrial_internships as $internship): ?>
