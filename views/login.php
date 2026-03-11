@@ -98,26 +98,44 @@ require_once 'includes/header.php';
                         <p class="text-muted text-center mb-4">Sign in to access your dashboard</p>
 
                         <form method="POST" action="">
+                            <?php
+                            $role_param = $_GET['role'] ?? '';
+                            if (!in_array($role_param, ['student', 'trainer']))
+                                $role_param = '';
+                            ?>
+
                             <!-- Role Selection -->
-                            <div class="mb-4">
+                            <div class="mb-4" <?php echo $role_param ? 'style="display:none;"' : ''; ?>>
                                 <label class="form-label text-center d-block mb-3"><i class="fas fa-user-tag"></i> Login
                                     As</label>
                                 <div class="d-flex justify-content-center gap-2">
                                     <input type="radio" class="btn-check" name="login_role" id="roleStudent"
-                                        value="student" checked>
+                                        value="student" <?php echo ($role_param === 'trainer') ? '' : 'checked'; ?>>
                                     <label class="btn btn-outline-primary" for="roleStudent">
                                         <i class="fas fa-user-graduate"></i><br>
                                         <small>Student</small>
                                     </label>
 
                                     <input type="radio" class="btn-check" name="login_role" id="roleTrainer"
-                                        value="trainer">
+                                        value="trainer" <?php echo ($role_param === 'trainer') ? 'checked' : ''; ?>>
                                     <label class="btn btn-outline-success" for="roleTrainer">
                                         <i class="fas fa-chalkboard-teacher"></i><br>
                                         <small>Trainer</small>
                                     </label>
                                 </div>
                             </div>
+
+                            <?php if ($role_param): ?>
+                                <div class="text-center mb-4">
+                                    <h4
+                                        class="fw-bold text-<?php echo $role_param === 'trainer' ? 'success' : 'primary'; ?>">
+                                        <?php echo ucfirst($role_param); ?> Login
+                                    </h4>
+                                    <a href="/login" class="small text-muted">Not a <?php echo $role_param; ?>? Change
+                                        role</a>
+                                </div>
+                                <input type="hidden" name="login_role" value="<?php echo $role_param; ?>">
+                            <?php endif; ?>
 
                             <div class="mb-3">
                                 <label class="form-label"><i class="fas fa-envelope"></i> Email Address</label>

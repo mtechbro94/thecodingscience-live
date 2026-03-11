@@ -493,7 +493,7 @@ require_once 'includes/header.php';
                                 <?php endif; ?>
                                 
                                 <div class="d-grid mt-auto">
-                                    <a href="<?php echo htmlspecialchars($position['application_link']); ?>" target="_blank" class="btn apply-btn">
+                                    <a href="/apply/career/<?php echo $position['id']; ?>" class="btn apply-btn">
                                         <i class="fas fa-paper-plane me-2"></i>Apply Now
                                     </a>
                                 </div>

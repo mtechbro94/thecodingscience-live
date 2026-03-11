@@ -395,6 +395,27 @@ function get_internships_by_category($category = null)
 }
 
 /**
+ * Get single internship by ID
+ * @param int $id Internship ID
+ * @return array|null
+ */
+function get_internship($id)
+{
+    global $pdo;
+
+    $sql = "SELECT * FROM internships WHERE id = ? AND is_active = 1";
+
+    try {
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        error_log("Error fetching internship: " . $e->getMessage());
+        return null;
+    }
+}
+
+/**
  * Get all active trainer positions
  * @return array
  */
@@ -449,33 +470,33 @@ function markdown_to_html($markdown)
 
     // Convert markdown to HTML
     $html = htmlspecialchars($markdown);
-    
+
     // Headers
     $html = preg_replace('/^### (.*?)$/m', '<h4>$1</h4>', $html);
     $html = preg_replace('/^## (.*?)$/m', '<h3>$1</h3>', $html);
     $html = preg_replace('/^# (.*?)$/m', '<h2>$1</h2>', $html);
-    
+
     // Bold
     $html = preg_replace('/\*\*(.*?)\*\*/m', '<strong>$1</strong>', $html);
-    $html = preg_replace('/__\(.*?__)\/m', '<strong>$1</strong>', $html);
-    
+    $html = preg_replace('/__(.*?)__/m', '<strong>$1</strong>', $html);
+
     // Italic
     $html = preg_replace('/\*(.*?)\*/m', '<em>$1</em>', $html);
-    $html = preg_replace('/_\(.*?)_\/m', '<em>$1</em>', $html);
-    
+    $html = preg_replace('/_(.*?)_/m', '<em>$1</em>', $html);
+
     // Lists
     $html = preg_replace('/^\- (.*?)$/m', '<li>$1</li>', $html);
     $html = preg_replace('/(<li>.*?<\/li>)/s', '<ul>$1</ul>', $html);
     $html = str_replace('</li><li>', '</li><li>', $html);
-    
+
     // Ordered lists
     $html = preg_replace('/^\d+\. (.*?)$/m', '<li>$1</li>', $html);
-    
+
     // Line breaks
     $html = nl2br($html);
-    
+
     // Blockquotes
     $html = preg_replace('/^&gt; (.*?)$/m', '<blockquote><p>$1</p></blockquote>', $html);
-    
+
     return $html;
 }

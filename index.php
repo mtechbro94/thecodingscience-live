@@ -57,11 +57,19 @@ switch ($path) {
         break;
 
     case 'login':
-        require 'views/login.php';
+        if (!isset($_GET['role']) && !isset($_POST['login_role']) && !is_logged_in()) {
+            require 'views/auth_selection.php';
+        } else {
+            require 'views/login.php';
+        }
         break;
 
     case 'register':
-        require 'views/register.php';
+        if (!isset($_GET['role']) && !isset($_POST['register_role']) && !is_logged_in()) {
+            require 'views/auth_selection.php';
+        } else {
+            require 'views/register.php';
+        }
         break;
 
     case 'verify-otp':
@@ -237,6 +245,10 @@ switch ($path) {
         } elseif (preg_match('/^career-track\/([a-z0-9-]+)$/', $path, $matches)) {
             $track_slug = $matches[1];
             require 'views/career_track.php';
+        } elseif (preg_match('/^apply\/(internship|career)\/(\d+)$/', $path, $matches)) {
+            $type = $matches[1];
+            $id = $matches[2];
+            require 'views/apply_handler.php';
         } else {
 
             http_response_code(404);

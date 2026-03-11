@@ -116,26 +116,47 @@ require_once 'includes/header.php';
                         <p class="text-muted text-center mb-4">Join our learning community</p>
 
                         <form method="POST" action="">
+                            <?php
+                            $role_param = $_GET['role'] ?? '';
+                            if (!in_array($role_param, ['student', 'trainer']))
+                                $role_param = '';
+                            ?>
+
                             <!-- Role Selection -->
-                            <div class="mb-4">
+                            <div class="mb-4" <?php echo $role_param ? 'style="display:none;"' : ''; ?>>
                                 <label class="form-label text-center d-block mb-3"><i class="fas fa-user-tag"></i>
                                     Register As</label>
                                 <div class="d-flex justify-content-center gap-3">
                                     <input type="radio" class="btn-check" name="register_role" id="roleStudent"
-                                        value="student" checked onchange="toggleTrainerFields()">
+                                        value="student" <?php echo ($role_param === 'trainer') ? '' : 'checked'; ?>
+                                        onchange="toggleTrainerFields()">
                                     <label class="btn btn-outline-primary px-4 py-3" for="roleStudent">
                                         <i class="fas fa-user-graduate fa-2x d-block mb-2"></i>
                                         Student
                                     </label>
 
                                     <input type="radio" class="btn-check" name="register_role" id="roleTrainer"
-                                        value="trainer" onchange="toggleTrainerFields()">
+                                        value="trainer" <?php echo ($role_param === 'trainer') ? 'checked' : ''; ?>
+                                        onchange="toggleTrainerFields()">
                                     <label class="btn btn-outline-success px-4 py-3" for="roleTrainer">
                                         <i class="fas fa-chalkboard-teacher fa-2x d-block mb-2"></i>
                                         Trainer
                                     </label>
                                 </div>
                             </div>
+
+                            <?php if ($role_param): ?>
+                                <div class="text-center mb-4">
+                                    <h4
+                                        class="fw-bold text-<?php echo $role_param === 'trainer' ? 'success' : 'primary'; ?>">
+                                        <?php echo ucfirst($role_param); ?> Registration
+                                    </h4>
+                                    <a href="/register" class="small text-muted">Not a <?php echo $role_param; ?>? Change
+                                        role</a>
+                                </div>
+                                <input type="hidden" name="register_role" id="role_hidden"
+                                    value="<?php echo $role_param; ?>">
+                            <?php endif; ?>
 
                             <hr>
 
@@ -269,7 +290,17 @@ require_once 'includes/header.php';
     }
 
     function toggleTrainerFields() {
-        const isTrainer = document.getElementById('roleTrainer').checked;
+        const roleStudent = document.getElementById('roleStudent');
+        const roleTrainer = document.getElementById('roleTrainer');
+        const roleHidden = document.getElementById('role_hidden');
+
+        let isTrainer = false;
+        if (roleTrainer) {
+            isTrainer = roleTrainer.checked;
+        } else if (roleHidden) {
+            isTrainer = roleHidden.value === 'trainer';
+        }
+
         const trainerFields = document.getElementById('trainerFields');
         const submitText = document.getElementById('submitText');
 
