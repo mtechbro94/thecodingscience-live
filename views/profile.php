@@ -143,8 +143,8 @@ require_once 'includes/header.php';
                                             class="rounded-circle shadow"
                                             style="width: 150px; height: 150px; object-fit: cover; border: 4px solid #f8f9fa;">
                                     <?php else: ?>
-                                        <div class="avatar-circle bg-primary text-white mx-auto shadow d-flex align-items-center justify-content-center"
-                                            style="width: 150px; height: 150px; font-size: 4rem; border-radius: 50%; border: 4px solid #f8f9fa;">
+                                        <div class="avatar-circle avatar-circle-lg bg-primary mx-auto shadow"
+                                            style="border: 4px solid #f8f9fa;">
                                             <?php echo strtoupper(substr($user['name'], 0, 1)); ?>
                                         </div>
                                     <?php endif; ?>

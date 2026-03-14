@@ -168,14 +168,13 @@ require_once __DIR__ . '/functions.php';
                         $user = current_user(); ?>
                         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown"
                             role="button" data-bs-toggle="dropdown">
-                            <?php
-                            $profile_img = $_SESSION['user_profile_image'] ?? null;
-                            if ($profile_img): ?>
-                                <img src="/assets/images/profiles/<?php echo $profile_img; ?>" alt="Avatar"
-                                    class="rounded-circle me-2"
+                            <?php if ($profile_img): ?>
+                                <img src="<?php echo get_avatar($user); ?>" alt="Avatar" class="rounded-circle me-2"
                                     style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ddd;">
                             <?php else: ?>
-                                <i class="fas fa-user-circle me-2"></i>
+                                <div class="avatar-circle avatar-circle-sm bg-primary me-2">
+                                    <?php echo strtoupper(substr($user['name'], 0, 1)); ?>
+                                </div>
                             <?php endif; ?>
                             <?php echo htmlspecialchars($user['name']); ?>
                         </a>

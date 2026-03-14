@@ -24,7 +24,8 @@ function current_user()
             'id' => $_SESSION['user_id'] ?? null,
             'name' => $_SESSION['user_name'] ?? null,
             'role' => $_SESSION['user_role'] ?? 'student',
-            'email' => $_SESSION['user_email'] ?? null
+            'email' => $_SESSION['user_email'] ?? null,
+            'profile_image' => $_SESSION['user_profile_image'] ?? null
         ];
     }
     return null;
@@ -148,8 +149,9 @@ function get_image_url($path, $type = 'common')
  */
 function get_avatar($user_data)
 {
-    if (!empty($user_data['profile_image'])) {
-        return get_image_url($user_data['profile_image'], 'profile');
+    $img = $user_data['profile_image'] ?? null;
+    if (!empty($img)) {
+        return get_image_url($img, 'profile');
     }
     return get_image_url('', 'profile');
 }

@@ -73,6 +73,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 // Student
                 $redirect_url = $_GET['redirect'] ?? '/dashboard';
+                // Prevent open redirect attacks - only allow relative URLs
+                if (empty($redirect_url) || $redirect_url[0] !== '/' || strpos($redirect_url, '//') === 0) {
+                    $redirect_url = '/dashboard';
+                }
                 redirect($redirect_url);
             }
         } else {

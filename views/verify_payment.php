@@ -1,12 +1,6 @@
 <?php
 // views/verify_payment.php - Verify Razorpay Payment
 
-require_once 'config.php';
-require_once 'includes/db.php';
-require_once 'includes/functions.php';
-
-session_start();
-
 header('Content-Type: application/json');
 
 if (!is_logged_in()) {
@@ -36,13 +30,16 @@ if (!$enrollment) {
     exit;
 }
 
-// Verify the signature
-$signature_data = $razorpay_order_id . '|' . $razorpay_payment_id;
-$expected_signature = hash_hmac('sha256', $signature_data, RAZORPAY_KEY_SECRET);
+// Verify the Razorpay signature (critical security check)
+if (!empty($razorpay_order_id) && !empty($razorpay_signature)) {
+    $signature_data = $razorpay_order_id . '|' . $razorpay_payment_id;
+    $expected_signature = hash_hmac('sha256', $signature_data, RAZORPAY_KEY_SECRET);
 
-if ($razorpay_signature !== $expected_signature) {
-    // Signature verification failed - but still mark as completed for now (you can add more strict verification)
-    error_log("Razorpay signature mismatch for enrollment $enrollment_id");
+    if ($razorpay_signature !== $expected_signature) {
+        error_log("Razorpay signature mismatch for enrollment $enrollment_id. Expected: $expected_signature, Got: $razorpay_signature");
+        echo json_encode(['status' => 'error', 'message' => 'Payment verification failed. Signature mismatch. Please contact support.']);
+        exit;
+    }
 }
 
 // Payment successful - update enrollment

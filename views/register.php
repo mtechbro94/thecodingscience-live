@@ -94,7 +94,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 set_flash('danger', 'Failed to send verification email. Please contact support.');
             }
         } catch (PDOException $e) {
-            set_flash('danger', 'Registration failed: ' . $e->getMessage());
+            error_log('Registration failed: ' . $e->getMessage());
+            set_flash('danger', 'Registration failed. Please try again or contact support.');
         }
     } else {
         foreach ($errors as $error) {

@@ -16,18 +16,18 @@ $page_title = "Users";
 // Handle Edit User Form
 $edit_id = 0;
 if (isset($_GET['edit'])) {
-    $edit_id = (int)$_GET['edit'];
-    
+    $edit_id = (int) $_GET['edit'];
+
     if ($edit_id > 0) {
         $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
         $stmt->execute([$edit_id]);
         $edit_user = $stmt->fetch();
-        
+
         if (!$edit_user) {
             set_flash('danger', 'User not found.');
             redirect('/admin/users');
         }
-        
+
         // Handle form submission
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $name = sanitize($_POST['name'] ?? '');
@@ -35,7 +35,7 @@ if (isset($_GET['edit'])) {
             $role = sanitize($_POST['role'] ?? 'student');
             $is_approved = isset($_POST['is_approved']) ? 1 : 0;
             $is_active = isset($_POST['is_active']) ? 1 : 0;
-            
+
             if (empty($name) || empty($email)) {
                 set_flash('danger', 'Name and email are required.');
             } else {
@@ -45,7 +45,7 @@ if (isset($_GET['edit'])) {
                 redirect('/admin/users');
             }
         }
-        
+
         $page_title = "Edit User";
         include __DIR__ . '/includes/header.php';
         ?>
@@ -55,9 +55,9 @@ if (isset($_GET['edit'])) {
                 <i class="fas fa-arrow-left"></i> Back to Users
             </a>
         </div>
-        
+
         <?php echo get_flash(); ?>
-        
+
         <form method="POST">
             <div class="row">
                 <div class="col-md-8">
@@ -65,19 +65,24 @@ if (isset($_GET['edit'])) {
                         <div class="card-body">
                             <div class="mb-3">
                                 <label class="form-label">Name</label>
-                                <input type="text" class="form-control" name="name" value="<?php echo htmlspecialchars($edit_user['name']); ?>" required>
+                                <input type="text" class="form-control" name="name"
+                                    value="<?php echo htmlspecialchars($edit_user['name']); ?>" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Email</label>
-                                <input type="email" class="form-control" value="<?php echo htmlspecialchars($edit_user['email']); ?>" disabled>
+                                <input type="email" class="form-control"
+                                    value="<?php echo htmlspecialchars($edit_user['email']); ?>" disabled>
                                 <small class="text-muted">Email cannot be changed.</small>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Role</label>
                                 <select class="form-select" name="role">
-                                    <option value="student" <?php echo $edit_user['role'] === 'student' ? 'selected' : ''; ?>>Student</option>
-                                    <option value="trainer" <?php echo $edit_user['role'] === 'trainer' ? 'selected' : ''; ?>>Trainer</option>
-                                    <option value="admin" <?php echo $edit_user['role'] === 'admin' ? 'selected' : ''; ?>>Admin</option>
+                                    <option value="student" <?php echo $edit_user['role'] === 'student' ? 'selected' : ''; ?>>
+                                        Student</option>
+                                    <option value="trainer" <?php echo $edit_user['role'] === 'trainer' ? 'selected' : ''; ?>>
+                                        Trainer</option>
+                                    <option value="admin" <?php echo $edit_user['role'] === 'admin' ? 'selected' : ''; ?>>Admin
+                                    </option>
                                 </select>
                             </div>
                             <div class="form-check form-switch mb-3">
@@ -96,6 +101,7 @@ if (isset($_GET['edit'])) {
         </form>
         <?php
         require_once __DIR__ . '/includes/footer.php';
+        include_once __DIR__ . '/includes/footer.php';
         exit;
     }
 }
@@ -174,10 +180,14 @@ require_once __DIR__ . '/includes/header.php';
                             </td>
                             <td>
                                 <div class="d-flex align-items-center">
-                                    <div class="avatar-circle bg-secondary text-white me-2 d-flex align-items-center justify-content-center"
-                                        style="width: 32px; height: 32px; border-radius: 50%; font-size: 0.8rem;">
-                                        <?php echo strtoupper(substr($user['name'], 0, 1)); ?>
-                                    </div>
+                                    <?php if ($user['profile_image']): ?>
+                                        <img src="<?php echo get_avatar($user); ?>" alt="Profile" class="rounded-circle me-2"
+                                            style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ddd;">
+                                    <?php else: ?>
+                                        <div class="avatar-circle avatar-circle-sm bg-secondary me-2">
+                                            <?php echo strtoupper(substr($user['name'], 0, 1)); ?>
+                                        </div>
+                                    <?php endif; ?>
                                     <?php echo htmlspecialchars($user['name']); ?>
                                 </div>
                             </td>

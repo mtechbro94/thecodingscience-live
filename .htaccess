@@ -1,8 +1,40 @@
-# .htaccess - URL Rewriting for Apache
+# .htaccess - URL Rewriting and Security for Apache
 
 RewriteEngine On
 RewriteBase /
 
+# --- Security: Block access to sensitive files ---
+# Block .env files
+<FilesMatch "^\.env">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Block config.php direct access
+<Files "config.php">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Block fix_db.php and similar dev scripts
+<FilesMatch "^fix_.*\.php$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Block access to includes/ and database/ directories
+RewriteRule ^includes/ - [F,L]
+RewriteRule ^database/ - [F,L]
+
+# --- Security Headers ---
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# --- URL Rewriting ---
 # Redirect Trailing Slashes
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_URI} (.+)/$

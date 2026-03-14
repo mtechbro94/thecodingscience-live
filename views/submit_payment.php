@@ -63,7 +63,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             set_flash('success', 'Payment details submitted successfully! Our team will verify it soon.');
             redirect('/dashboard');
         } catch (PDOException $e) {
-            $error = "Failed to update enrollment: " . $e->getMessage();
+            error_log('Payment submission failed: ' . $e->getMessage());
+            $error = "Failed to process payment. Please try again or contact support.";
         }
     }
 }

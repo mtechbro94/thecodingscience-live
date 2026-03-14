@@ -114,6 +114,9 @@ require_once 'includes/header.php';
 <!-- Razorpay Checkout Script -->
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
+// Razorpay instance in outer scope so payment.failed handler works
+var rzp1;
+
 document.getElementById('razorpay-btn').addEventListener('click', function() {
     var options = {
         key: "<?php echo RAZORPAY_KEY_ID; ?>",
@@ -127,13 +130,12 @@ document.getElementById('razorpay-btn').addEventListener('click', function() {
         ?>",
         receipt: "<?php echo $receipt_id; ?>",
         handler: function(response) {
-            // Payment successful
-            // Submit payment details to server for verification
+            // Payment successful - submit to server for verification
             var formData = new FormData();
             formData.append('enrollment_id', '<?php echo $enrollment_id; ?>');
             formData.append('razorpay_payment_id', response.razorpay_payment_id);
-            formData.append('razorpay_order_id', response.razorpay_order_id);
-            formData.append('razorpay_signature', response.razorpay_signature);
+            formData.append('razorpay_order_id', response.razorpay_order_id || '');
+            formData.append('razorpay_signature', response.razorpay_signature || '');
             
             fetch('/verify-payment', {
                 method: 'POST',
@@ -162,21 +164,17 @@ document.getElementById('razorpay-btn').addEventListener('click', function() {
         },
         modal: {
             ondismiss: function() {
-                // User closed the payment modal
                 console.log('Payment modal closed');
             }
         }
     };
     
-    var rzp1 = new Razorpay(options);
+    rzp1 = new Razorpay(options);
+    rzp1.on('payment.failed', function(response) {
+        alert('Payment failed: ' + response.error.description);
+        window.location.href = '/submit-payment/<?php echo $enrollment_id; ?>';
+    });
     rzp1.open();
-});
-
-rzp1.on('payment.failed', function(response) {
-    // Payment failed
-    alert('Payment failed: ' + response.error.description);
-    // Redirect to manual payment
-    window.location.href = '/submit-payment/<?php echo $enrollment_id; ?>';
 });
 
 // Auto-open Razorpay checkout on page load

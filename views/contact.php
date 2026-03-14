@@ -45,7 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             echo json_encode(['status' => 'success', 'message' => 'Thank you! Your message has been sent.']);
         } catch (PDOException $e) {
-            echo json_encode(['status' => 'error', 'message' => 'Database error: ' . $e->getMessage()]);
+            error_log('Contact form DB error: ' . $e->getMessage());
+            echo json_encode(['status' => 'error', 'message' => 'An error occurred. Please try again later.']);
         }
     } else {
         echo json_encode(['status' => 'error', 'message' => implode(', ', $errors)]);

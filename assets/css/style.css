@@ -16,6 +16,22 @@
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Avatar Utils */
+.avatar-circle {
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+.avatar-circle-sm { width: 32px; height: 32px; font-size: 0.85rem; }
+.avatar-circle-md { width: 80px; height: 80px; font-size: 1.75rem; }
+.avatar-circle-lg { width: 150px; height: 150px; font-size: 3.5rem; }
+
 * {
     margin: 0;
     padding: 0;
