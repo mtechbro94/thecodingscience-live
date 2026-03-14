@@ -413,7 +413,7 @@ function getLevelBadgeClass($level)
                                             data-bs-target="#curriculumModal<?php echo $index; ?>">
                                             <i class="fas fa-list-alt me-1"></i> View Curriculum
                                         </button>
-                                        <a href="/enroll?course=<?php echo urlencode($course['name']); ?>"
+                                        <a href="/enroll/<?php echo $course['id']; ?>"
                                             class="btn btn-primary btn-sm py-1 px-3" style="font-size: 0.85rem;">Enroll Now</a>
                                     </div>
                                 </div>
@@ -476,7 +476,7 @@ function getLevelBadgeClass($level)
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                    <a href="/enroll?course=<?php echo urlencode($course['name']); ?>" class="btn btn-primary">
+                                    <a href="/enroll/<?php echo $course['id']; ?>" class="btn btn-primary">
                                         <i class="fas fa-graduation-cap me-1"></i> Enroll Now -
                                         ₹<?php echo number_format($course['price']); ?>
                                     </a>

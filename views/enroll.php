@@ -157,7 +157,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['enroll_now'])) {
     $applied_coupon = $_POST['applied_coupon'] ?? '';
     
     try {
-        if (!empty($course_id) && isset($course['is_combo']) && !$course['is_combo']) {
+        if (!empty($course_id) && !isset($course['is_combo']) && !isset($course['is_track'])) {
             // Regular course enrollment
             $sql = "INSERT INTO enrollments (user_id, course_id, status, payment_method, amount_paid, enrolled_at) VALUES (?, ?, 'pending', ?, ?, NOW())";
             $stmt = $pdo->prepare($sql);

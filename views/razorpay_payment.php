@@ -178,6 +178,13 @@ rzp1.on('payment.failed', function(response) {
     // Redirect to manual payment
     window.location.href = '/submit-payment/<?php echo $enrollment_id; ?>';
 });
+
+// Auto-open Razorpay checkout on page load
+window.addEventListener('load', function() {
+    setTimeout(function() {
+        document.getElementById('razorpay-btn').click();
+    }, 500);
+});
 </script>
 
 <?php require_once 'includes/footer.php'; ?>
