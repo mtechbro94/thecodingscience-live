@@ -43,6 +43,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $summary = sanitize($_POST['summary'] ?? '');
     $price = (float) ($_POST['price'] ?? 0);
     $duration = sanitize($_POST['duration'] ?? '');
+    $batch_timing = sanitize($_POST['batch_timing'] ?? '');
+    $live_link = sanitize($_POST['live_link'] ?? '');
     $level = sanitize($_POST['level'] ?? '');
     $trainer_id = !empty($_POST['trainer_id']) ? (int) $_POST['trainer_id'] : null;
     $curriculum = $_POST['curriculum'] ?? '[]'; // JSON string
@@ -89,15 +91,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             if ($is_edit) {
                 // Update
-                $sql = "UPDATE courses SET name = ?, description = ?, summary = ?, price = ?, duration = ?, level = ?, trainer_id = ?, image = ?, curriculum = ?, is_featured = ? WHERE id = ?";
+                $sql = "UPDATE courses SET name = ?, description = ?, summary = ?, price = ?, duration = ?, batch_timing = ?, live_link = ?, level = ?, trainer_id = ?, image = ?, curriculum = ?, is_featured = ? WHERE id = ?";
                 $stmt = $pdo->prepare($sql);
-                $stmt->execute([$name, $description, $summary, $price, $duration, $level, $trainer_id, $image, $curriculum, $is_featured, $course_id]);
+                $stmt->execute([$name, $description, $summary, $price, $duration, $batch_timing, $live_link, $level, $trainer_id, $image, $curriculum, $is_featured, $course_id]);
                 set_flash('success', 'Course updated successfully.');
             } else {
                 // Insert
-                $sql = "INSERT INTO courses (name, description, summary, price, duration, level, trainer_id, image, curriculum, is_featured, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+                $sql = "INSERT INTO courses (name, description, summary, price, duration, batch_timing, live_link, level, trainer_id, image, curriculum, is_featured, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
                 $stmt = $pdo->prepare($sql);
-                $stmt->execute([$name, $description, $summary, $price, $duration, $level, $trainer_id, $image, $curriculum, $is_featured]);
+                $stmt->execute([$name, $description, $summary, $price, $duration, $batch_timing, $live_link, $level, $trainer_id, $image, $curriculum, $is_featured]);
                 set_flash('success', 'Course created successfully.');
             }
             redirect('/admin/courses');
@@ -198,6 +200,18 @@ require_once __DIR__ . '/includes/header.php';
                         <label class="form-label">Duration</label>
                         <input type="text" class="form-control" name="duration" placeholder="e.g. 8 Weeks"
                             value="<?php echo htmlspecialchars($course['duration'] ?? ($_POST['duration'] ?? '')); ?>">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Batch Timing</label>
+                        <input type="text" class="form-control" name="batch_timing" placeholder="e.g. Mon-Fri, 7 PM - 8 PM"
+                            value="<?php echo htmlspecialchars($course['batch_timing'] ?? ($_POST['batch_timing'] ?? '')); ?>">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Live Class Link (Zoom/Meet)</label>
+                        <input type="url" class="form-control" name="live_link" placeholder="https://zoom.us/j/..."
+                            value="<?php echo htmlspecialchars($course['live_link'] ?? ($_POST['live_link'] ?? '')); ?>">
                     </div>
 
                     <div class="mb-3">

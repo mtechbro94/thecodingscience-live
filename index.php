@@ -153,6 +153,10 @@ switch ($path) {
     case 'admin/course_form.php':
         require 'admin/course_form.php';
         break;
+    case 'admin/course-content':
+    case 'admin/course_content.php':
+        require 'admin/course_content.php';
+        break;
     case 'admin/enrollments':
     case 'admin/enrollments.php':
         require 'admin/enrollments.php';
@@ -223,6 +227,9 @@ switch ($path) {
         } elseif (preg_match('/^blog\/([a-z0-9-]+)$/', $path, $matches)) {
             $blog_slug = $matches[1];
             require 'views/blog_detail.php';
+        } elseif (preg_match('/^course-content\/(\d+)$/', $path, $matches)) {
+            $id = $matches[1];
+            require 'views/course_content.php';
         } elseif (preg_match('/^enroll\/(\d+)$/', $path, $matches)) {
             $id = $matches[1];
             require 'views/enroll.php';

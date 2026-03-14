@@ -173,8 +173,10 @@ require_once 'includes/header.php';
                                             <div class="progress mb-2" style="height: 8px;">
                                                 <div class="progress-bar bg-success" role="progressbar" style="width: 100%"></div>
                                             </div>
-                                            <a href="/course/<?php echo $enrollment['course_id']; ?>"
-                                                class="btn btn-primary btn-sm w-100">Continue Learning</a>
+                                            <a href="/course-content/<?php echo $enrollment['course_id']; ?>"
+                                                class="btn btn-primary btn-sm w-100 shadow-sm fw-bold">
+                                                <i class="fas fa-graduation-cap me-1"></i> Go to Course Dashboard
+                                            </a>
                                         <?php elseif ($enrollment['status'] === 'pending'): ?>
                                             <div class="alert alert-light border border-warning small py-2 mb-3">
                                                 <i class="fas fa-clock text-warning"></i>

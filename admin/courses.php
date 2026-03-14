@@ -122,6 +122,10 @@ require_once __DIR__ . '/includes/header.php';
                                         target="_blank" title="View">
                                         <i class="fas fa-eye"></i>
                                     </a>
+                                    <a href="/admin/course-content?id=<?php echo $course['id']; ?>"
+                                        class="btn btn-outline-info" title="Manage Content">
+                                        <i class="fas fa-folder-open"></i>
+                                    </a>
                                     <a href="/admin/course_form?id=<?php echo $course['id']; ?>"
                                         class="btn btn-outline-primary" title="Edit">
                                         <i class="fas fa-edit"></i>
