@@ -113,6 +113,12 @@ $whatsapp_number_clean = preg_replace('/[^0-9]/', '', $whatsapp_number);
     <i class="fab fa-whatsapp"></i>
 </a>
 
+<!-- Dark Mode Toggle Button -->
+<button class="dark-mode-toggle" id="darkModeToggle" title="Toggle Dark Mode">
+    <i class="fas fa-sun icon-sun"></i>
+    <i class="fas fa-moon icon-moon"></i>
+</button>
+
 <!-- AOS Animation Library -->
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
@@ -122,18 +128,31 @@ $whatsapp_number_clean = preg_replace('/[^0-9]/', '', $whatsapp_number);
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<!-- Custom JS (with stronger cache busting) -->
-<script src="/assets/js/main.js?v=<?php echo time(); ?>"></script>
+<!-- Custom JS (with versioning) -->
+<script src="/assets/js/main.js?v=1.1.0"></script>
 
 <!-- Initialize AOS -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        // Initialize AOS
         AOS.init({
             duration: 800,
             easing: 'ease-in-out',
             once: true,
             offset: 50
         });
+
+        // Dark Mode Logic
+        const toggleBtn = document.getElementById('darkModeToggle');
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+            });
+        }
     });
 </script>
 

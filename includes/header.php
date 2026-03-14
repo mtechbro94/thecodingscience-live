@@ -34,8 +34,17 @@ require_once __DIR__ . '/functions.php';
     <!-- Custom CSS -->
     <!-- AOS Animations CSS -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <!-- Custom CSS (with cache busting) -->
-    <link rel="stylesheet" href="/assets/css/style.css?v=<?php echo time(); ?>">
+    
+    <!-- Theme Initialization (Prevent Flash) -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        })();
+    </script>
+
+    <!-- Custom CSS (with versioning) -->
+    <link rel="stylesheet" href="/assets/css/style.css?v=1.1.0">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="<?php echo isset($og_type) ? $og_type : 'website'; ?>">
