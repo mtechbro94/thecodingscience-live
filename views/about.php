@@ -129,7 +129,6 @@ $values = [
             <?php endforeach; ?>
         </div>
 
-        <!-- Why Choose The Coding Science Section -->
         <h2 class="text-center mb-5">Why Choose The Coding Science?</h2>
         <div class="row g-4 mb-5">
             <div class="col-md-6 col-lg-3">
@@ -156,7 +155,7 @@ $values = [
                         <i class="fas fa-certificate fa-3x text-warning"></i>
                     </div>
                     <h5>Industry Certification</h5>
-                    <p class="small mb-0">Earn recognized certificates upon course completion that boost your resume.</p>
+                    <p class="small mb-0">Earn recognized certificates upon course completion that boost your resume and credentials.</p>
                 </div>
             </div>
             <div class="col-md-6 col-lg-3">
@@ -165,43 +164,7 @@ $values = [
                         <i class="fas fa-briefcase fa-3x text-info"></i>
                     </div>
                     <h5>Career Support</h5>
-                    <p class="small mb-0">Comprehensive career support including resume review and interview preparation.</p>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-3">
-                <div class="feature-box p-4 h-100 text-center">
-                    <div class="feature-icon-large mb-3">
-                        <i class="fas fa-laptop-code fa-3x text-danger"></i>
-                    </div>
-                    <h5>Hands-on Training</h5>
-                    <p class="small mb-0">Practice coding in real-time with live sessions and interactive exercises.</p>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-3">
-                <div class="feature-box p-4 h-100 text-center">
-                    <div class="feature-icon-large mb-3">
-                        <i class="fas fa-users fa-3x text-primary"></i>
-                    </div>
-                    <h5>Community Support</h5>
-                    <p class="small mb-0">Join a community of learners and professionals for peer-to-peer learning.</p>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-3">
-                <div class="feature-box p-4 h-100 text-center">
-                    <div class="feature-icon-large mb-3">
-                        <i class="fas fa-clock fa-3x text-success"></i>
-                    </div>
-                    <h5>Flexible Learning</h5>
-                    <p class="small mb-0">Learn at your own pace with access to recorded sessions and lifetime course updates.</p>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-3">
-                <div class="feature-box p-4 h-100 text-center">
-                    <div class="feature-icon-large mb-3">
-                        <i class="fas fa-rupee-sign fa-3x text-warning"></i>
-                    </div>
-                    <h5>Affordable Pricing</h5>
-                    <p class="small mb-0">Quality education at competitive prices with value for your investment.</p>
+                    <p class="small mb-0">Comprehensive career support including resume review, interview preparation, and placement assistance.</p>
                 </div>
             </div>
         </div>

@@ -126,8 +126,6 @@ if (!empty($hero_bg)) {
                             studies</span></li>
                     <li><i class="fas fa-check-circle text-primary"></i> <span>Job placement assistance</span></li>
                     <li><i class="fas fa-check-circle text-primary"></i> <span>Flexible learning schedules</span></li>
-                    <li><i class="fas fa-check-circle text-primary"></i> <span>Affordable pricing and payment
-                            plans</span></li>
                 </ul>
             </div>
             <div class="col-lg-6" data-aos="fade-left">
