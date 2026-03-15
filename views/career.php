@@ -9,7 +9,7 @@ $page_title = "Career - Join Our Team as a Technical Trainer | The Coding Scienc
 require_once 'includes/header.php';
 
 // Google Form application link
-$apply_link = "https://forms.gle/YOUR_GOOGLE_FORM_LINK_HERE"; 
+$apply_link = "https://docs.google.com/forms/d/e/1FAIpQLSc7OK-eGBEV-PWb4LJflIJJF2V1Zk_s_-p0kbiwrwgcibLt6w/viewform?usp=sharing&ouid=102780806115090907943"; 
 ?>
 
 <style>
