@@ -173,15 +173,19 @@ $positions = $career_config['specific_openings'];
     /* About Role Section */
     .role-image-wrapper {
         position: relative;
-        border-radius: 24px;
-        overflow: hidden;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-        height: 100%;
+        border-radius: 30px;
         min-height: 400px;
         background: var(--gradient);
         display: flex;
         align-items: center;
         justify-content: center;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
+    .role-image-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
     .role-image-wrapper i {
         font-size: 8rem;
@@ -553,7 +557,11 @@ $positions = $career_config['specific_openings'];
             <div class="row align-items-center">
                 <div class="col-lg-5 mb-5 mb-lg-0">
                     <div class="role-image-wrapper">
-                        <i class="fas fa-chalkboard-teacher"></i>
+                        <?php if (!empty($career_config['about_role']['image_url'])): ?>
+                            <img src="<?php echo htmlspecialchars($career_config['about_role']['image_url']); ?>" alt="Shaping the future" class="img-fluid rounded-4 shadow-lg">
+                        <?php else: ?>
+                            <i class="fas fa-chalkboard-teacher"></i>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <div class="col-lg-7 ps-lg-5">

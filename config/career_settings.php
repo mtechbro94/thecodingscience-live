@@ -15,15 +15,16 @@ return [
         'background' => [
             'type' => 'gradient', // 'gradient' or 'image'
             'value' => 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            // 'image_url' => '/assets/images/career-hero-bg.jpg' 
+            'image_url' => '/assets/images/career-hero-bg.jpeg'
         ]
     ],
-    
+
     'apply_link' => 'https://docs.google.com/forms/d/e/1FAIpQLSc7OK-eGBEV-PWb4LJflIJJF2V1Zk_s_-p0kbiwrwgcibLt6w/viewform?usp=sharing',
 
     'about_role' => [
         'heading' => 'Shape the Future of Tech Education',
         'subheading' => 'As a Technical Trainer, you will play a crucial role in delivering high-quality education and mentoring students to achieve their career goals.',
+        'image_url' => '/assets/images/shaping-future.jpeg', // Add your image path here
         'points' => [
             ['title' => 'Teaching Students', 'desc' => 'Deliver engaging and insightful lectures on industry-standard technologies.', 'icon' => 'fas fa-users'],
             ['title' => 'Mentoring & Guidance', 'desc' => 'Provide one-on-one mentorship and resolve student doubts.', 'icon' => 'fas fa-hands-helping'],
