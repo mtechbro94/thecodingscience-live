@@ -218,7 +218,7 @@ require_once 'includes/header.php';
 
                 <div class="mb-3">
                     <label for="application_link" class="form-label">Application/Form Link *</label>
-                    <input type="url" class="form-control" id="application_link" name="application_link" required
+                    <input type="text" class="form-control" id="application_link" name="application_link" required
                         value="<?php echo $position ? htmlspecialchars($position['application_link']) : ''; ?>"
                         placeholder="https://forms.google.com/...">
                     <small class="form-text text-muted">Link to Google Form or application portal</small>
