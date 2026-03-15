@@ -12,6 +12,20 @@ $page_title = "Add Trainer Position";
 $position = null;
 $position_id = isset($_GET['id']) ? intval($_GET['id']) : null;
 
+// Schema Debug (Once)
+if (!file_exists('schema_debug_log.txt')) {
+    try {
+        $stmt = $pdo->query("DESCRIBE trainer_positions");
+        $schema = "Schema for trainer_positions:\n";
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $schema .= "Field: {$row['Field']} | Type: {$row['Type']}\n";
+        }
+        file_put_contents('schema_debug_log.txt', $schema);
+    } catch (Exception $e) {
+        file_put_contents('schema_debug_log.txt', "Schema fetch failed: " . $e->getMessage());
+    }
+}
+
 // Fetch position if editing
 if ($position_id) {
     try {
@@ -89,7 +103,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         redirect('/admin/trainer_positions');
     } catch (PDOException $e) {
-        set_flash('danger', 'Database Error: ' . $e->getMessage());
+        $error_msg = 'Database Error: ' . $e->getMessage();
+        file_put_contents('error_log_debug.txt', date('[Y-m-d H:i:s] ') . $error_msg . PHP_EOL, FILE_APPEND);
+        set_flash('danger', $error_msg);
     }
 }
 
