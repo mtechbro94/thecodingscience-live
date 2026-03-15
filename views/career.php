@@ -615,7 +615,7 @@ $positions = get_trainer_positions();
                                 
                                 <?php if ($position['expertise_required']): ?>
                                     <h6>Key Expertise</h6>
-                                    <ul class="req-list">
+                                    <ul class="req-list mb-3">
                                         <?php
                                         $expertise = array_filter(array_map('trim', explode(',', $position['expertise_required'])));
                                         foreach ($expertise as $item) {
@@ -624,9 +624,28 @@ $positions = get_trainer_positions();
                                         ?>
                                     </ul>
                                 <?php endif; ?>
+
+                                <?php if (!empty($position['requirement_details'])): ?>
+                                    <h6>Detailed Requirements</h6>
+                                    <div class="mb-3 ps-3 border-start" style="font-size: 0.95rem; border-color: var(--primary) !important;">
+                                        <?php echo nl2br(htmlspecialchars($position['requirement_details'])); ?>
+                                    </div>
+                                <?php endif; ?>
+
+                                <?php if (!empty($position['stipend_info'])): ?>
+                                    <div class="mt-4 p-3 rounded-4" style="background: rgba(102, 126, 234, 0.08); border: 1px dashed var(--primary);">
+                                        <h6 class="mb-2"><i class="fas fa-money-bill-wave me-2 text-primary"></i>Stipend & Benefits</h6>
+                                        <p class="mb-0" style="font-size: 0.95rem; color: var(--text-dark);"><?php echo nl2br(htmlspecialchars($position['stipend_info'])); ?></p>
+                                    </div>
+                                <?php endif; ?>
+
+                                <?php if (!empty($position['growth_opportunities'])): ?>
+                                    <h6 class="mt-4">Growth & Development</h6>
+                                    <p class="mb-0" style="font-size: 0.95rem;"><?php echo nl2br(htmlspecialchars($position['growth_opportunities'])); ?></p>
+                                <?php endif; ?>
                             </div>
                             <div class="pos-card-footer">
-                                <a href="/apply/career/<?php echo $position['id']; ?>" class="btn-apply-secondary w-100 justify-content-center">
+                                <a href="<?php echo htmlspecialchars($position['application_link'] ?? $apply_link); ?>" target="_blank" class="btn-apply-secondary w-100 justify-content-center">
                                     Quick Apply <i class="fas fa-paper-plane ms-2"></i>
                                 </a>
                             </div>
