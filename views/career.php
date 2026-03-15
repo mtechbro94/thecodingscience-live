@@ -12,7 +12,6 @@ $page_title = "Career - Join Our Team as a Technical Trainer | The Coding Scienc
 require_once 'includes/header.php';
 
 $apply_link = $career_config['apply_link'];
-$positions = $career_config['specific_openings'];
 ?>
 
 <style>
@@ -32,7 +31,12 @@ $positions = $career_config['specific_openings'];
 
     /* Hero Section */
     .career-hero {
-        background: var(--gradient);
+        background: <?php echo $career_config['hero']['background']['value'] ?? 'var(--gradient)'; ?>;
+        <?php if (!empty($career_config['hero']['background']['image_url'])): ?>
+        background-image: url('<?php echo $career_config['hero']['background']['image_url']; ?>');
+        background-size: cover;
+        background-position: center;
+        <?php endif; ?>
         padding: 140px 0 100px;
         color: white;
         text-align: center;
@@ -520,20 +524,7 @@ $positions = $career_config['specific_openings'];
         margin-bottom: 15px;
         opacity: 0.5;
     }
-    /* Hero Section */
-    .career-hero {
-        background: <?php echo $career_config['hero']['background']['value'] ?? 'var(--gradient)'; ?>;
-        <?php if (!empty($career_config['hero']['background']['image_url'])): ?>
-        background-image: url('<?php echo $career_config['hero']['background']['image_url']; ?>');
-        background-size: cover;
-        background-position: center;
-        <?php endif; ?>
-        padding: 140px 0 100px;
-        color: white;
-        text-align: center;
-        position: relative;
-        overflow: hidden;
-    }
+
 </style>
 
 <div class="career-page-wrapper">

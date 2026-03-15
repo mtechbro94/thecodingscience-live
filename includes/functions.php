@@ -417,46 +417,7 @@ function get_internship($id)
     }
 }
 
-/**
- * Get all active trainer positions
- * @return array
- */
-function get_trainer_positions()
-{
-    global $pdo;
 
-    $sql = "SELECT * FROM trainer_positions WHERE is_active = 1 ORDER BY created_at DESC";
-
-    try {
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    } catch (PDOException $e) {
-        error_log("Error fetching trainer positions: " . $e->getMessage());
-        return [];
-    }
-}
-
-/**
- * Get single trainer position by ID
- * @param int $id Position ID
- * @return array|null
- */
-function get_trainer_position($id)
-{
-    global $pdo;
-
-    $sql = "SELECT * FROM trainer_positions WHERE id = ? AND is_active = 1";
-
-    try {
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([$id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    } catch (PDOException $e) {
-        error_log("Error fetching trainer position: " . $e->getMessage());
-        return null;
-    }
-}
 
 /**
  * Convert Markdown to HTML

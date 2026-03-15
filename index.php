@@ -205,14 +205,7 @@ switch ($path) {
     case 'admin/internship_form.php':
         require 'admin/internship_form.php';
         break;
-    case 'admin/trainer_positions':
-    case 'admin/trainer_positions.php':
-        require 'admin/trainer_positions.php';
-        break;
-    case 'admin/trainer_position_form':
-    case 'admin/trainer_position_form.php':
-        require 'admin/trainer_position_form.php';
-        break;
+
 
 
     case 'blogs':
@@ -252,9 +245,9 @@ switch ($path) {
         } elseif (preg_match('/^career-track\/([a-z0-9-]+)$/', $path, $matches)) {
             $track_slug = $matches[1];
             require 'views/career_track.php';
-        } elseif (preg_match('/^apply\/(internship|career)\/(\d+)$/', $path, $matches)) {
-            $type = $matches[1];
-            $id = $matches[2];
+        } elseif (preg_match('/^apply\/internship\/(\d+)$/', $path, $matches)) {
+            $type = 'internship';
+            $id = $matches[1];
             require 'views/apply_handler.php';
         } else {
 
