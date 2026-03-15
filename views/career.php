@@ -46,28 +46,26 @@ $apply_link = $career_config['apply_link'];
     .career-hero::before {
         content: '';
         position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.3); /* Subtle overlay, main contrast from glass card */
-        z-index: 1;
+        width: 400px;
+        height: 400px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 50%;
+        top: -100px;
+        left: -100px;
+    }
+    .career-hero::after {
+        content: '';
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 50%;
+        bottom: -50px;
+        right: -50px;
     }
     .career-hero .container {
         position: relative;
-        z-index: 5;
-        display: flex;
-        justify-content: center;
-    }
-    .glass-hero-card {
-        background: rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        padding: 60px 50px;
-        border-radius: 40px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        max-width: 900px;
-        box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+        z-index: 2;
     }
     .hero-badge {
         display: inline-block;
@@ -87,7 +85,6 @@ $apply_link = $career_config['apply_link'];
         margin-bottom: 25px;
         letter-spacing: -1px;
         line-height: 1.2;
-        text-shadow: 0 2px 10px rgba(0,0,0,0.3);
     }
     .career-hero p {
         font-size: 1.25rem;
@@ -95,7 +92,6 @@ $apply_link = $career_config['apply_link'];
         max-width: 700px;
         margin: 0 auto 40px;
         line-height: 1.6;
-        text-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
     
     /* Buttons */
@@ -535,14 +531,12 @@ $apply_link = $career_config['apply_link'];
     <!-- Hero Section -->
     <section class="career-hero">
         <div class="container">
-            <div class="glass-hero-card">
-                <div class="hero-badge"><i class="fas fa-rocket me-2"></i> <?php echo htmlspecialchars($career_config['hero']['badge']); ?></div>
-                <h1><?php echo htmlspecialchars($career_config['hero']['heading']); ?></h1>
-                <p><?php echo htmlspecialchars($career_config['hero']['description']); ?></p>
-                <a href="<?php echo htmlspecialchars($apply_link); ?>" target="_blank" class="btn-apply-primary mt-3">
-                    <?php echo htmlspecialchars($career_config['hero']['apply_btn_text']); ?> <i class="fas fa-arrow-right"></i>
-                </a>
-            </div>
+            <div class="hero-badge"><i class="fas fa-rocket me-2"></i> <?php echo htmlspecialchars($career_config['hero']['badge']); ?></div>
+            <h1><?php echo htmlspecialchars($career_config['hero']['heading']); ?></h1>
+            <p><?php echo htmlspecialchars($career_config['hero']['description']); ?></p>
+            <a href="<?php echo htmlspecialchars($apply_link); ?>" target="_blank" class="btn-apply-primary mt-3">
+                <?php echo htmlspecialchars($career_config['hero']['apply_btn_text']); ?> <i class="fas fa-arrow-right"></i>
+            </a>
         </div>
     </section>
 
