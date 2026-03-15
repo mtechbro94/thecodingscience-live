@@ -21,33 +21,6 @@ return [
     
     'apply_link' => 'https://docs.google.com/forms/d/e/1FAIpQLSc7OK-eGBEV-PWb4LJflIJJF2V1Zk_s_-p0kbiwrwgcibLt6w/viewform?usp=sharing',
 
-    'specific_openings' => [
-        [
-            'title' => 'Python Full Stack Trainer',
-            'location' => 'Remote / Hybrid',
-            'employment_type' => 'Full-time',
-            'description' => 'We are looking for a highly skilled Python Full Stack Developer who has a passion for teaching and mentoring students.',
-            'minimum_experience' => 2,
-            'expertise' => 'Python, Django/Flask, React, MySQL',
-            'requirements' => 'Excellent communication skills, ability to simplify complex concepts, and hands-on experience with production-grade applications.',
-            'stipend' => 'Competitive base salary + performance incentives.',
-            'growth' => 'Opportunity to lead curriculum development and transition into a Senior Training Manager role.',
-            'application_link' => 'https://docs.google.com/forms/d/e/1FAIpQLSc7OK-eGBEV-PWb4LJflIJJF2V1Zk_s_-p0kbiwrwgcibLt6w/viewform?usp=sharing'
-        ],
-        [
-            'title' => 'Cyber Security Specialist & Trainer',
-            'location' => 'Remote',
-            'employment_type' => 'Part-time / Freelance',
-            'description' => 'Looking for an expert in ethical hacking and penetration testing to lead our advanced security batches.',
-            'minimum_experience' => 3,
-            'expertise' => 'Kali Linux, Web App Pentesting, Network Security',
-            'requirements' => 'CEH or OSCP certifications are a plus. Must have experience in conducting live training sessions.',
-            'stipend' => 'Industry-standard hourly/monthly rates.',
-            'growth' => 'Lead our project-based security consulting wing.',
-            'application_link' => 'https://docs.google.com/forms/d/e/1FAIpQLSc7OK-eGBEV-PWb4LJflIJJF2V1Zk_s_-p0kbiwrwgcibLt6w/viewform?usp=sharing'
-        ]
-    ],
-
     'about_role' => [
         'heading' => 'Shape the Future of Tech Education',
         'subheading' => 'As a Technical Trainer, you will play a crucial role in delivering high-quality education and mentoring students to achieve their career goals.',
