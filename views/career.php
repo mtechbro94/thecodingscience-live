@@ -531,57 +531,6 @@ $positions = get_trainer_positions();
         </div>
     </section>
 
-    <!-- About the Role -->
-    <section class="section-padding bg-white-section">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-5 mb-5 mb-lg-0">
-                    <div class="role-image-wrapper">
-                        <i class="fas fa-chalkboard-teacher"></i>
-                    </div>
-                </div>
-                <div class="col-lg-7 ps-lg-5">
-                    <div class="section-title text-start mb-5">
-                        <span>About The Role</span>
-                        <h2>Shape the Future of Tech Education</h2>
-                        <p>As a Technical Trainer, you will play a crucial role in delivering high-quality education and mentoring students to achieve their career goals.</p>
-                    </div>
-                    
-                    <ul class="role-list">
-                        <li>
-                            <div class="icon-wrapper"><i class="fas fa-users"></i></div>
-                            <div>
-                                <h4>Teaching Students</h4>
-                                <p>Deliver engaging and insightful lectures on industry-standard technologies and best practices.</p>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="icon-wrapper"><i class="fas fa-hands-helping"></i></div>
-                            <div>
-                                <h4>Mentoring & Guidance</h4>
-                                <p>Provide one-on-one mentorship, resolve doubts, and guide students through complex concepts.</p>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="icon-wrapper"><i class="fas fa-laptop-code"></i></div>
-                            <div>
-                                <h4>Conducting Practical Sessions</h4>
-                                <p>Lead hands-on coding sessions, project building, and essential real-world application building.</p>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="icon-wrapper"><i class="fas fa-book-open"></i></div>
-                            <div>
-                                <h4>Preparing Learning Materials</h4>
-                                <p>Design and update course curriculums, assignments, and study materials aligned with current industry trends.</p>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- Specific Job Openings -->
     <?php if (!empty($positions)): ?>
     <section class="section-padding specific-positions-section">
@@ -589,7 +538,7 @@ $positions = get_trainer_positions();
             <div class="section-title">
                 <span>Current Openings</span>
                 <h2>Specific Opportunities</h2>
-                <p>Explore our specialized trainer roles currently open for applications.</p>
+                <p>Explore our specialized trainer roles currently open for applications. We are looking for experts to join our core team.</p>
             </div>
             
             <div class="row g-4 justify-content-center">
@@ -656,6 +605,56 @@ $positions = get_trainer_positions();
         </div>
     </section>
     <?php endif; ?>
+
+    <!-- About the Role -->
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-5 mb-5 mb-lg-0">
+                    <div class="role-image-wrapper">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                </div>
+                <div class="col-lg-7 ps-lg-5">
+                    <div class="section-title text-start mb-5">
+                        <span>About The Role</span>
+                        <h2>Shape the Future of Tech Education</h2>
+                        <p>As a Technical Trainer, you will play a crucial role in delivering high-quality education and mentoring students to achieve their career goals.</p>
+                    </div>
+                    
+                    <ul class="role-list">
+                        <li>
+                            <div class="icon-wrapper"><i class="fas fa-users"></i></div>
+                            <div>
+                                <h4>Teaching Students</h4>
+                                <p>Deliver engaging and insightful lectures on industry-standard technologies and best practices.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="icon-wrapper"><i class="fas fa-hands-helping"></i></div>
+                            <div>
+                                <h4>Mentoring & Guidance</h4>
+                                <p>Provide one-on-one mentorship, resolve doubts, and guide students through complex concepts.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="icon-wrapper"><i class="fas fa-laptop-code"></i></div>
+                            <div>
+                                <h4>Conducting Practical Sessions</h4>
+                                <p>Lead hands-on coding sessions, project building, and essential real-world application building.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="icon-wrapper"><i class="fas fa-book-open"></i></div>
+                            <div>
+                                <h4>Preparing Learning Materials</h4>
+                                <p>Design and update course curriculums, assignments, and study materials aligned with current industry trends.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- Domains We Are Hiring For -->
     <section class="section-padding">

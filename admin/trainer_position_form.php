@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stipend_info = $_POST['stipend_info'] ?? '';
     $growth_opportunities = $_POST['growth_opportunities'] ?? '';
     $requirement_details = $_POST['requirement_details'] ?? '';
-    $application_link = sanitize($_POST['application_link'] ?? '');
+    $application_link = trim($_POST['application_link'] ?? ''); // Don't use sanitize() here as it uses htmlspecialchars
     $is_active = isset($_POST['is_active']) ? 1 : 0;
 
     // Validation
@@ -46,8 +46,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirect("/admin/trainer_position_form" . ($position_id ? "?id=$position_id" : ""));
     }
 
-    if (!filter_var($application_link, FILTER_VALIDATE_URL)) {
-        set_flash('danger', 'Invalid application link URL');
+    // Try to add http if missing
+    if (!empty($application_link) && !preg_match("~^(?:f|ht)tps?://~i", $application_link)) {
+        $application_link = "https://" . $application_link;
+    }
+
+    if (!empty($application_link) && !filter_var($application_link, FILTER_VALIDATE_URL)) {
+        set_flash('danger', 'Invalid application link URL: ' . htmlspecialchars($application_link));
         redirect("/admin/trainer_position_form" . ($position_id ? "?id=$position_id" : ""));
     }
 
@@ -84,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         redirect('/admin/trainer_positions');
     } catch (PDOException $e) {
-        set_flash('danger', 'Error saving position: ' . $e->getMessage());
+        set_flash('danger', 'Database Error: ' . $e->getMessage());
     }
 }
 
