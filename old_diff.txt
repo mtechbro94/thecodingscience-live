@@ -1,0 +1,1063 @@
+commit 465f8d23005682577b37262c2fa7ea3b2b3bc659
+Author: Miraaqib786 <aaqib.csds@gniindia.org>
+Date:   Sun Mar 15 11:55:55 2026 +0530
+
+    feat: Redesign career page for unified Technical Trainer role
+
+diff --git a/views/career.php b/views/career.php
+index 26bce02..8e69fbf 100644
+--- a/views/career.php
++++ b/views/career.php
+@@ -1,565 +1,590 @@
+ <?php
+-// views/career.php - Trainer Career Opportunities
++// views/career.php - Technical Trainer Career Page
+ 
+ require_once 'includes/db.php';
+ require_once 'includes/functions.php';
+ 
+-$page_title = "Career - Join Our Training Team";
+-
+-// Fetch trainer positions
+-$positions = get_trainer_positions();
++$page_title = "Career - Join Our Team as a Technical Trainer | The Coding Science";
+ 
+ require_once 'includes/header.php';
++
++// Google Form application link
++$apply_link = "https://forms.gle/YOUR_GOOGLE_FORM_LINK_HERE"; 
+ ?>
+ 
+ <style>
+-    /* Main Section Styling */
+-    .career-section {
+-        padding: 80px 0;
++    :root {
++        --primary: #667eea;
++        --secondary: #764ba2;
++        --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
++        --text-dark: #1a1a1a;
++        --text-light: #666;
++        --bg-light: #f8f9fa;
++    }
++    
++    .career-page-wrapper {
++        font-family: 'Inter', sans-serif;
++        background-color: #fafbfc;
+     }
+-    .section-header {
++
++    /* Hero Section */
++    .career-hero {
++        background: var(--gradient);
++        padding: 140px 0 100px;
++        color: white;
+         text-align: center;
+-        margin-bottom: 60px;
++        position: relative;
++        overflow: hidden;
++    }
++    .career-hero::before {
++        content: '';
++        position: absolute;
++        width: 400px;
++        height: 400px;
++        background: rgba(255,255,255,0.05);
++        border-radius: 50%;
++        top: -100px;
++        left: -100px;
++    }
++    .career-hero::after {
++        content: '';
++        position: absolute;
++        width: 300px;
++        height: 300px;
++        background: rgba(255,255,255,0.05);
++        border-radius: 50%;
++        bottom: -50px;
++        right: -50px;
++    }
++    .career-hero .container {
++        position: relative;
++        z-index: 2;
++    }
++    .hero-badge {
++        display: inline-block;
++        background: rgba(255,255,255,0.2);
++        padding: 8px 20px;
++        border-radius: 50px;
++        font-size: 0.95rem;
++        font-weight: 600;
++        letter-spacing: 1px;
++        margin-bottom: 25px;
++        backdrop-filter: blur(10px);
++        text-transform: uppercase;
++    }
++    .career-hero h1 {
++        font-size: 3.8rem;
++        font-weight: 800;
++        margin-bottom: 25px;
++        letter-spacing: -1px;
++        line-height: 1.2;
++    }
++    .career-hero p {
++        font-size: 1.25rem;
++        opacity: 0.95;
++        max-width: 700px;
++        margin: 0 auto 40px;
++        line-height: 1.6;
+     }
+-    .section-header h2 {
+-        font-size: 2.8rem;
++    
++    /* Buttons */
++    .btn-apply-primary {
++        background: #fff;
++        color: var(--secondary);
++        padding: 16px 45px;
++        font-size: 1.1rem;
+         font-weight: 700;
+-        color: #1a1a1a;
+-        margin-bottom: 15px;
++        border-radius: 50px;
++        text-transform: uppercase;
++        letter-spacing: 1px;
++        transition: all 0.3s ease;
++        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
++        display: inline-flex;
++        align-items: center;
++        gap: 10px;
++        text-decoration: none;
+     }
+-    .section-header i {
+-        margin-right: 15px;
+-        color: #667eea;
++    .btn-apply-primary:hover {
++        transform: translateY(-5px);
++        box-shadow: 0 15px 35px rgba(0,0,0,0.25);
++        color: var(--primary);
+     }
+     
+-    /* Info Card Styling */
+-    .career-info-card {
+-        background: white;
+-        border-radius: 20px;
+-        padding: 50px;
+-        margin-bottom: 50px;
+-        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+-        border-left: 6px solid #667eea;
++    .btn-apply-secondary {
++        background: var(--gradient);
++        color: #fff;
++        padding: 16px 45px;
++        font-size: 1.1rem;
++        font-weight: 700;
++        border-radius: 50px;
++        text-transform: uppercase;
++        letter-spacing: 1px;
+         transition: all 0.3s ease;
+-        position: relative;
+-        z-index: 10;
+-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
++        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
++        display: inline-flex;
++        align-items: center;
++        gap: 10px;
++        text-decoration: none;
++        border: none;
+     }
+-    .career-info-card:hover {
+-        transform: translateY(-8px);
+-        box-shadow: 0 20px 50px rgba(0,0,0,0.15);
++    .btn-apply-secondary:hover {
++        transform: translateY(-5px);
++        box-shadow: 0 15px 35px rgba(102, 126, 234, 0.5);
++        color: #fff;
+     }
+-    .info-card-inner {
+-        display: flex;
+-        gap: 35px;
+-        align-items: flex-start;
++
++    /* Common Sections */
++    .section-padding {
++        padding: 100px 0;
+     }
+-    .info-card-icon {
+-        font-size: 4.5rem;
+-        flex-shrink: 0;
+-        line-height: 1;
+-        color: #667eea;
++    .bg-white-section { background: #fff; }
++    
++    .section-title {
++        text-align: center;
++        margin-bottom: 60px;
+     }
+-    .info-card-content h5 {
+-        font-size: 1.8rem;
++    .section-title span {
++        color: var(--primary);
+         font-weight: 700;
+-        color: #1a1a1a;
++        text-transform: uppercase;
++        letter-spacing: 2px;
++        font-size: 0.9rem;
++        display: block;
+         margin-bottom: 15px;
+     }
+-    .info-card-content p {
+-        color: #555;
+-        line-height: 1.8;
++    .section-title h2 {
++        font-size: 3rem;
++        font-weight: 800;
++        color: var(--text-dark);
+         margin-bottom: 20px;
+-        font-size: 1.05rem;
++        line-height: 1.2;
+     }
+-    .info-card-list {
++    .section-title p {
++        color: var(--text-light);
++        font-size: 1.15rem;
++        max-width: 650px;
++        margin: 0 auto;
++        line-height: 1.7;
++    }
++    
++    /* About Role Section */
++    .role-image-wrapper {
++        position: relative;
++        border-radius: 24px;
++        overflow: hidden;
++        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
++        height: 100%;
++        min-height: 400px;
++        background: var(--gradient);
++        display: flex;
++        align-items: center;
++        justify-content: center;
++    }
++    .role-image-wrapper i {
++        font-size: 8rem;
++        color: rgba(255,255,255,0.9);
++    }
++    .role-list {
+         list-style: none;
+         padding: 0;
+         margin: 0;
+     }
+-    .info-card-list li {
+-        padding: 12px 0 12px 32px;
+-        position: relative;
+-        color: #666;
+-        line-height: 1.8;
+-        font-size: 0.98rem;
+-        font-weight: 500;
++    .role-list li {
++        display: flex;
++        align-items: flex-start;
++        margin-bottom: 30px;
++        background: #fff;
++        padding: 25px;
++        border-radius: 20px;
++        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
++        border: 1px solid rgba(0,0,0,0.02);
++        transition: all 0.3s ease;
+     }
+-    .info-card-list li::before {
+-        content: '✓';
+-        position: absolute;
+-        left: 0;
+-        font-weight: bold;
+-        font-size: 1.5rem;
+-        color: #667eea;
++    .role-list li:hover {
++        transform: translateX(10px);
++        box-shadow: 0 15px 35px rgba(0,0,0,0.06);
++        border-color: rgba(102, 126, 234, 0.2);
+     }
+-    
+-    /* Position Card Styling */
+-    .position-card {
+-        border: none;
+-        border-radius: 15px;
+-        transition: all 0.3s ease;
+-        overflow: hidden;
+-        background-color: #fff;
+-        box-shadow: 0 5px 25px rgba(0,0,0,0.08);
++    .role-list li .icon-wrapper {
++        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
++        width: 60px;
++        height: 60px;
++        border-radius: 16px;
+         display: flex;
+-        flex-direction: column;
+-        height: 100%;
++        align-items: center;
++        justify-content: center;
++        color: var(--primary);
++        font-size: 1.8rem;
++        margin-right: 20px;
++        flex-shrink: 0;
+     }
+-    .position-card:hover {
+-        transform: translateY(-15px);
+-        box-shadow: 0 20px 50px rgba(0,0,0,0.18) !important;
++    .role-list li h4 {
++        font-size: 1.3rem;
++        font-weight: 700;
++        margin-bottom: 8px;
++        color: var(--text-dark);
+     }
+-    .position-header {
+-        padding: 40px 25px;
+-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+-        color: white;
+-        border-top-left-radius: 15px;
+-        border-top-right-radius: 15px;
++    .role-list li p {
++        color: var(--text-light);
++        margin: 0;
++        line-height: 1.6;
++        font-size: 1.05rem;
++    }
++
++    /* Domains Grid */
++    .domain-card {
++        background: #fff;
++        border-radius: 24px;
++        padding: 40px 30px;
++        text-align: center;
++        box-shadow: 0 10px 30px rgba(0,0,0,0.04);
++        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
++        border: 1px solid rgba(102, 126, 234, 0.1);
++        height: 100%;
+         position: relative;
+         overflow: hidden;
++        z-index: 1;
++        display: flex;
++        flex-direction: column;
++        align-items: center;
++        justify-content: center;
+     }
+-    .position-header::before {
++    .domain-card::before {
+         content: '';
+         position: absolute;
+-        top: -50%;
+-        right: -50%;
+-        width: 200px;
+-        height: 200px;
+-        border-radius: 50%;
+-        background: rgba(255,255,255,0.1);
+-        transition: all 0.3s ease;
++        top: 0;
++        left: 0;
++        width: 100%;
++        height: 100%;
++        background: var(--gradient);
++        z-index: -1;
++        opacity: 0;
++        transition: all 0.4s ease;
+     }
+-    .position-card:hover .position-header::before {
+-        top: -30%;
+-        right: -30%;
++    .domain-card:hover {
++        transform: translateY(-10px);
++        box-shadow: 0 20px 40px rgba(102, 126, 234, 0.25);
++        border-color: transparent;
+     }
+-    .position-header-content {
+-        position: relative;
+-        z-index: 1;
+-        text-align: center;
++    .domain-card:hover::before {
++        opacity: 1;
+     }
+-    .position-icon {
++    .domain-icon {
+         width: 85px;
+         height: 85px;
++        background: rgba(102, 126, 234, 0.08);
+         border-radius: 50%;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+-        font-size: 45px;
+-        background: rgba(255,255,255,0.25);
+-        margin: 0 auto 20px;
+-        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+-        transition: all 0.3s ease;
++        font-size: 2.5rem;
++        color: var(--primary);
++        margin: 0 auto 25px;
++        transition: all 0.4s ease;
+     }
+-    .position-card:hover .position-icon {
+-        transform: scale(1.15) rotate(8deg);
+-        background: rgba(255,255,255,0.35);
++    .domain-card:hover .domain-icon {
++        background: rgba(255,255,255,0.2);
++        color: #fff;
++        transform: scale(1.1) rotate(5deg);
+     }
+-    .position-header h3 {
+-        margin: 0;
+-        font-size: 1.6rem;
++    .domain-card h4 {
++        font-size: 1.25rem;
+         font-weight: 700;
+-        letter-spacing: -0.5px;
++        color: var(--text-dark);
++        margin: 0;
++        transition: all 0.4s ease;
++        line-height: 1.4;
++    }
++    .domain-card:hover h4 {
++        color: #fff;
+     }
+-    .position-meta {
++
++    /* Attributes Layout: Who Can Apply & Work Type */
++    .attributes-section {
++        background: #fff;
++        position: relative;
++    }
++    .attr-box {
++        background: #fafbfc;
++        border-radius: 24px;
++        padding: 50px 40px;
++        height: 100%;
++        border: 1px solid rgba(0,0,0,0.03);
++    }
++    .attr-box h3 {
++        font-size: 2rem;
++        font-weight: 800;
++        margin-bottom: 30px;
++        color: var(--text-dark);
+         display: flex;
+         align-items: center;
+-        justify-content: center;
+         gap: 15px;
+-        color: rgba(255,255,255,0.95);
+-        font-size: 0.85rem;
+-        margin-top: 14px;
+-        font-weight: 500;
+-        flex-wrap: wrap;
+     }
+-    .position-meta-item {
+-        display: flex;
+-        align-items: center;
+-        gap: 5px;
++    .attr-box h3 i {
++        color: var(--primary);
+     }
+-    .position-card .card-body {
+-        padding: 35px;
+-        flex-grow: 1;
++    .pill-grid {
+         display: flex;
+-        flex-direction: column;
+-    }
+-    .position-card .card-body p {
+-        line-height: 1.7;
+-        color: #666;
+-        margin-bottom: 20px;
+-    }
+-    .position-card .card-body h6 {
+-        color: #333;
+-        margin-bottom: 15px;
+-        font-size: 0.98rem;
+-        font-weight: 700;
+-        text-transform: uppercase;
+-        letter-spacing: 1px;
+-    }
+-    /* Markdown Styling */
+-    .position-card .card-body h2,
+-    .position-card .card-body h3,
+-    .position-card .card-body h4 {
+-        color: #333;
+-        margin-top: 15px;
+-        margin-bottom: 10px;
+-        font-weight: 600;
+-    }
+-    .position-card .card-body h2 {
+-        font-size: 1.3rem;
+-    }
+-    .position-card .card-body h3 {
+-        font-size: 1.15rem;
+-    }
+-    .position-card .card-body h4 {
+-        font-size: 1rem;
+-    }
+-    .position-card .card-body ul,
+-    .position-card .card-body ol {
+-        margin-left: 20px;
+-        margin-bottom: 15px;
+-    }
+-    .position-card .card-body li {
+-        margin-bottom: 8px;
+-        color: #666;
+-    }
+-    .position-card .card-body strong {
+-        color: #333;
+-        font-weight: 600;
+-    }
+-    .position-card .card-body em {
+-        font-style: italic;
+-        color: #555;
+-    }
+-    .position-card .card-body blockquote {
+-        border-left: 4px solid #667eea;
+-        margin-left: 0;
+-        margin-bottom: 15px;
+-        color: #666;
+-        background: rgba(102, 126, 234, 0.05);
+-        padding: 12px 15px;
+-        border-radius: 4px;
+-    }
+-    .requirements-list {
+-        list-style: none;
+-        padding: 0;
+-        margin: 0 0 20px 0;
+-    }
+-    .requirements-list li {
+-        padding: 8px 0 8px 25px;
+-        position: relative;
+-        color: #666;
+-        font-size: 0.95rem;
+-        line-height: 1.6;
+-    }
+-    .requirements-list li::before {
+-        content: '▸';
+-        position: absolute;
+-        left: 0;
+-        color: #667eea;
+-        font-weight: bold;
++        flex-wrap: wrap;
++        gap: 15px;
+     }
+-    .apply-btn {
+-        padding: 14px 32px;
+-        font-weight: 700;
++    .feature-pill {
++        background: #fff;
+         border-radius: 50px;
++        padding: 16px 28px;
++        display: flex;
++        align-items: center;
++        gap: 12px;
++        box-shadow: 0 8px 20px rgba(0,0,0,0.04);
++        font-weight: 600;
++        font-size: 1.05rem;
++        color: var(--text-dark);
+         transition: all 0.3s ease;
+-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+-        border: none;
+-        color: white;
+-        margin-top: auto;
+-        text-transform: uppercase;
+-        font-size: 0.9rem;
+-        letter-spacing: 0.8px;
+-    }
+-    .apply-btn:hover {
+-        transform: translateY(-4px);
+-        box-shadow: 0 12px 28px rgba(102, 126, 234, 0.4);
+-        color: white;
++        border: 1px solid rgba(0,0,0,0.03);
+     }
+-    
+-    /* Benefits Section */
+-    .benefits-section {
+-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+-        border-radius: 20px;
+-        padding: 80px 50px;
+-        color: white;
+-        margin-top: 80px;
++    .feature-pill:hover {
++        transform: translateY(-5px) scale(1.02);
++        box-shadow: 0 15px 30px rgba(102, 126, 234, 0.15);
++        border-color: rgba(102, 126, 234, 0.4);
++        color: var(--primary);
+     }
+-    .benefits-section h3 {
+-        font-size: 2.4rem;
+-        font-weight: 700;
+-        margin-bottom: 15px;
+-        text-align: center;
++    .feature-pill i {
++        color: var(--primary);
++        font-size: 1.3rem;
+     }
+-    .benefits-section .subtitle {
+-        font-size: 1.15rem;
+-        opacity: 0.95;
+-        margin-bottom: 60px;
++
++    /* Final CTA Section */
++    .cta-container {
++        padding: 0 20px;
++        margin-bottom: 80px;
++    }
++    .cta-section {
++        background: var(--gradient);
++        padding: 90px 40px;
+         text-align: center;
++        color: white;
++        border-radius: 40px;
++        position: relative;
++        overflow: hidden;
++        box-shadow: 0 30px 60px rgba(102, 126, 234, 0.3);
+     }
+-    .benefit-item {
+-        text-align: center;
+-        padding: 25px;
+-        transition: all 0.3s ease;
+-        border-radius: 15px;
+-        background: rgba(255,255,255,0.1);
+-        padding: 35px;
++    .cta-section::before {
++        content: '';
++        position: absolute;
++        top: 0; left: 0; right: 0; bottom: 0;
++        background: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40" stroke="rgba(255,255,255,0.1)" stroke-width="2" fill="none"/></svg>') repeat;
++        opacity: 0.5;
+     }
+-    .benefit-item:hover {
+-        transform: translateY(-12px);
+-        background: rgba(255,255,255,0.15);
++    .cta-content {
++        position: relative;
++        z-index: 2;
+     }
+-    .benefit-item i {
++    .cta-section h2 {
+         font-size: 3.5rem;
+-        margin-bottom: 20px;
+-        opacity: 0.95;
++        font-weight: 800;
++        margin-bottom: 25px;
++        line-height: 1.1;
+     }
+-    .benefit-item h5 {
++    .cta-section p {
+         font-size: 1.3rem;
+-        font-weight: 700;
+-        margin-bottom: 12px;
+-    }
+-    .benefit-item p {
+-        font-size: 0.98rem;
+-        opacity: 0.9;
+-    }
+-    
+-    /* Hero Section */
+-    .career-hero {
+-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.1) 100%);
+-        padding: 80px 0;
+-        text-align: center;
+-        margin-top: 80px;
+-        margin-bottom: 40px;
+-        border-radius: 15px;
+-    }
+-    .career-hero h1 {
+-        font-size: 3.2rem;
+-        font-weight: 700;
+-        color: #1a1a1a;
+-        margin-bottom: 15px;
+-    }
+-    .career-hero p {
+-        font-size: 1.25rem;
+-        color: #666;
+-        margin-bottom: 0;
+-    }
+-    
+-    /* Empty State */
+-    .empty-state {
+-        text-align: center;
+-        padding: 60px 20px;
+-    }
+-    .empty-state i {
+-        font-size: 4rem;
+-        color: #667eea;
+-        margin-bottom: 20px;
+-    }
+-    .empty-state h3 {
+-        color: #333;
+-        margin-bottom: 10px;
++        opacity: 0.95;
++        margin-bottom: 45px;
++        max-width: 600px;
++        margin-left: auto;
++        margin-right: auto;
+     }
+-    .empty-state p {
+-        color: #999;
+-        font-size: 1.05rem;
++
++    @media (max-width: 991px) {
++        .career-hero h1 { font-size: 3rem; }
++        .section-title h2 { font-size: 2.5rem; }
++        .role-image-wrapper { min-height: 300px; margin-bottom: 40px; }
++        .cta-section h2 { font-size: 2.8rem; }
+     }
+-    
+-    /* Responsive */
+     @media (max-width: 768px) {
+-        .section-header h2 {
+-            font-size: 2.2rem;
+-        }
+-        .career-info-card {
+-            padding: 35px 25px;
+-        }
+-        .info-card-inner {
+-            flex-direction: column;
+-            gap: 25px;
+-            align-items: center;
+-            text-align: center;
+-        }
+-        .info-card-icon {
+-            font-size: 3.5rem;
+-        }
+-        .info-card-list li {
+-            padding-left: 28px;
+-        }
+-        .benefits-section {
+-            padding: 50px 30px;
+-            margin-top: 60px;
+-        }
+-        .benefits-section h3 {
+-            font-size: 1.8rem;
+-        }
+-        .career-hero {
+-            padding: 50px 20px;
+-            margin-top: 60px;
+-        }
+-        .career-hero h1 {
+-            font-size: 2rem;
+-        }
+-        .career-hero p {
+-            font-size: 1rem;
+-        }
+-        .position-meta {
+-            font-size: 0.75rem;
+-        }
++        .career-hero { padding: 120px 20px 80px; }
++        .career-hero h1 { font-size: 2.5rem; }
++        .career-hero p { font-size: 1.1rem; }
++        .section-padding { padding: 70px 0; }
++        .section-title h2 { font-size: 2.2rem; }
++        .attr-box { padding: 40px 25px; }
++        .cta-section { padding: 60px 20px; border-radius: 25px; }
++        .cta-section h2 { font-size: 2.2rem; }
++        .btn-apply-primary, .btn-apply-secondary { font-size: 1rem; padding: 14px 35px; }
+     }
+ </style>
+ 
+-<!-- Hero Section -->
+-<div class="container career-hero">
+-    <h1 class="mb-3 fw-bold">Build Your Career With Us</h1>
+-    <p>Join The Coding Science team and inspire the next generation of developers. Help shape futures and grow your expertise.</p>
+-</div>
++<div class="career-page-wrapper">
++    <!-- Hero Section -->
++    <section class="career-hero">
++        <div class="container">
++            <div class="hero-badge"><i class="fas fa-rocket me-2"></i> We are hiring!</div>
++            <h1>Join Our Team as a Technical Trainer</h1>
++            <p>Inspire the next generation of developers and technologists. Help shape futures, impart practical skills, and grow your own expertise with The Coding Science.</p>
++            <a href="<?php echo htmlspecialchars($apply_link); ?>" target="_blank" class="btn-apply-primary mt-3">
++                Apply Now <i class="fas fa-arrow-right"></i>
++            </a>
++        </div>
++    </section>
+ 
+-<section class="career-section">
+-    <div class="container">
+-        <!-- Info Card -->
+-        <div class="row justify-content-center mb-5">
+-            <div class="col-lg-11">
+-                <div class="career-info-card">
+-                    <div class="info-card-inner">
+-                        <div class="info-card-icon">
+-                            <i class="fas fa-chalkboard-teacher"></i>
+-                        </div>
+-                        <div class="info-card-content">
+-                            <h5>Become a Trainer at The Coding Science</h5>
+-                            <p>We are looking for passionate and experienced professionals to join our faculty. This is an opportunity to impact learning and make a real difference in students' lives.</p>
+-                            <ul class="info-card-list">
+-                                <li><strong>Competitive Compensation:</strong> Competitive base salary with performance-based incentives and bonuses</li>
+-                                <li><strong>Stipend Model:</strong> New trainers start with monthly stipends while they settle in, then transition to permanent positions</li>
+-                                <li><strong>Professional Growth:</strong> Continuous learning opportunities, skill development, and career advancement paths</li>
+-                                <li><strong>Flexible Work:</strong> Full-time, part-time, and freelance opportunities available based on expertise</li>
+-                                <li><strong>Impact:</strong> Mentor talented students and help shape the next generation of tech professionals</li>
+-                            </ul>
+-                        </div>
++    <!-- About the Role -->
++    <section class="section-padding bg-white-section">
++        <div class="container">
++            <div class="row align-items-center">
++                <div class="col-lg-5 mb-5 mb-lg-0">
++                    <div class="role-image-wrapper">
++                        <i class="fas fa-chalkboard-teacher"></i>
+                     </div>
+                 </div>
+-            </div>
+-        </div>
+-        
+-        <!-- Position Cards -->
+-        <?php if (!empty($positions)): ?>
+-            <div class="row g-4 justify-content-center">
+-                <?php foreach ($positions as $position): ?>
+-                    <div class="col-md-6 col-lg-4 d-flex">
+-                        <div class="card h-100 position-card">
+-                            <div class="position-header">
+-                                <div class="position-header-content">
+-                                    <div class="position-icon mx-auto">
+-                                        <i class="fas fa-briefcase"></i>
+-                                    </div>
+-                                    <h3><?php echo htmlspecialchars($position['title']); ?></h3>
+-                                    <div class="position-meta">
+-                                        <div class="position-meta-item">
+-                                            <i class="fas fa-building"></i>
+-                                            <span><?php echo htmlspecialchars($position['location'] ?? 'Remote'); ?></span>
+-                                        </div>
+-                                        <div class="position-meta-item">
+-                                            <i class="fas fa-clock"></i>
+-                                            <span><?php echo htmlspecialchars($position['employment_type']); ?></span>
+-                                        </div>
+-                                    </div>
+-                                </div>
++                <div class="col-lg-7 ps-lg-5">
++                    <div class="section-title text-start mb-5">
++                        <span>About The Role</span>
++                        <h2>Shape the Future of Tech Education</h2>
++                        <p>As a Technical Trainer, you will play a crucial role in delivering high-quality education and mentoring students to achieve their career goals.</p>
++                    </div>
++                    
++                    <ul class="role-list">
++                        <li>
++                            <div class="icon-wrapper"><i class="fas fa-users"></i></div>
++                            <div>
++                                <h4>Teaching Students</h4>
++                                <p>Deliver engaging and insightful lectures on industry-standard technologies and best practices.</p>
+                             </div>
+-                            <div class="card-body">
+-                                <div><?php echo markdown_to_html($position['description']); ?></div>
+-                                
+-                                <?php if ($position['minimum_experience']): ?>
+-                                    <h6>Experience Required:</h6>
+-                                    <p class="text-muted mb-3"><?php echo htmlspecialchars($position['minimum_experience']); ?>+ years</p>
+-                                <?php endif; ?>
+-                                
+-                                <?php if ($position['expertise_required']): ?>
+-                                    <h6>Required Expertise:</h6>
+-                                    <ul class="requirements-list mb-3">
+-                                        <?php
+-                                        $expertise = array_filter(array_map('trim', explode(',', $position['expertise_required'])));
+-                                        foreach ($expertise as $item) {
+-                                            echo '<li>' . htmlspecialchars($item) . '</li>';
+-                                        }
+-                                        ?>
+-                                    </ul>
+-                                <?php endif; ?>
+-                                
+-                                <?php if ($position['stipend_info']): ?>
+-                                    <div class="alert alert-info alert-sm mb-3" style="background: rgba(102, 126, 234, 0.1); border: 1px solid #667eea; color: #333; font-size: 0.9rem;">
+-                                        <i class="fas fa-info-circle me-2"></i>
+-                                        <?php echo htmlspecialchars($position['stipend_info']); ?>
+-                                    </div>
+-                                <?php endif; ?>
+-                                
+-                                <div class="d-grid mt-auto">
+-                                    <a href="/apply/career/<?php echo $position['id']; ?>" class="btn apply-btn">
+-                                        <i class="fas fa-paper-plane me-2"></i>Apply Now
+-                                    </a>
+-                                </div>
++                        </li>
++                        <li>
++                            <div class="icon-wrapper"><i class="fas fa-hands-helping"></i></div>
++                            <div>
++                                <h4>Mentoring & Guidance</h4>
++                                <p>Provide one-on-one mentorship, resolve doubts, and guide students through complex concepts.</p>
+                             </div>
+-                        </div>
+-                    </div>
+-                <?php endforeach; ?>
++                        </li>
++                        <li>
++                            <div class="icon-wrapper"><i class="fas fa-laptop-code"></i></div>
++                            <div>
++                                <h4>Conducting Practical Sessions</h4>
++                                <p>Lead hands-on coding sessions, project building, and essential real-world application building.</p>
++                            </div>
++                        </li>
++                        <li>
++                            <div class="icon-wrapper"><i class="fas fa-book-open"></i></div>
++                            <div>
++                                <h4>Preparing Learning Materials</h4>
++                                <p>Design and update course curriculums, assignments, and study materials aligned with current industry trends.</p>
++                            </div>
++                        </li>
++                    </ul>
++                </div>
+             </div>
+-        <?php else: ?>
+-            <div class="empty-state">
+-                <i class="fas fa-inbox"></i>
+-                <h3>No Positions Available Now</h3>
+-                <p>Stay tuned! We're always looking for passionate trainers. Check back soon for exciting opportunities.</p>
++        </div>
++    </section>
++
++    <!-- Domains We Are Hiring For -->
++    <section class="section-padding">
++        <div class="container">
++            <div class="section-title">
++                <span>Areas of Expertise</span>
++                <h2>Domains We Are Hiring For</h2>
++                <p>We are looking for passionate subject matter experts in various cutting-edge technological domains.</p>
+             </div>
+-        <?php endif; ?>
+-        
+-        <!-- Benefits Section -->
+-        <div class="benefits-section">
+-            <h3>Why Join The Coding Science?</h3>
+-            <p class="subtitle">We invest in our team's success and growth</p>
+-            <div class="row g-4">
+-                <div class="col-md-4 col-sm-6">
+-                    <div class="benefit-item">
+-                        <i class="fas fa-star"></i>
+-                        <h5>Industry Recognition</h5>
+-                        <p>Be part of a leading EdTech organization recognized for excellence in tech education</p>
++            
++            <div class="row g-4 justify-content-center">
++                <div class="col-lg-3 col-md-4 col-sm-6">
++                    <div class="domain-card">
++                        <div class="domain-icon"><i class="fab fa-python"></i></div>
++                        <h4>Python<br>Programming</h4>
++                    </div>
++                </div>
++                <div class="col-lg-3 col-md-4 col-sm-6">
++                    <div class="domain-card">
++                        <div class="domain-icon"><i class="fas fa-layer-group"></i></div>
++                        <h4>Full Stack Web<br>Development</h4>
+                     </div>
+                 </div>
+-                <div class="col-md-4 col-sm-6">
+-                    <div class="benefit-item">
+-                        <i class="fas fa-book"></i>
+-                        <h5>Professional Development</h5>
+-                        <p>Ongoing training and resources to keep your skills current with industry trends</p>
++                <div class="col-lg-3 col-md-4 col-sm-6">
++                    <div class="domain-card">
++                        <div class="domain-icon"><i class="fas fa-brain"></i></div>
++                        <h4>AI & Machine<br>Learning</h4>
+                     </div>
+                 </div>
+-                <div class="col-md-4 col-sm-6">
+-                    <div class="benefit-item">
+-                        <i class="fas fa-users-tie"></i>
+-                        <h5>Collaborative Team</h5>
+-                        <p>Work with passionate educators and experienced mentors who share your vision</p>
++                <div class="col-lg-3 col-md-4 col-sm-6">
++                    <div class="domain-card">
++                        <div class="domain-icon"><i class="fas fa-user-secret"></i></div>
++                        <h4>Ethical Hacking &<br>Pen Testing</h4>
+                     </div>
+                 </div>
+-                <div class="col-md-4 col-sm-6">
+-                    <div class="benefit-item">
+-                        <i class="fas fa-chart-line"></i>
+-                        <h5>Career Growth</h5>
+-                        <p>Clear path for advancement from stipend roles to permanent positions and leadership</p>
++                <div class="col-lg-3 col-md-4 col-sm-6">
++                    <div class="domain-card">
++                        <div class="domain-icon"><i class="fas fa-chart-pie"></i></div>
++                        <h4>Data Science &<br>Analytics</h4>
+                     </div>
+                 </div>
+-                <div class="col-md-4 col-sm-6">
+-                    <div class="benefit-item">
+-                        <i class="fas fa-globe"></i>
+-                        <h5>Flexible Options</h5>
+-                        <p>Full-time, part-time, or freelance roles to fit your lifestyle and goals</p>
++                <div class="col-lg-3 col-md-4 col-sm-6">
++                    <div class="domain-card">
++                        <div class="domain-icon"><i class="fas fa-comment-dots"></i></div>
++                        <h4>Prompt<br>Engineering</h4>
+                     </div>
+                 </div>
+-                <div class="col-md-4 col-sm-6">
+-                    <div class="benefit-item">
+-                        <i class="fas fa-heart"></i>
+-                        <h5>Make an Impact</h5>
+-                        <p>Shape young minds and help build the next generation of tech innovators</p>
++                <div class="col-lg-3 col-md-4 col-sm-6">
++                    <div class="domain-card">
++                        <div class="domain-icon"><i class="fas fa-microchip"></i></div>
++                        <h4>AI<br>Tools</h4>
++                    </div>
++                </div>
++                <div class="col-lg-3 col-md-4 col-sm-6">
++                    <div class="domain-card">
++                        <div class="domain-icon"><i class="fas fa-square-root-alt"></i></div>
++                        <h4>Mathematical<br>Aptitude</h4>
+                     </div>
+                 </div>
+             </div>
+         </div>
++    </section>
++
++    <!-- Who Can Apply & Work Type -->
++    <section class="section-padding bg-white-section attributes-section">
++        <div class="container">
++            <div class="row g-5">
++                <div class="col-lg-7">
++                    <div class="attr-box border-0">
++                        <h3><i class="fas fa-user-check"></i> Who Can Apply?</h3>
++                        <p class="mb-4 text-muted fs-5">We welcome individuals from diverse professional backgrounds who have a genuine passion for teaching and sharing knowledge.</p>
++                        <div class="pill-grid">
++                            <div class="feature-pill"><i class="fas fa-chalkboard-teacher"></i> Trainers</div>
++                            <div class="feature-pill"><i class="fas fa-code"></i> Developers</div>
++                            <div class="feature-pill"><i class="fas fa-laptop-house"></i> Freelancers</div>
++                            <div class="feature-pill"><i class="fas fa-user-tie"></i> Industry Professionals</div>
++                        </div>
++                    </div>
++                </div>
++                <div class="col-lg-5">
++                    <div class="attr-box border-0">
++                        <h3><i class="fas fa-briefcase"></i> Work Type</h3>
++                        <p class="mb-4 text-muted fs-5">We offer flexible working arrangements to suit your schedule and lifestyle preferences.</p>
++                        <div class="pill-grid">
++                            <div class="feature-pill"><i class="fas fa-business-time"></i> Part-Time</div>
++                            <div class="feature-pill"><i class="fas fa-sun"></i> Full-Time</div>
++                            <div class="feature-pill"><i class="fas fa-handshake"></i> Freelance</div>
++                            <div class="feature-pill"><i class="fas fa-wifi"></i> Remote</div>
++                        </div>
++                    </div>
++                </div>
++            </div>
++        </div>
++    </section>
++
++    <!-- Final CTA -->
++    <div class="cta-container">
++        <div class="container">
++            <section class="cta-section">
++                <div class="cta-content">
++                    <h2>Ready to Make an Impact?</h2>
++                    <p>Take the next step in your career. Become part of The Coding Science trainer team and empower students with high-demand tech skills.</p>
++                    <a href="<?php echo htmlspecialchars($apply_link); ?>" target="_blank" class="btn-apply-primary btn-lg mt-2">
++                        Apply Now <i class="fas fa-rocket ms-2"></i>
++                    </a>
++                </div>
++            </section>
++        </div>
+     </div>
+-</section>
++</div>
+ 
+ <?php require_once 'includes/footer.php'; ?>

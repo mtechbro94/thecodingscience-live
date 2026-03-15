@@ -4,15 +4,12 @@
 require_once 'includes/db.php';
 require_once 'includes/functions.php';
 
-// Load career configuration
-$career_config = require_once 'config/career_settings.php';
-
 $page_title = "Career - Join Our Team as a Technical Trainer | The Coding Science";
 
 require_once 'includes/header.php';
 
-$apply_link = $career_config['apply_link'];
-$positions = $career_config['specific_openings'];
+// Google Form application link
+$apply_link = "https://forms.gle/YOUR_GOOGLE_FORM_LINK_HERE"; 
 ?>
 
 <style>
@@ -414,211 +411,20 @@ $positions = $career_config['specific_openings'];
         .cta-section h2 { font-size: 2.2rem; }
         .btn-apply-primary, .btn-apply-secondary { font-size: 1rem; padding: 14px 35px; }
     }
-    /* Dynamic Position Card Styling */
-    .specific-positions-section {
-        background: #fdfdfe;
-    }
-    .pos-card {
-        background: #fff;
-        border-radius: 24px;
-        overflow: hidden;
-        border: 1px solid rgba(0,0,0,0.03);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.02);
-        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-    }
-    .pos-card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 20px 40px rgba(102, 126, 234, 0.12);
-        border-color: rgba(102, 126, 234, 0.2);
-    }
-    .pos-card-header {
-        padding: 35px 30px;
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.03) 0%, rgba(118, 75, 162, 0.03) 100%);
-        border-bottom: 1px solid rgba(0,0,0,0.02);
-        position: relative;
-    }
-    .pos-card-header h3 {
-        font-size: 1.6rem;
-        font-weight: 800;
-        color: var(--text-dark);
-        margin-bottom: 12px;
-    }
-    .pos-meta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 15px;
-        color: var(--text-light);
-        font-size: 0.9rem;
-        font-weight: 600;
-    }
-    .pos-meta span {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    .pos-meta i {
-        color: var(--primary);
-    }
-    .pos-card-body {
-        padding: 30px;
-        flex-grow: 1;
-        color: var(--text-light);
-        line-height: 1.6;
-    }
-    .pos-card-body h6 {
-        color: var(--text-dark);
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        font-size: 0.85rem;
-        margin-bottom: 15px;
-        margin-top: 20px;
-    }
-    .pos-card-body h6:first-child { margin-top: 0; }
-    
-    .req-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-    .req-list li {
-        padding-left: 20px;
-        position: relative;
-        margin-bottom: 8px;
-        font-size: 0.95rem;
-    }
-    .req-list li::before {
-        content: '\f0da';
-        font-family: 'Font Awesome 5 Free';
-        font-weight: 900;
-        position: absolute;
-        left: 0;
-        color: var(--primary);
-    }
-    .pos-card-footer {
-        padding: 0 30px 35px;
-    }
-    
-    /* Empty State */
-    .empty-positions {
-        text-align: center;
-        padding: 40px;
-        background: rgba(102, 126, 234, 0.05);
-        border-radius: 24px;
-        border: 2px dashed rgba(102, 126, 234, 0.2);
-    }
-    .empty-positions i {
-        font-size: 3rem;
-        color: var(--primary);
-        margin-bottom: 15px;
-        opacity: 0.5;
-    }
-    /* Hero Section */
-    .career-hero {
-        background: <?php echo $career_config['hero']['background']['value'] ?? 'var(--gradient)'; ?>;
-        <?php if (!empty($career_config['hero']['background']['image_url'])): ?>
-        background-image: url('<?php echo $career_config['hero']['background']['image_url']; ?>');
-        background-size: cover;
-        background-position: center;
-        <?php endif; ?>
-        padding: 140px 0 100px;
-        color: white;
-        text-align: center;
-        position: relative;
-        overflow: hidden;
-    }
 </style>
 
 <div class="career-page-wrapper">
     <!-- Hero Section -->
     <section class="career-hero">
         <div class="container">
-            <div class="hero-badge"><i class="fas fa-rocket me-2"></i> <?php echo htmlspecialchars($career_config['hero']['badge']); ?></div>
-            <h1><?php echo htmlspecialchars($career_config['hero']['heading']); ?></h1>
-            <p><?php echo htmlspecialchars($career_config['hero']['description']); ?></p>
+            <div class="hero-badge"><i class="fas fa-rocket me-2"></i> We are hiring!</div>
+            <h1>Join Our Team as a Technical Trainer</h1>
+            <p>Inspire the next generation of developers and technologists. Help shape futures, impart practical skills, and grow your own expertise with The Coding Science.</p>
             <a href="<?php echo htmlspecialchars($apply_link); ?>" target="_blank" class="btn-apply-primary mt-3">
-                <?php echo htmlspecialchars($career_config['hero']['apply_btn_text']); ?> <i class="fas fa-arrow-right"></i>
+                Apply Now <i class="fas fa-arrow-right"></i>
             </a>
         </div>
     </section>
-
-    <!-- Specific Job Openings -->
-    <?php if (!empty($positions)): ?>
-    <section class="section-padding specific-positions-section">
-        <div class="container">
-            <div class="section-title">
-                <span>Current Openings</span>
-                <h2>Specific Opportunities</h2>
-                <p>Explore our specialized trainer roles currently open for applications. We are looking for experts to join our core team.</p>
-            </div>
-            
-            <div class="row g-4 justify-content-center">
-                <?php foreach ($positions as $position): ?>
-                    <div class="col-md-6 col-lg-4 d-flex">
-                        <div class="pos-card">
-                            <div class="pos-card-header">
-                                <h3><?php echo htmlspecialchars($position['title']); ?></h3>
-                                <div class="pos-meta">
-                                    <span><i class="fas fa-map-marker-alt"></i> <?php echo htmlspecialchars($position['location'] ?? 'Remote'); ?></span>
-                                    <span><i class="fas fa-clock"></i> <?php echo htmlspecialchars($position['employment_type']); ?></span>
-                                </div>
-                            </div>
-                            <div class="pos-card-body">
-                                <div class="mb-4 text-muted"><?php echo $position['description']; ?></div>
-                                
-                                <?php if (!empty($position['minimum_experience'])): ?>
-                                    <h6>Experience Required</h6>
-                                    <ul class="req-list mb-3">
-                                        <li>At least <?php echo htmlspecialchars($position['minimum_experience']); ?>+ years of relevant experience</li>
-                                    </ul>
-                                <?php endif; ?>
-                                
-                                <?php if (!empty($position['expertise'])): ?>
-                                    <h6>Key Expertise</h6>
-                                    <ul class="req-list mb-3">
-                                        <?php
-                                        $expertise = array_filter(array_map('trim', explode(',', $position['expertise'])));
-                                        foreach ($expertise as $item) {
-                                            echo '<li>' . htmlspecialchars($item) . '</li>';
-                                        }
-                                        ?>
-                                    </ul>
-                                <?php endif; ?>
-
-                                <?php if (!empty($position['requirements'])): ?>
-                                    <h6>Detailed Requirements</h6>
-                                    <div class="mb-3 ps-3 border-start" style="font-size: 0.95rem; border-color: var(--primary) !important;">
-                                        <?php echo nl2br(htmlspecialchars($position['requirements'])); ?>
-                                    </div>
-                                <?php endif; ?>
-
-                                <?php if (!empty($position['stipend'])): ?>
-                                    <div class="mt-4 p-3 rounded-4" style="background: rgba(102, 126, 234, 0.08); border: 1px dashed var(--primary);">
-                                        <h6 class="mb-2"><i class="fas fa-money-bill-wave me-2 text-primary"></i>Stipend & Benefits</h6>
-                                        <p class="mb-0" style="font-size: 0.95rem; color: var(--text-dark);"><?php echo nl2br(htmlspecialchars($position['stipend'])); ?></p>
-                                    </div>
-                                <?php endif; ?>
-
-                                <?php if (!empty($position['growth'])): ?>
-                                    <h6 class="mt-4">Growth & Development</h6>
-                                    <p class="mb-0" style="font-size: 0.95rem;"><?php echo nl2br(htmlspecialchars($position['growth'])); ?></p>
-                                <?php endif; ?>
-                            </div>
-                            <div class="pos-card-footer">
-                                <a href="<?php echo htmlspecialchars($position['application_link'] ?? $apply_link); ?>" target="_blank" class="btn-apply-secondary w-100 justify-content-center">
-                                    Quick Apply <i class="fas fa-paper-plane ms-2"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-        </div>
-    </section>
-    <?php endif; ?>
 
     <!-- About the Role -->
     <section class="section-padding bg-white-section">
@@ -632,20 +438,39 @@ $positions = $career_config['specific_openings'];
                 <div class="col-lg-7 ps-lg-5">
                     <div class="section-title text-start mb-5">
                         <span>About The Role</span>
-                        <h2><?php echo htmlspecialchars($career_config['about_role']['heading']); ?></h2>
-                        <p><?php echo htmlspecialchars($career_config['about_role']['subheading']); ?></p>
+                        <h2>Shape the Future of Tech Education</h2>
+                        <p>As a Technical Trainer, you will play a crucial role in delivering high-quality education and mentoring students to achieve their career goals.</p>
                     </div>
                     
                     <ul class="role-list">
-                        <?php foreach ($career_config['about_role']['points'] as $point): ?>
                         <li>
-                            <div class="icon-wrapper"><i class="<?php echo htmlspecialchars($point['icon']); ?>"></i></div>
+                            <div class="icon-wrapper"><i class="fas fa-users"></i></div>
                             <div>
-                                <h4><?php echo htmlspecialchars($point['title']); ?></h4>
-                                <p><?php echo htmlspecialchars($point['desc']); ?></p>
+                                <h4>Teaching Students</h4>
+                                <p>Deliver engaging and insightful lectures on industry-standard technologies and best practices.</p>
                             </div>
                         </li>
-                        <?php endforeach; ?>
+                        <li>
+                            <div class="icon-wrapper"><i class="fas fa-hands-helping"></i></div>
+                            <div>
+                                <h4>Mentoring & Guidance</h4>
+                                <p>Provide one-on-one mentorship, resolve doubts, and guide students through complex concepts.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="icon-wrapper"><i class="fas fa-laptop-code"></i></div>
+                            <div>
+                                <h4>Conducting Practical Sessions</h4>
+                                <p>Lead hands-on coding sessions, project building, and essential real-world application building.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="icon-wrapper"><i class="fas fa-book-open"></i></div>
+                            <div>
+                                <h4>Preparing Learning Materials</h4>
+                                <p>Design and update course curriculums, assignments, and study materials aligned with current industry trends.</p>
+                            </div>
+                        </li>
                     </ul>
                 </div>
             </div>
