@@ -46,26 +46,16 @@ $apply_link = $career_config['apply_link'];
     .career-hero::before {
         content: '';
         position: absolute;
-        width: 400px;
-        height: 400px;
-        background: rgba(255,255,255,0.05);
-        border-radius: 50%;
-        top: -100px;
-        left: -100px;
-    }
-    .career-hero::after {
-        content: '';
-        position: absolute;
-        width: 300px;
-        height: 300px;
-        background: rgba(255,255,255,0.05);
-        border-radius: 50%;
-        bottom: -50px;
-        right: -50px;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5); /* Dark overlay for text readability */
+        z-index: 1;
     }
     .career-hero .container {
         position: relative;
-        z-index: 2;
+        z-index: 5;
     }
     .hero-badge {
         display: inline-block;
@@ -85,6 +75,7 @@ $apply_link = $career_config['apply_link'];
         margin-bottom: 25px;
         letter-spacing: -1px;
         line-height: 1.2;
+        text-shadow: 0 2px 15px rgba(0,0,0,0.4);
     }
     .career-hero p {
         font-size: 1.25rem;
@@ -92,6 +83,7 @@ $apply_link = $career_config['apply_link'];
         max-width: 700px;
         margin: 0 auto 40px;
         line-height: 1.6;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.4);
     }
     
     /* Buttons */
