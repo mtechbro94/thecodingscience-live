@@ -31,5 +31,16 @@ return [
             ['title' => 'Practical Sessions', 'desc' => 'Lead hands-on coding sessions and real-world project building.', 'icon' => 'fas fa-laptop-code'],
             ['title' => 'Learning Materials', 'desc' => 'Design and update course curriculums and assignments.', 'icon' => 'fas fa-book-open']
         ]
+    ],
+
+    'hiring_domains' => [
+        ['title' => 'Python Programming', 'icon' => 'fab fa-python'],
+        ['title' => 'Full Stack Web Development', 'icon' => 'fas fa-layer-group'],
+        ['title' => 'AI & Machine Learning', 'icon' => 'fas fa-brain'],
+        ['title' => 'Ethical Hacking & Pen Testing', 'icon' => 'fas fa-user-secret'],
+        ['title' => 'Data Science & Analytics', 'icon' => 'fas fa-chart-pie'],
+        ['title' => 'Prompt Engineering', 'icon' => 'fas fa-comment-dots'],
+        ['title' => 'AI Tools', 'icon' => 'fas fa-microchip'],
+        ['title' => 'Mathematical Aptitude', 'icon' => 'fas fa-square-root-alt']
     ]
 ];

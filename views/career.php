@@ -588,54 +588,18 @@ $apply_link = $career_config['apply_link'];
             </div>
             
             <div class="row g-4 justify-content-center">
+                <?php foreach ($career_config['hiring_domains'] as $domain): 
+                    // Split title into two lines for the card if it contains space
+                    $title_parts = explode(' ', $domain['title'], 2);
+                    $display_title = count($title_parts) > 1 ? $title_parts[0] . '<br>' . $title_parts[1] : $domain['title'];
+                ?>
                 <div class="col-lg-3 col-md-4 col-sm-6">
                     <div class="domain-card">
-                        <div class="domain-icon"><i class="fab fa-python"></i></div>
-                        <h4>Python<br>Programming</h4>
+                        <div class="domain-icon"><i class="<?php echo htmlspecialchars($domain['icon']); ?>"></i></div>
+                        <h4><?php echo $display_title; ?></h4>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div class="domain-card">
-                        <div class="domain-icon"><i class="fas fa-layer-group"></i></div>
-                        <h4>Full Stack Web<br>Development</h4>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div class="domain-card">
-                        <div class="domain-icon"><i class="fas fa-brain"></i></div>
-                        <h4>AI & Machine<br>Learning</h4>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div class="domain-card">
-                        <div class="domain-icon"><i class="fas fa-user-secret"></i></div>
-                        <h4>Ethical Hacking &<br>Pen Testing</h4>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div class="domain-card">
-                        <div class="domain-icon"><i class="fas fa-chart-pie"></i></div>
-                        <h4>Data Science &<br>Analytics</h4>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div class="domain-card">
-                        <div class="domain-icon"><i class="fas fa-comment-dots"></i></div>
-                        <h4>Prompt<br>Engineering</h4>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div class="domain-card">
-                        <div class="domain-icon"><i class="fas fa-microchip"></i></div>
-                        <h4>AI<br>Tools</h4>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div class="domain-card">
-                        <div class="domain-icon"><i class="fas fa-square-root-alt"></i></div>
-                        <h4>Mathematical<br>Aptitude</h4>
-                    </div>
-                </div>
+                <?php endforeach; ?>
             </div>
         </div>
     </section>
