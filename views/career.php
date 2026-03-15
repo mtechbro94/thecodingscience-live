@@ -10,6 +10,9 @@ require_once 'includes/header.php';
 
 // Google Form application link
 $apply_link = "https://docs.google.com/forms/d/e/1FAIpQLSc7OK-eGBEV-PWb4LJflIJJF2V1Zk_s_-p0kbiwrwgcibLt6w/viewform?usp=sharing&ouid=102780806115090907943"; 
+
+// Fetch specific trainer positions from database
+$positions = get_trainer_positions();
 ?>
 
 <style>
@@ -411,6 +414,108 @@ $apply_link = "https://docs.google.com/forms/d/e/1FAIpQLSc7OK-eGBEV-PWb4LJflIJJF
         .cta-section h2 { font-size: 2.2rem; }
         .btn-apply-primary, .btn-apply-secondary { font-size: 1rem; padding: 14px 35px; }
     }
+    /* Dynamic Position Card Styling */
+    .specific-positions-section {
+        background: #fdfdfe;
+    }
+    .pos-card {
+        background: #fff;
+        border-radius: 24px;
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.03);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+    .pos-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(102, 126, 234, 0.12);
+        border-color: rgba(102, 126, 234, 0.2);
+    }
+    .pos-card-header {
+        padding: 35px 30px;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.03) 0%, rgba(118, 75, 162, 0.03) 100%);
+        border-bottom: 1px solid rgba(0,0,0,0.02);
+        position: relative;
+    }
+    .pos-card-header h3 {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: var(--text-dark);
+        margin-bottom: 12px;
+    }
+    .pos-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        color: var(--text-light);
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+    .pos-meta span {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .pos-meta i {
+        color: var(--primary);
+    }
+    .pos-card-body {
+        padding: 30px;
+        flex-grow: 1;
+        color: var(--text-light);
+        line-height: 1.6;
+    }
+    .pos-card-body h6 {
+        color: var(--text-dark);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.85rem;
+        margin-bottom: 15px;
+        margin-top: 20px;
+    }
+    .pos-card-body h6:first-child { margin-top: 0; }
+    
+    .req-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .req-list li {
+        padding-left: 20px;
+        position: relative;
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+    }
+    .req-list li::before {
+        content: '\f0da';
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        position: absolute;
+        left: 0;
+        color: var(--primary);
+    }
+    .pos-card-footer {
+        padding: 0 30px 35px;
+    }
+    
+    /* Empty State */
+    .empty-positions {
+        text-align: center;
+        padding: 40px;
+        background: rgba(102, 126, 234, 0.05);
+        border-radius: 24px;
+        border: 2px dashed rgba(102, 126, 234, 0.2);
+    }
+    .empty-positions i {
+        font-size: 3rem;
+        color: var(--primary);
+        margin-bottom: 15px;
+        opacity: 0.5;
+    }
 </style>
 
 <div class="career-page-wrapper">
@@ -476,6 +581,62 @@ $apply_link = "https://docs.google.com/forms/d/e/1FAIpQLSc7OK-eGBEV-PWb4LJflIJJF
             </div>
         </div>
     </section>
+
+    <!-- Specific Job Openings -->
+    <?php if (!empty($positions)): ?>
+    <section class="section-padding specific-positions-section">
+        <div class="container">
+            <div class="section-title">
+                <span>Current Openings</span>
+                <h2>Specific Opportunities</h2>
+                <p>Explore our specialized trainer roles currently open for applications.</p>
+            </div>
+            
+            <div class="row g-4 justify-content-center">
+                <?php foreach ($positions as $position): ?>
+                    <div class="col-md-6 col-lg-4 d-flex">
+                        <div class="pos-card">
+                            <div class="pos-card-header">
+                                <h3><?php echo htmlspecialchars($position['title']); ?></h3>
+                                <div class="pos-meta">
+                                    <span><i class="fas fa-map-marker-alt"></i> <?php echo htmlspecialchars($position['location'] ?? 'Remote'); ?></span>
+                                    <span><i class="fas fa-clock"></i> <?php echo htmlspecialchars($position['employment_type']); ?></span>
+                                </div>
+                            </div>
+                            <div class="pos-card-body">
+                                <div class="mb-4 text-muted"><?php echo markdown_to_html($position['description']); ?></div>
+                                
+                                <?php if ($position['minimum_experience']): ?>
+                                    <h6>Experience Required</h6>
+                                    <ul class="req-list mb-3">
+                                        <li>At least <?php echo htmlspecialchars($position['minimum_experience']); ?>+ years of relevant experience</li>
+                                    </ul>
+                                <?php endif; ?>
+                                
+                                <?php if ($position['expertise_required']): ?>
+                                    <h6>Key Expertise</h6>
+                                    <ul class="req-list">
+                                        <?php
+                                        $expertise = array_filter(array_map('trim', explode(',', $position['expertise_required'])));
+                                        foreach ($expertise as $item) {
+                                            echo '<li>' . htmlspecialchars($item) . '</li>';
+                                        }
+                                        ?>
+                                    </ul>
+                                <?php endif; ?>
+                            </div>
+                            <div class="pos-card-footer">
+                                <a href="/apply/career/<?php echo $position['id']; ?>" class="btn-apply-secondary w-100 justify-content-center">
+                                    Quick Apply <i class="fas fa-paper-plane ms-2"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </section>
+    <?php endif; ?>
 
     <!-- Domains We Are Hiring For -->
     <section class="section-padding">
