@@ -13,7 +13,7 @@ if (empty($courses)) {
 
 // Fetch Latest Blogs (Limit 3)
 $stmt = $pdo->query("
-    SELECT b.*, u.profile_image AS author_image 
+    SELECT b.*, u.name AS author_name, u.profile_image AS author_image 
     FROM blogs b 
     LEFT JOIN users u ON b.author_id = u.id 
     WHERE b.is_published = 1 
@@ -277,19 +277,25 @@ if (!empty($hero_bg)) {
                         <div class="card-footer bg-white border-0 px-4 pb-4">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div class="d-flex align-items-center">
-                                    <?php if (!empty($blog['author_image'])): ?>
-                                        <img src="<?php echo get_image_url($blog['author_image'], 'profile'); ?>"
-                                            alt="<?php echo htmlspecialchars($blog['author']); ?>"
+                                    <?php 
+                                    $author_name = $blog['author_name'] ?? $blog['author'] ?? 'Admin';
+                                    $author_data = [
+                                        'profile_image' => $blog['author_image'],
+                                        'name' => $author_name
+                                    ];
+                                    if (!empty($blog['author_image'])): ?>
+                                        <img src="<?php echo get_avatar($author_data); ?>"
+                                            alt="<?php echo htmlspecialchars($author_name); ?>"
                                             class="rounded-circle me-2 shadow-sm"
                                             style="width: 32px; height: 32px; object-fit: cover;">
                                     <?php else: ?>
                                         <div class="avatar px-2 py-1 bg-primary text-white rounded-circle me-2 font-weight-bold d-flex align-items-center justify-content-center"
-                                            style="width:32px; height:32px;">
-                                            <?php echo strtoupper(substr($blog['author'], 0, 1)); ?>
+                                            style="width:32px; height:32px; font-size: 0.8rem;">
+                                            <?php echo strtoupper(substr($author_name, 0, 1)); ?>
                                         </div>
                                     <?php endif; ?>
                                     <small class="text-dark font-weight-bold">
-                                        <?php echo htmlspecialchars($blog['author']); ?>
+                                        <?php echo htmlspecialchars($author_name); ?>
                                     </small>
                                 </div>
                                 <a href="/blog/<?php echo $blog['slug']; ?>"

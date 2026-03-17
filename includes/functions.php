@@ -138,7 +138,11 @@ function get_image_url($path, $type = 'common')
     }
 
     if ($type === 'profile') {
-        return SITE_URL . '/assets/images/profiles/' . $path;
+        $full_path = BASE_PATH . '/assets/images/profiles/' . $path;
+        if (file_exists($full_path)) {
+            return SITE_URL . '/assets/images/profiles/' . $path;
+        }
+        return SITE_URL . '/assets/images/' . $path;
     }
 
     return SITE_URL . '/assets/images/' . $path;

@@ -175,9 +175,10 @@ require_once __DIR__ . '/functions.php';
                     <li class="nav-item nav-divider"></li>
                     <?php if (is_logged_in()):
                         $user = current_user(); ?>
+                        <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown"
                             role="button" data-bs-toggle="dropdown">
-                            <?php if ($profile_img): ?>
+                            <?php if (!empty($user['profile_image'])): ?>
                                 <img src="<?php echo get_avatar($user); ?>" alt="Avatar" class="rounded-circle me-2"
                                     style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ddd;">
                             <?php else: ?>
