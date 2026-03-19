@@ -12,8 +12,14 @@ $page_title = "Login";
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = sanitize($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
+    $selected_role = $_POST['login_role'] ?? 'student';
 
     $errors = [];
+
+    // Block traditional login for students and trainers
+    if (in_array($selected_role, ['student', 'trainer'])) {
+        $errors[] = "Please use Google to sign in to your " . $selected_role . " account.";
+    }
 
     if (empty($email))
         $errors[] = "Email is required";
@@ -26,32 +32,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user = $stmt->fetch();
 
         if ($user && password_verify($password, $user['password_hash'])) {
-            // Check if user account is active
-            if (empty($user['is_active']) || $user['is_active'] == 0) {
-                if (!empty($user['otpcode'])) {
-                    $_SESSION['pending_verification_email'] = $user['email'];
-                    set_flash('warning', 'Please verify your email address to continue.');
-                    redirect('/verify-otp');
-                } else {
-                    set_flash('danger', 'Your account has been deactivated. Please contact support.');
-                    redirect('/login');
-                }
-            }
-
-            // Check if trainer is approved
-            if ($user['role'] === 'trainer' && empty($user['is_approved'])) {
-                set_flash('warning', 'Your trainer account is pending approval. Please wait for admin to approve your account.');
+            
+            // Only admins can login via password now
+            if ($user['role'] !== 'admin') {
+                set_flash('danger', 'Please use Google to sign in to your account.');
                 redirect('/login');
             }
 
-            // Role Verification Logic
-            $selected_role = $_POST['login_role'] ?? 'student';
-
-            // Admin can login through any role selection but will be redirected to admin dashboard
-            if ($user['role'] === 'admin') {
-                // Admin is allowed
-            } elseif ($user['role'] !== $selected_role) {
-                set_flash('danger', 'Unauthorized access. Please select the correct role for your account.');
+            // Check if user account is active
+            if (empty($user['is_active']) || $user['is_active'] == 0) {
+                set_flash('danger', 'Your account has been deactivated. Please contact support.');
                 redirect('/login');
             }
 
@@ -68,16 +58,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Redirect based on role
             if ($user['role'] === 'admin') {
                 redirect('/admin/dashboard');
-            } elseif ($user['role'] === 'trainer') {
-                redirect('/trainer-dashboard');
             } else {
-                // Student
-                $redirect_url = $_GET['redirect'] ?? '/dashboard';
-                // Prevent open redirect attacks - only allow relative URLs
-                if (empty($redirect_url) || $redirect_url[0] !== '/' || strpos($redirect_url, '//') === 0) {
-                    $redirect_url = '/dashboard';
-                }
-                redirect($redirect_url);
+                redirect('/dashboard');
             }
         } else {
             set_flash('danger', 'Invalid email or password');
@@ -101,7 +83,7 @@ require_once 'includes/header.php';
                         <h2 class="card-title mb-4 text-center">Welcome Back</h2>
                         <p class="text-muted text-center mb-4">Sign in to access your dashboard</p>
 
-                        <form method="POST" action="">
+                        <form method="POST" action="" id="loginForm">
                             <?php
                             $role_param = $_GET['role'] ?? '';
                             if (!in_array($role_param, ['student', 'trainer']))
@@ -114,14 +96,14 @@ require_once 'includes/header.php';
                                     As</label>
                                 <div class="d-flex justify-content-center gap-2">
                                     <input type="radio" class="btn-check" name="login_role" id="roleStudent"
-                                        value="student" <?php echo ($role_param === 'trainer') ? '' : 'checked'; ?>>
+                                        value="student" <?php echo ($role_param === 'trainer') ? '' : 'checked'; ?> onchange="updateLoginForm()">
                                     <label class="btn btn-outline-primary" for="roleStudent">
                                         <i class="fas fa-user-graduate"></i><br>
                                         <small>Student</small>
                                     </label>
 
                                     <input type="radio" class="btn-check" name="login_role" id="roleTrainer"
-                                        value="trainer" <?php echo ($role_param === 'trainer') ? 'checked' : ''; ?>>
+                                        value="trainer" <?php echo ($role_param === 'trainer') ? 'checked' : ''; ?> onchange="updateLoginForm()">
                                     <label class="btn btn-outline-success" for="roleTrainer">
                                         <i class="fas fa-chalkboard-teacher"></i><br>
                                         <small>Trainer</small>
@@ -141,46 +123,39 @@ require_once 'includes/header.php';
                                 <input type="hidden" name="login_role" value="<?php echo $role_param; ?>">
                             <?php endif; ?>
 
-                            <div class="mb-3">
-                                <label class="form-label"><i class="fas fa-envelope"></i> Email Address</label>
-                                <input type="email" class="form-control" name="email" required
-                                    placeholder="your@email.com" autofocus>
+                            <!-- Traditional Login Fields (Only for Admin - Hidden via JS) -->
+                            <div id="traditionalFields" style="display: none;">
+                                <div class="mb-3">
+                                    <label class="form-label"><i class="fas fa-envelope"></i> Email Address</label>
+                                    <input type="email" class="form-control" name="email"
+                                        placeholder="your@email.com">
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label"><i class="fas fa-lock"></i> Password</label>
+                                    <input type="password" class="form-control" name="password"
+                                        placeholder="Enter your password">
+                                </div>
+
+                                <button type="submit" class="btn btn-primary w-100 mb-3">
+                                    <i class="fas fa-sign-in-alt"></i> Sign In
+                                </button>
                             </div>
 
-                            <div class="mb-4">
-                                <label class="form-label"><i class="fas fa-lock"></i> Password</label>
-                                <input type="password" class="form-control" name="password" required
-                                    placeholder="Enter your password">
-                                <a href="/forgot-password" class="small text-primary mt-2 d-inline-block">
-                                    <i class="fas fa-redo"></i> Forgot Password?
-                                </a>
+                            <!-- Social Login Message -->
+                            <div id="socialOnlyMessage" class="text-center mb-4">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i> For security, all <strong>Students</strong> and <strong>Trainers</strong> must sign in using their Google account.
+                                </div>
+                                <button type="button" onclick="socialLogin('google')" class="btn btn-danger btn-lg w-100 py-3 shadow-sm">
+                                    <i class="fab fa-google me-2"></i> Continue with Google
+                                </button>
                             </div>
-
-                            <div class="form-check mb-4">
-                                <input class="form-check-input" type="checkbox" name="remember" id="rememberMe">
-                                <label class="form-check-label" for="rememberMe">Remember me</label>
-                            </div>
-
-                            <button type="submit" class="btn btn-primary w-100 mb-3">
-                                <i class="fas fa-sign-in-alt"></i> Sign In
-                            </button>
                         </form>
 
-                        <div class="text-center my-4">
-                            <div class="d-flex align-items-center">
-                                <hr class="flex-grow-1">
-                                <span class="mx-3 text-muted small text-uppercase">Or continue with</span>
-                                <hr class="flex-grow-1">
-                            </div>
+                        <div id="adminLink" class="text-center mt-3">
+                            <a href="javascript:void(0)" onclick="showAdminLogin()" class="small text-muted">Admin Login? Click here</a>
                         </div>
-
-                        <div class="d-flex justify-content-center gap-3">
-                            <button onclick="socialLogin('google')" class="btn btn-outline-danger px-3 py-2 flex-grow-1"
-                                title="Continue with Google">
-                                <i class="fab fa-google"></i> Google
-                            </button>
-                        </div>
-
 
                         <hr>
 
@@ -196,11 +171,60 @@ require_once 'includes/header.php';
 </section>
 
 <script>
-    function socialLogin(provider) {
+    function updateLoginForm() {
         const roleElement = document.querySelector('input[name="login_role"]:checked');
+        const role = roleElement ? roleElement.value : 'student';
+        
+        const traditionalFields = document.getElementById('traditionalFields');
+        const socialOnlyMessage = document.getElementById('socialOnlyMessage');
+        const adminLink = document.getElementById('adminLink');
+
+        if (role === 'admin') {
+            traditionalFields.style.display = 'block';
+            socialOnlyMessage.style.display = 'none';
+            adminLink.style.display = 'none';
+        } else {
+            traditionalFields.style.display = 'none';
+            socialOnlyMessage.style.display = 'block';
+            adminLink.style.display = 'block';
+        }
+    }
+
+    function showAdminLogin() {
+        // Create an admin radio button dynamically or just show fields
+        const traditionalFields = document.getElementById('traditionalFields');
+        const socialOnlyMessage = document.getElementById('socialOnlyMessage');
+        const adminLink = document.getElementById('adminLink');
+        
+        traditionalFields.style.display = 'block';
+        socialOnlyMessage.style.display = 'none';
+        adminLink.style.display = 'none';
+        
+        // Add a hidden role input for admin
+        let roleInput = document.querySelector('input[name="login_role"][value="admin"]');
+        if (!roleInput) {
+            const form = document.getElementById('loginForm');
+            const hiddenAdmin = document.createElement('input');
+            hiddenAdmin.type = 'hidden';
+            hiddenAdmin.name = 'login_role';
+            hiddenAdmin.value = 'admin';
+            form.appendChild(hiddenAdmin);
+            
+            // Uncheck other radios
+            document.querySelectorAll('input[name="login_role"]').forEach(r => {
+                if(r.type === 'radio') r.checked = false;
+            });
+        }
+    }
+
+    function socialLogin(provider) {
+        const roleElement = document.querySelector('input[name="login_role"]:checked') || document.querySelector('input[name="login_role"][type="hidden"]');
         const role = roleElement ? roleElement.value : 'student';
         window.location.href = '/social-login/' + provider + '?role=' + role;
     }
+
+    // Initial state
+    document.addEventListener('DOMContentLoaded', updateLoginForm);
 </script>
 
 <style>
@@ -223,4 +247,4 @@ require_once 'includes/header.php';
     }
 </style>
 
-<?php require_once 'includes/footer.php'; ?>
+<?php require_once 'includes/footer.php'; ?>
