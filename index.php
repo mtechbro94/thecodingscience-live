@@ -57,19 +57,11 @@ switch ($path) {
         break;
 
     case 'login':
-        if (!isset($_GET['role']) && !isset($_POST['login_role']) && !is_logged_in()) {
-            require 'views/auth_selection.php';
-        } else {
-            require 'views/login.php';
-        }
+        require 'views/login.php';
         break;
 
     case 'register':
-        if (!isset($_GET['role']) && !isset($_POST['register_role']) && !is_logged_in()) {
-            require 'views/auth_selection.php';
-        } else {
-            require 'views/register.php';
-        }
+        require 'views/register.php';
         break;
 
     case 'verify-otp':

@@ -78,91 +78,66 @@ require_once 'includes/header.php';
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-5">
-                <div class="card shadow">
+                <div class="card shadow border-0" style="border-radius: 20px;">
                     <div class="card-body p-5">
-                        <h2 class="card-title mb-4 text-center">Welcome Back</h2>
-                        <p class="text-muted text-center mb-4">Sign in to access your dashboard</p>
+                        <div class="text-center mb-4">
+                            <h2 class="fw-bold">Welcome Back</h2>
+                            <p class="text-muted">Access your dashboard seamlessly</p>
+                        </div>
 
-                        <form method="POST" action="" id="loginForm">
+                        <form id="loginForm">
                             <?php
-                            $role_param = $_GET['role'] ?? '';
-                            if (!in_array($role_param, ['student', 'trainer']))
-                                $role_param = '';
+                            $role_param = $_GET['role'] ?? 'student';
+                            if (!in_array($role_param, ['student', 'trainer'])) $role_param = 'student';
                             ?>
 
                             <!-- Role Selection -->
-                            <div class="mb-4" <?php echo $role_param ? 'style="display:none;"' : ''; ?>>
-                                <label class="form-label text-center d-block mb-3"><i class="fas fa-user-tag"></i> Login
-                                    As</label>
+                            <div class="mb-4 text-center">
+                                <label class="form-label text-muted small text-uppercase fw-bold mb-3">Login As</label>
                                 <div class="d-flex justify-content-center gap-2">
-                                    <input type="radio" class="btn-check" name="login_role" id="roleStudent"
-                                        value="student" <?php echo ($role_param === 'trainer') ? '' : 'checked'; ?> onchange="updateLoginForm()">
-                                    <label class="btn btn-outline-primary" for="roleStudent">
-                                        <i class="fas fa-user-graduate"></i><br>
-                                        <small>Student</small>
+                                    <input type="radio" class="btn-check" name="login_role" id="roleStudent" value="student" <?php echo ($role_param !== 'trainer') ? 'checked' : ''; ?>>
+                                    <label class="btn btn-outline-primary px-4" for="roleStudent">
+                                        <i class="fas fa-user-graduate me-2"></i>Student
                                     </label>
 
-                                    <input type="radio" class="btn-check" name="login_role" id="roleTrainer"
-                                        value="trainer" <?php echo ($role_param === 'trainer') ? 'checked' : ''; ?> onchange="updateLoginForm()">
-                                    <label class="btn btn-outline-success" for="roleTrainer">
-                                        <i class="fas fa-chalkboard-teacher"></i><br>
-                                        <small>Trainer</small>
+                                    <input type="radio" class="btn-check" name="login_role" id="roleTrainer" value="trainer" <?php echo ($role_param === 'trainer') ? 'checked' : ''; ?>>
+                                    <label class="btn btn-outline-success px-4" for="roleTrainer">
+                                        <i class="fas fa-chalkboard-teacher me-2"></i>Trainer
                                     </label>
                                 </div>
                             </div>
 
-                            <?php if ($role_param): ?>
-                                <div class="text-center mb-4">
-                                    <h4
-                                        class="fw-bold text-<?php echo $role_param === 'trainer' ? 'success' : 'primary'; ?>">
-                                        <?php echo ucfirst($role_param); ?> Login
-                                    </h4>
-                                    <a href="/login" class="small text-muted">Not a <?php echo $role_param; ?>? Change
-                                        role</a>
-                                </div>
-                                <input type="hidden" name="login_role" value="<?php echo $role_param; ?>">
-                            <?php endif; ?>
-
-                            <!-- Traditional Login Fields (Only for Admin - Hidden via JS) -->
-                            <div id="traditionalFields" style="display: none;">
-                                <div class="mb-3">
-                                    <label class="form-label"><i class="fas fa-envelope"></i> Email Address</label>
-                                    <input type="email" class="form-control" name="email"
-                                        placeholder="your@email.com">
-                                </div>
-
-                                <div class="mb-4">
-                                    <label class="form-label"><i class="fas fa-lock"></i> Password</label>
-                                    <input type="password" class="form-control" name="password"
-                                        placeholder="Enter your password">
-                                </div>
-
-                                <button type="submit" class="btn btn-primary w-100 mb-3">
-                                    <i class="fas fa-sign-in-alt"></i> Sign In
-                                </button>
+                            <div class="alert alert-light border text-center mb-4" style="font-size: 0.9rem; border-radius: 12px;">
+                                <i class="fas fa-shield-alt text-primary me-2"></i>
+                                We use Google for secure and fast authentication.
                             </div>
 
-                            <!-- Social Login Message -->
-                            <div id="socialOnlyMessage" class="text-center mb-4">
-                                <div class="alert alert-info">
-                                    <i class="fas fa-info-circle"></i> For security, all <strong>Students</strong> and <strong>Trainers</strong> must sign in using their Google account.
-                                </div>
-                                <button type="button" onclick="socialLogin('google')" class="btn btn-danger btn-lg w-100 py-3 shadow-sm">
-                                    <i class="fab fa-google me-2"></i> Continue with Google
-                                </button>
-                            </div>
+                            <button type="button" onclick="socialLogin('google')" class="btn btn-danger btn-lg w-100 py-3 shadow-sm" style="border-radius: 12px; font-weight: 600;">
+                                <i class="fab fa-google me-2"></i> Continue with Google
+                            </button>
                         </form>
 
-                        <div id="adminLink" class="text-center mt-3">
-                            <a href="javascript:void(0)" onclick="showAdminLogin()" class="small text-muted">Admin Login? Click here</a>
+                        <div class="text-center mt-5">
+                            <p class="mb-0">Don't have an account? <a href="/register" class="text-primary fw-bold text-decoration-none">Register Now</a></p>
                         </div>
 
-                        <hr>
+                        <!-- Subtle Admin Access -->
+                        <div class="text-center mt-4">
+                            <a href="javascript:void(0)" onclick="toggleAdmin()" class="text-muted small text-decoration-none opacity-50">Admin Access</a>
+                        </div>
 
-                        <p class="text-center">
-                            Don't have an account?
-                            <a href="/register" class="text-primary fw-bold">Register Now</a>
-                        </p>
+                        <div id="adminArea" style="display: none;" class="mt-4 pt-4 border-top">
+                            <form method="POST" action="">
+                                <input type="hidden" name="login_role" value="admin">
+                                <div class="mb-3">
+                                    <input type="email" class="form-control" name="email" placeholder="Admin Email" required>
+                                </div>
+                                <div class="mb-3">
+                                    <input type="password" class="form-control" name="password" placeholder="Password" required>
+                                </div>
+                                <button type="submit" class="btn btn-dark w-100">Admin Sign In</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -171,79 +146,35 @@ require_once 'includes/header.php';
 </section>
 
 <script>
-    function updateLoginForm() {
-        const roleElement = document.querySelector('input[name="login_role"]:checked');
-        const role = roleElement ? roleElement.value : 'student';
-        
-        const traditionalFields = document.getElementById('traditionalFields');
-        const socialOnlyMessage = document.getElementById('socialOnlyMessage');
-        const adminLink = document.getElementById('adminLink');
-
-        if (role === 'admin') {
-            traditionalFields.style.display = 'block';
-            socialOnlyMessage.style.display = 'none';
-            adminLink.style.display = 'none';
-        } else {
-            traditionalFields.style.display = 'none';
-            socialOnlyMessage.style.display = 'block';
-            adminLink.style.display = 'block';
-        }
-    }
-
-    function showAdminLogin() {
-        // Create an admin radio button dynamically or just show fields
-        const traditionalFields = document.getElementById('traditionalFields');
-        const socialOnlyMessage = document.getElementById('socialOnlyMessage');
-        const adminLink = document.getElementById('adminLink');
-        
-        traditionalFields.style.display = 'block';
-        socialOnlyMessage.style.display = 'none';
-        adminLink.style.display = 'none';
-        
-        // Add a hidden role input for admin
-        let roleInput = document.querySelector('input[name="login_role"][value="admin"]');
-        if (!roleInput) {
-            const form = document.getElementById('loginForm');
-            const hiddenAdmin = document.createElement('input');
-            hiddenAdmin.type = 'hidden';
-            hiddenAdmin.name = 'login_role';
-            hiddenAdmin.value = 'admin';
-            form.appendChild(hiddenAdmin);
-            
-            // Uncheck other radios
-            document.querySelectorAll('input[name="login_role"]').forEach(r => {
-                if(r.type === 'radio') r.checked = false;
-            });
+    function toggleAdmin() {
+        const area = document.getElementById('adminArea');
+        area.style.display = area.style.display === 'none' ? 'block' : 'none';
+        if(area.style.display === 'block') {
+            area.scrollIntoView({ behavior: 'smooth' });
         }
     }
 
     function socialLogin(provider) {
-        const roleElement = document.querySelector('input[name="login_role"]:checked') || document.querySelector('input[name="login_role"][type="hidden"]');
-        const role = roleElement ? roleElement.value : 'student';
+        const role = document.querySelector('input[name="login_role"]:checked').value;
         window.location.href = '/social-login/' + provider + '?role=' + role;
     }
-
-    // Initial state
-    document.addEventListener('DOMContentLoaded', updateLoginForm);
 </script>
 
 <style>
     .btn-check:checked+.btn-outline-primary {
-        background: linear-gradient(135deg, #007bff, #0056b3);
+        background: #0d6efd;
         color: white;
-        border-color: #007bff;
     }
-
     .btn-check:checked+.btn-outline-success {
-        background: linear-gradient(135deg, #28a745, #1e7e34);
+        background: #198754;
         color: white;
-        border-color: #28a745;
     }
-
-    .btn-outline-primary,
-    .btn-outline-success {
-        min-width: 90px;
-        padding: 15px 10px;
+    .btn-outline-primary, .btn-outline-success {
+        border-radius: 10px;
+        transition: all 0.2s;
+    }
+    .btn-outline-primary:hover, .btn-outline-success:hover {
+        transform: translateY(-2px);
     }
 </style>
 
