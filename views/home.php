@@ -23,9 +23,7 @@ $stmt = $pdo->query("
 $blogs = $stmt->fetchAll();
 
 // Fetch stats for animated counters
-$total_students = $pdo->query("SELECT COUNT(*) FROM users WHERE role = 'student'")->fetchColumn() ?: 0;
 $total_courses = $pdo->query("SELECT COUNT(*) FROM courses")->fetchColumn() ?: 0;
-$total_enrollments = $pdo->query("SELECT COUNT(*) FROM enrollments WHERE status = 'completed'")->fetchColumn() ?: 0;
 
 // Fetch Active Success Stories
 try {
@@ -68,7 +66,7 @@ if (!empty($hero_bg)) {
                     <div class="stat-counter-icon">
                         <i class="fas fa-user-graduate"></i>
                     </div>
-                    <h2 class="stat-counter-number" data-target="<?php echo $total_students; ?>">0</h2>
+                    <h2 class="stat-counter-number" data-target="5000">0</h2>
                     <span class="stat-counter-suffix">+</span>
                     <p class="stat-counter-label">Students Enrolled</p>
                 </div>
@@ -88,7 +86,7 @@ if (!empty($hero_bg)) {
                     <div class="stat-counter-icon">
                         <i class="fas fa-certificate"></i>
                     </div>
-                    <h2 class="stat-counter-number" data-target="<?php echo $total_enrollments; ?>">0</h2>
+                    <h2 class="stat-counter-number" data-target="500">0</h2>
                     <span class="stat-counter-suffix">+</span>
                     <p class="stat-counter-label">Certifications Issued</p>
                 </div>
