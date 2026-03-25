@@ -110,7 +110,7 @@ require_once __DIR__ . '/functions.php';
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 align-items-lg-center">
                     <li class="nav-item">
                         <a class="nav-link" href="/">Home</a>
                     </li>
@@ -172,82 +172,78 @@ require_once __DIR__ . '/functions.php';
                     <li class="nav-item">
                         <a class="nav-link" href="/contact">Contact</a>
                     </li>
-                    <li class="nav-item nav-divider"></li>
-                    <?php if (is_logged_in()):
-                        $user = current_user(); ?>
-                        <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown"
-                            role="button" data-bs-toggle="dropdown">
-                            <?php if (!empty($user['profile_image'])): ?>
-                                <img src="<?php echo get_avatar($user); ?>" alt="Avatar" class="rounded-circle me-2"
-                                    style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ddd;">
-                            <?php else: ?>
-                                <div class="avatar-circle avatar-circle-sm bg-primary me-2">
-                                    <?php echo strtoupper(substr($user['name'], 0, 1)); ?>
-                                </div>
-                            <?php endif; ?>
-                            <?php echo htmlspecialchars($user['name']); ?>
-                        </a>
-
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                            <li><a class="dropdown-item" href="/dashboard"><i
-                                        class="fas fa-chart-line me-2"></i>Dashboard</a></li>
-                            <?php if (is_admin()): ?>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item" href="/admin/dashboard"><i
-                                            class="fas fa-tachometer-alt me-2"></i>Admin Panel</a></li>
-                            <?php endif; ?>
-
-
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item text-danger" href="/logout"><i
-                                        class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
-                        </ul>
-                        </li>
-                    <?php else: ?>
-                        <li class="nav-item">
-                            <a class="nav-link btn btn-primary btn-lg ms-2 px-4" href="/login">
-                                <i class="fas fa-sign-in-alt me-2"></i>Login
-                            </a>
-                        </li>
-                    <?php endif; ?>
-                    
-                    <!-- Responsive Search Form -->
-                    <li class="nav-item d-lg-flex align-items-center ms-lg-3 my-3 my-lg-0">
-                        <form action="/index.php" method="GET" class="d-flex w-100">
-                            <input type="hidden" name="_route_" value="search">
-                            <div class="input-group input-group-sm w-100" style="max-width: 250px;">
-                                <input type="text" name="q" class="form-control border-end-0 border-primary-subtle" placeholder="Search..." aria-label="Search" style="border-radius: 20px 0 0 20px; min-width: 130px;" required>
-                                <button class="btn btn-outline-primary border-start-0" type="submit" style="border-radius: 0 20px 20px 0;">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div>
-                        </form>
-                    </li>
                 </ul>
-                
-                <div class="navbar-social d-flex align-items-center gap-2 mt-3 mt-lg-0 ms-lg-3 justify-content-center justify-content-lg-start">
-                    <?php if (get_setting('facebook_url')): ?>
-                        <a class="social-link facebook-link" href="<?php echo get_setting('facebook_url'); ?>"
-                            title="Facebook" target="_blank" rel="noopener noreferrer">
-                            <i class="fa-brands fa-facebook"></i>
-                        </a>
-                    <?php endif; ?>
-                    <?php if (get_setting('linkedin_url')): ?>
-                        <a class="social-link linkedin-link" href="<?php echo get_setting('linkedin_url'); ?>"
-                            title="LinkedIn" target="_blank" rel="noopener noreferrer">
-                            <i class="fa-brands fa-linkedin"></i>
-                        </a>
-                    <?php endif; ?>
-                    <?php if (get_setting('instagram_url')): ?>
-                        <a class="social-link instagram-link" href="<?php echo get_setting('instagram_url'); ?>"
-                            title="Instagram" target="_blank" rel="noopener noreferrer">
-                            <i class="fa-brands fa-instagram"></i>
-                        </a>
+
+                <!-- Right Side Elements: Search, User, Social -->
+                <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3 mt-3 mt-lg-0">
+                    
+                    <!-- Search Form -->
+                    <form action="/index.php" method="GET" class="d-flex w-100" style="max-width: 250px;">
+                        <input type="hidden" name="_route_" value="search">
+                        <div class="input-group input-group-sm w-100">
+                            <input type="text" name="q" class="form-control border-end-0 border-primary-subtle" placeholder="Search..." aria-label="Search" style="border-radius: 20px 0 0 20px; min-width: 120px;" required>
+                            <button class="btn btn-outline-primary border-start-0" type="submit" style="border-radius: 0 20px 20px 0;">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- User Actions -->
+                    <ul class="navbar-nav">
+                        <?php if (is_logged_in()):
+                            $user = current_user(); ?>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                    <?php if (!empty($user['profile_image'])): ?>
+                                        <img src="<?php echo get_avatar($user); ?>" alt="Avatar" class="rounded-circle me-2"
+                                            style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ddd; flex-shrink: 0;">
+                                    <?php else: ?>
+                                        <div class="avatar-circle avatar-circle-sm bg-primary me-2" style="flex-shrink: 0;">
+                                            <?php echo strtoupper(substr($user['name'], 0, 1)); ?>
+                                        </div>
+                                    <?php endif; ?>
+                                    <span class="d-inline-block text-truncate fw-semibold" style="max-width: 120px;" title="<?php echo htmlspecialchars($user['name']); ?>">
+                                        <?php echo htmlspecialchars($user['name']); ?>
+                                    </span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="userDropdown">
+                                    <li><a class="dropdown-item" href="/dashboard"><i class="fas fa-chart-line me-2 text-primary"></i>Dashboard</a></li>
+                                    <?php if (is_admin()): ?>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item" href="/admin/dashboard"><i class="fas fa-tachometer-alt me-2 text-info"></i>Admin Panel</a></li>
+                                    <?php endif; ?>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item text-danger" href="/logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                                </ul>
+                            </li>
+                        <?php else: ?>
+                            <li class="nav-item">
+                                <a class="btn btn-primary btn-sm px-3 rounded-pill fw-bold" href="/login">
+                                    <i class="fas fa-sign-in-alt me-1"></i>Login
+                                </a>
+                            </li>
+                        <?php endif; ?>
+                    </ul>
+
+                    <!-- Social Icons -->
+                    <div class="navbar-social d-flex align-items-center gap-2 justify-content-center justify-content-lg-start">
+                        <?php if (get_setting('facebook_url')): ?>
+                            <a class="social-link facebook-link" href="<?php echo get_setting('facebook_url'); ?>"
+                                title="Facebook" target="_blank" rel="noopener noreferrer">
+                                <i class="fa-brands fa-facebook"></i>
+                            </a>
+                        <?php endif; ?>
+                        <?php if (get_setting('linkedin_url')): ?>
+                            <a class="social-link linkedin-link" href="<?php echo get_setting('linkedin_url'); ?>"
+                                title="LinkedIn" target="_blank" rel="noopener noreferrer">
+                                <i class="fa-brands fa-linkedin"></i>
+                            </a>
+                        <?php endif; ?>
+                        <?php if (get_setting('instagram_url')): ?>
+                            <a class="social-link instagram-link" href="<?php echo get_setting('instagram_url'); ?>"
+                                title="Instagram" target="_blank" rel="noopener noreferrer">
+                                <i class="fa-brands fa-instagram"></i>
+                            </a>
                     <?php endif; ?>
                     <?php if (get_setting('youtube_url')): ?>
                         <a class="social-link youtube-link" href="<?php echo get_setting('youtube_url'); ?>" title="YouTube"
