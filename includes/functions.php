@@ -491,7 +491,7 @@ function search_content($query) {
     $results = array_merge($results, $stmt->fetchAll());
 
     // Search Blogs
-    $stmt = $pdo->prepare("SELECT 'blog' as type, id, title, content, summary as summary, image FROM blogs WHERE (title LIKE ? OR content LIKE ? OR summary LIKE ?) AND is_published = 1");
+    $stmt = $pdo->prepare("SELECT 'blog' as type, id, title, excerpt as content, image FROM blogs WHERE (title LIKE ? OR content LIKE ? OR excerpt LIKE ?) AND is_published = 1");
     $stmt->execute([$search_term, $search_term, $search_term]);
     $results = array_merge($results, $stmt->fetchAll());
 
