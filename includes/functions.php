@@ -104,14 +104,6 @@ function generate_slug($title)
 }
 
 /**
- * Generate a 6-digit OTP
- */
-function generate_otp()
-{
-    return str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
-}
-
-/**
  * Get a site setting by key
  */
 function get_setting($key, $default = '')
@@ -296,6 +288,23 @@ function render_markdown($text)
     $text = preg_replace('/(<br\s*\/?>\s*){3,}/', '<br>', $text);
 
     return $text;
+}
+
+/**
+ * Generate CSRF token
+ */
+function generate_csrf_token() {
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+/**
+ * Validate CSRF token
+ */
+function validate_csrf_token($token) {
+    return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
 }
 
 /**

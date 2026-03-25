@@ -5,6 +5,13 @@ require_once 'config.php';
 require_once 'includes/db.php';
 require_once 'includes/functions.php';
 
+// Security headers
+header("Strict-Transport-Security: max-age=31536000; includeSubDomains");
+header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'");
+header("X-Content-Type-Options: nosniff");
+header("X-Frame-Options: DENY");
+header("X-XSS-Protection: 1; mode=block");
+
 $path = '';
 
 // Check if path is passed via query parameter (for PHP built-in server routing)
@@ -62,10 +69,6 @@ switch ($path) {
 
     case 'register':
         require 'views/register.php';
-        break;
-
-    case 'verify-otp':
-        require 'views/verify_otp.php';
         break;
 
     case 'logout':

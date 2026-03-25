@@ -20,6 +20,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user = $stmt->fetch();
         
         if ($user) {
+            // Block password reset for students and trainers (Google-only roles)
+            if (in_array($user['role'], ['student', 'trainer'])) {
+                set_flash('info', 'Your account is linked to your Google account. Please use the "Continue with Google" button on the <a href="/login" class="alert-link">Login page</a>.');
+                redirect('/forgot-password');
+            }
+            
+            // Proceed with reset for admins
             // Generate reset token
             $token = bin2hex(random_bytes(32));
             $token_time = time() + 3600; // Token valid for 1 hour
