@@ -43,9 +43,20 @@ if (!$user) {
     $user = $stmt->fetch();
 
     if ($user) {
-        // Link social account to existing email
+        $requested_role = $_SESSION['oauth_role'] ?? '';
+        unset($_SESSION['oauth_role']);
+
+        // Link social account to existing email (existing logic)
         $stmt = $pdo->prepare("UPDATE users SET oauth_provider = ?, oauth_id = ?, profile_image = COALESCE(profile_image, ?) WHERE id = ?");
         $stmt->execute([$provider, $profile['id'], $profile['avatar'] ?? null, $user['id']]);
+
+        // If a student wants to become a trainer, update their role (requires re-approval)
+        if ($requested_role === 'trainer' && $user['role'] === 'student') {
+            $stmt = $pdo->prepare("UPDATE users SET role = 'trainer', is_approved = 0 WHERE id = ?");
+            $stmt->execute([$user['id']]);
+            $user['role'] = 'trainer';
+            $user['is_approved'] = 0;
+        }
     }
 }
 
@@ -93,6 +104,8 @@ if ($user) {
     $_SESSION['user_email'] = $user['email'];
     $_SESSION['user_profile_image'] = $user['profile_image'];
     $_SESSION['is_approved'] = $user['is_approved'] ?? 1;
+
+    session_regenerate_id(true);
 
     set_flash('success', 'Welcome back, ' . $user['name'] . '!');
 

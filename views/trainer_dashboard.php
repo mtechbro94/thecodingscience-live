@@ -58,6 +58,9 @@ require_once 'includes/header.php';
                         <a href="/trainer-blogs" class="list-group-item list-group-item-action">
                             <i class="fas fa-blog me-2"></i> My Blogs
                         </a>
+                        <a href="/dashboard" class="list-group-item list-group-item-action">
+                            <i class="fas fa-graduation-cap me-2 text-primary"></i> Learning Dashboard
+                        </a>
                         <a href="/trainer-blog/new" class="list-group-item list-group-item-action">
                             <i class="fas fa-plus-square me-2"></i> Write New Blog
                         </a>

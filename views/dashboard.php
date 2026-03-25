@@ -12,11 +12,7 @@ $user = current_user();
 if ($user['role'] === 'admin') {
     redirect('/admin/dashboard');
 }
-
-// Redirect Trainer
-if ($user['role'] === 'trainer') {
-    redirect('/trainer-dashboard');
-}
+// Trainers can access both, no forced redirect here anymore
 
 $page_title = "Dashboard";
 
@@ -65,6 +61,11 @@ require_once 'includes/header.php';
                         <a href="/dashboard" class="list-group-item list-group-item-action active">
                             <i class="fas fa-tachometer-alt me-2"></i> Dashboard
                         </a>
+                        <?php if ($user['role'] === 'trainer' || $user['role'] === 'admin'): ?>
+                            <a href="/trainer-dashboard" class="list-group-item list-group-item-action text-success fw-bold">
+                                <i class="fas fa-chalkboard-teacher me-2"></i> Trainer Dashboard
+                            </a>
+                        <?php endif; ?>
                         <a href="/profile" class="list-group-item list-group-item-action">
                             <i class="fas fa-user me-2"></i> My Profile
                         </a>
