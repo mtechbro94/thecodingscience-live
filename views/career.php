@@ -43,33 +43,49 @@ $apply_link = $career_config['apply_link'];
         position: relative;
         overflow: hidden;
     }
+
+    /* Animated mesh grid overlay */
     .career-hero::before {
         content: '';
         position: absolute;
-        width: 400px;
-        height: 400px;
-        background: rgba(255,255,255,0.05);
-        border-radius: 50%;
-        top: -100px;
-        left: -100px;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-image: 
+            linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+        background-size: 60px 60px;
+        animation: meshMove 20s linear infinite;
+        z-index: 1;
     }
+
+    @keyframes meshMove {
+        from { transform: translate(0, 0); }
+        to { transform: translate(60px, 60px); }
+    }
+
+    /* Floating geometric shapes */
     .career-hero::after {
         content: '';
         position: absolute;
-        width: 300px;
-        height: 300px;
-        background: rgba(255,255,255,0.05);
+        width: 500px; height: 500px;
+        background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
         border-radius: 50%;
-        bottom: -50px;
-        right: -50px;
+        top: -150px; right: -100px;
+        animation: heroPulse 8s ease-in-out infinite alternate;
+        z-index: 1;
     }
+
+    @keyframes heroPulse {
+        from { transform: scale(1) translate(0, 0); opacity: 0.6; }
+        to { transform: scale(1.2) translate(-30px, 30px); opacity: 1; }
+    }
+
     .career-hero .container {
         position: relative;
         z-index: 2;
     }
     .hero-badge {
         display: inline-block;
-        background: rgba(255,255,255,0.2);
+        background: rgba(255,255,255,0.15);
         padding: 8px 20px;
         border-radius: 50px;
         font-size: 0.95rem;
@@ -78,6 +94,8 @@ $apply_link = $career_config['apply_link'];
         margin-bottom: 25px;
         backdrop-filter: blur(10px);
         text-transform: uppercase;
+        border: 1px solid rgba(255,255,255,0.2);
+        animation: fadeInDown 0.6s ease;
     }
     .career-hero h1 {
         font-size: 3.8rem;

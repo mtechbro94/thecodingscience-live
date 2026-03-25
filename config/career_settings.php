@@ -15,7 +15,7 @@ return [
         'background' => [
             'type' => 'gradient', // 'gradient' or 'image'
             'value' => 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            'image_url' => '/assets/images/career-hero-bg.jpg'
+            'image_url' => ''
         ]
     ],
 
