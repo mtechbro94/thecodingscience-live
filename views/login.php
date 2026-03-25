@@ -16,9 +16,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $errors = [];
 
-    // Block traditional login for students and trainers
-    if (in_array($selected_role, ['student', 'trainer'])) {
-        $errors[] = "Please use Google to sign in to your " . $selected_role . " account.";
+    // Block traditional login for students
+    if ($selected_role === 'student') {
+        $errors[] = "Please use Google to sign in to your student account.";
     }
 
     if (empty($email))
@@ -33,9 +33,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($user && password_verify($password, $user['password_hash'])) {
             
-            // Only admins can login via password now
-            if ($user['role'] !== 'admin') {
-                set_flash('danger', 'Please use Google to sign in to your account.');
+            // Allow admins and trainers to login via password
+            if ($user['role'] === 'student') {
+                set_flash('danger', 'Please use Google to sign in to your student account.');
                 redirect('/login');
             }
 
@@ -153,17 +153,19 @@ require_once 'includes/header.php';
                                         <p>Sign in or create your account seamlessly</p>
                                     </div>
 
-                                    <form id="loginForm">
+                                    <form id="loginForm" method="GET">
                                         <?php
                                         $role_param = $_GET['role'] ?? 'student';
-                                        if (!in_array($role_param, ['student', 'trainer'])) $role_param = 'student';
+                                        if (!in_array($role_param, ['student', 'trainer']))
+                                            $role_param = 'student';
                                         ?>
-
                                         <!-- Role Selection -->
                                         <div class="role-selector">
                                             <label class="role-label">I am a</label>
                                             <div class="role-toggle">
-                                                <input type="radio" class="btn-check" name="login_role" id="roleStudent" value="student" <?php echo ($role_param !== 'trainer') ? 'checked' : ''; ?>>
+                                                <input type="radio" class="btn-check" name="login_role" id="roleStudent"
+                                                    value="student" <?php echo ($role_param !== 'trainer') ? 'checked' : ''; ?>
+                                                    onchange="updateRoleUI()">
                                                 <label class="role-option" for="roleStudent">
                                                     <div class="role-icon"><i class="fas fa-user-graduate"></i></div>
                                                     <div class="role-text">
@@ -172,7 +174,9 @@ require_once 'includes/header.php';
                                                     </div>
                                                 </label>
 
-                                                <input type="radio" class="btn-check" name="login_role" id="roleTrainer" value="trainer" <?php echo ($role_param === 'trainer') ? 'checked' : ''; ?>>
+                                                <input type="radio" class="btn-check" name="login_role" id="roleTrainer"
+                                                    value="trainer" <?php echo ($role_param === 'trainer') ? 'checked' : ''; ?>
+                                                    onchange="updateRoleUI()">
                                                 <label class="role-option" for="roleTrainer">
                                                     <div class="role-icon"><i class="fas fa-chalkboard-teacher"></i></div>
                                                     <div class="role-text">
@@ -183,53 +187,77 @@ require_once 'includes/header.php';
                                             </div>
                                         </div>
 
-                                        <!-- Security Badge -->
-                                        <div class="security-badge">
-                                            <i class="fas fa-shield-alt"></i>
-                                            <span>Secured by Google — fast, safe, and private</span>
+                                        <!-- Student Auth Silo -->
+                                        <div id="studentAuth" class="auth-section">
+                                            <div class="security-badge">
+                                                <i class="fas fa-shield-alt"></i>
+                                                <span>Secured by Google — fast, safe, and private</span>
+                                            </div>
+                                            <button type="button" onclick="socialLogin('google')" class="google-btn">
+                                                <div class="google-btn-inner">
+                                                    <svg class="google-icon" viewBox="0 0 24 24" width="22" height="22">
+                                                        <path fill="#4285F4"
+                                                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
+                                                        <path fill="#34A853"
+                                                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                                                        <path fill="#FBBC05"
+                                                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                                                        <path fill="#EA4335"
+                                                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                                                    </svg>
+                                                    <span>Continue with Google</span>
+                                                </div>
+                                            </button>
                                         </div>
 
-                                        <!-- Google Login Button -->
-                                        <button type="button" onclick="socialLogin('google')" class="google-btn" id="googleLoginBtn">
-                                            <div class="google-btn-inner">
-                                                <svg class="google-icon" viewBox="0 0 24 24" width="22" height="22">
-                                                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
-                                                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                                                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                                                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                                                </svg>
-                                                <span>Continue with Google</span>
+                                        <!-- Trainer Auth Silo -->
+                                        <div id="trainerAuth" class="auth-section d-none">
+                                            <div class="trainer-login-form p-3 border rounded-4 bg-light mb-3">
+                                                <form method="POST" action="">
+                                                    <input type="hidden" name="login_role" value="trainer">
+                                                    <div class="mb-3">
+                                                        <label class="form-label small fw-bold">Email Address</label>
+                                                        <input type="email" class="form-control" name="email"
+                                                            placeholder="trainer@example.com">
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label small fw-bold">Password</label>
+                                                        <input type="password" class="form-control" name="password"
+                                                            placeholder="••••••••">
+                                                    </div>
+                                                    <button type="submit" class="btn btn-primary w-100 fw-bold py-2"
+                                                        style="border-radius: 10px;">
+                                                        Trainer Sign In
+                                                    </button>
+                                                </form>
                                             </div>
-                                            <div class="google-btn-glow"></div>
-                                        </button>
+
+                                            <div class="text-center my-3">
+                                                <span class="text-muted small">OR</span>
+                                            </div>
+
+                                            <button type="button" onclick="socialLogin('github')" class="github-btn w-100">
+                                                <div class="github-btn-inner btn btn-dark w-100 py-2 d-flex align-items-center justify-content-center gap-2"
+                                                    style="border-radius: 10px;">
+                                                    <i class="fab fa-github fa-lg"></i>
+                                                    <span>Continue with GitHub</span>
+                                                </div>
+                                            </button>
+                                        </div>
                                     </form>
+
+                                    <!-- Added separate form for JS-based social login to avoid nesting -->
+                                    <form id="socialLoginForm" style="display:none;"></form>
 
                                     <!-- Terms -->
                                     <p class="login-terms">
                                         By continuing, you agree to our <a href="/terms">Terms</a> and <a href="/privacy">Privacy Policy</a>.
                                     </p>
 
-                                    <!-- Subtle Admin Access -->
-                                    <div class="admin-toggle-wrap">
-                                        <a href="javascript:void(0)" onclick="toggleAdmin()" class="admin-toggle-link">
-                                            <i class="fas fa-lock me-1"></i>Admin Access
-                                        </a>
-                                    </div>
-
-                                    <div id="adminArea" class="admin-area">
-                                        <form method="POST" action="">
-                                            <input type="hidden" name="login_role" value="admin">
-                                            <div class="mb-3">
-                                                <input type="email" class="form-control form-control-lg" name="email" placeholder="Admin Email" required>
-                                            </div>
-                                            <div class="mb-3">
-                                                <input type="password" class="form-control form-control-lg" name="password" placeholder="Password" required>
-                                            </div>
-                                            <button type="submit" class="btn btn-dark w-100 btn-lg" style="border-radius:12px;">
-                                                <i class="fas fa-sign-in-alt me-2"></i>Admin Sign In
-                                            </button>
-                                        </form>
-                                    </div>
+                                    <!-- Terms -->
+                                    <p class="login-terms">
+                                        By continuing, you agree to our <a href="/terms">Terms</a> and <a href="/privacy">Privacy Policy</a>.
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -241,12 +269,23 @@ require_once 'includes/header.php';
 </section>
 
 <script>
-    function toggleAdmin() {
-        const area = document.getElementById('adminArea');
-        area.classList.toggle('show');
-        if(area.classList.contains('show')) {
-            area.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    function updateRoleUI() {
+        const role = document.querySelector('input[name="login_role"]:checked').value;
+        const studentAuth = document.getElementById('studentAuth');
+        const trainerAuth = document.getElementById('trainerAuth');
+        
+        if (role === 'trainer') {
+            studentAuth.classList.add('d-none');
+            trainerAuth.classList.remove('d-none');
+        } else {
+            studentAuth.classList.remove('d-none');
+            trainerAuth.classList.add('d-none');
         }
+
+        // Update URL without reloading for bookmarking/sharing
+        const url = new URL(window.location);
+        url.searchParams.set('role', role);
+        window.history.pushState({}, '', url);
     }
 
     function socialLogin(provider) {
@@ -262,7 +301,10 @@ require_once 'includes/header.php';
         });
         // Initialize active state
         const radio = opt.previousElementSibling;
-        if (radio && radio.checked) opt.classList.add('active');
+        if (radio && radio.checked) {
+            opt.classList.add('active');
+            updateRoleUI();
+        }
     });
 </script>
 
@@ -670,47 +712,13 @@ require_once 'includes/header.php';
         text-decoration: underline;
     }
 
-    /* Admin Toggle */
-    .admin-toggle-wrap {
+    /* Terms */
+    .login-terms {
         text-align: center;
-        margin-top: 1.5rem;
-        padding-top: 1.5rem;
-        border-top: 1px solid #f1f5f9;
-    }
-
-    .admin-toggle-link {
         font-size: 0.78rem;
-        color: #cbd5e1;
-        text-decoration: none;
-        transition: color 0.2s;
-    }
-
-    .admin-toggle-link:hover {
-        color: #64748b;
-    }
-
-    /* Admin Area */
-    .admin-area {
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.4s ease;
-        padding: 0 0;
-    }
-
-    .admin-area.show {
-        max-height: 300px;
-        padding: 1.5rem 0 0;
-    }
-
-    .admin-area .form-control {
-        border-radius: 12px;
-        padding: 0.85rem 1rem;
-        border: 2px solid #e2e8f0;
-    }
-
-    .admin-area .form-control:focus {
-        border-color: #4f46e5;
-        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        color: #94a3b8;
+        margin-top: 1.25rem;
+        margin-bottom: 0;
     }
 
     /* ===== RESPONSIVE ===== */

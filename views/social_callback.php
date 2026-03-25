@@ -31,40 +31,35 @@ if (!$profile || empty($profile['email'])) {
     redirect('/login');
 }
 
-// 1. Check if user exists by OAuth ID
-$stmt = $pdo->prepare("SELECT * FROM users WHERE oauth_provider = ? AND oauth_id = ?");
-$stmt->execute([$provider, $profile['id']]);
+// Get requested role
+$role = $_SESSION['oauth_role'] ?? 'student';
+unset($_SESSION['oauth_role']);
+
+// 1. Check if user exists by OAuth ID and Role
+$stmt = $pdo->prepare("SELECT * FROM users WHERE oauth_provider = ? AND oauth_id = ? AND role = ?");
+$stmt->execute([$provider, $profile['id'], $role]);
 $user = $stmt->fetch();
 
-// 2. If not found by OAuth, check by Email
+// 2. If not found by OAuth, check by Email and Role
 if (!$user) {
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
-    $stmt->execute([$profile['email']]);
+    if (empty($profile['email'])) {
+        set_flash('danger', 'Email not provided by ' . ucfirst($provider) . '.');
+        redirect('/login');
+    }
+
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ? AND role = ?");
+    $stmt->execute([$profile['email'], $role]);
     $user = $stmt->fetch();
 
     if ($user) {
-        $requested_role = $_SESSION['oauth_role'] ?? '';
-        unset($_SESSION['oauth_role']);
-
-        // Link social account to existing email (existing logic)
+        // Link social account to existing email/role record
         $stmt = $pdo->prepare("UPDATE users SET oauth_provider = ?, oauth_id = ?, profile_image = COALESCE(profile_image, ?) WHERE id = ?");
         $stmt->execute([$provider, $profile['id'], $profile['avatar'] ?? null, $user['id']]);
-
-        // If a student wants to become a trainer, update their role (requires re-approval)
-        if ($requested_role === 'trainer' && $user['role'] === 'student') {
-            $stmt = $pdo->prepare("UPDATE users SET role = 'trainer', is_approved = 0 WHERE id = ?");
-            $stmt->execute([$user['id']]);
-            $user['role'] = 'trainer';
-            $user['is_approved'] = 0;
-        }
     }
 }
 
 // 3. If still not found, create new user
 if (!$user) {
-    $role = $_SESSION['oauth_role'] ?? 'student';
-    unset($_SESSION['oauth_role']);
-
     $name = $profile['name'];
     $email = $profile['email'];
     $oauth_id = $profile['id'];

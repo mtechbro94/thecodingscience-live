@@ -3,7 +3,7 @@
 require_once 'includes/SocialAuth.php';
 
 $provider = $match[1] ?? ''; // From router regex
-$allowed_providers = ['google'];
+$allowed_providers = ['google', 'github'];
 
 if (!in_array($provider, $allowed_providers)) {
     set_flash('danger', 'Invalid social provider.');
