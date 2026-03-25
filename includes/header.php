@@ -218,9 +218,10 @@ require_once __DIR__ . '/functions.php';
                 </ul>
                 
                 <!-- Search Form -->
-                <form action="/search" method="GET" class="d-flex mx-lg-4 my-2 my-lg-0">
+                <form action="/index.php" method="GET" class="d-flex mx-lg-4 my-2 my-lg-0">
+                    <input type="hidden" name="_route_" value="search">
                     <div class="input-group input-group-sm">
-                        <input type="text" name="q" class="form-control border-end-0 border-primary-subtle" placeholder="Search courses..." aria-label="Search" style="border-radius: 20px 0 0 20px; width: 150px;">
+                        <input type="text" name="q" class="form-control border-end-0 border-primary-subtle" placeholder="Search courses..." aria-label="Search" style="border-radius: 20px 0 0 20px; width: 150px;" required>
                         <button class="btn btn-outline-primary border-start-0" type="submit" style="border-radius: 0 20px 20px 0;">
                             <i class="fas fa-search"></i>
                         </button>
