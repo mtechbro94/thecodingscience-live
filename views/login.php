@@ -53,6 +53,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['user_profile_image'] = $user['profile_image'];
             $_SESSION['is_approved'] = $user['is_approved'] ?? 1;
 
+            session_regenerate_id(true);
+
             set_flash('success', 'Welcome back, ' . $user['name'] . '!');
 
             // Redirect based on role
@@ -82,7 +84,7 @@ require_once 'includes/header.php';
                     <div class="card-body p-5">
                         <div class="text-center mb-4">
                             <h2 class="fw-bold">Welcome Back</h2>
-                            <p class="text-muted">Access your dashboard seamlessly</p>
+                            <p class="text-muted">Sign in or create your account seamlessly</p>
                         </div>
 
                         <form id="loginForm">
@@ -116,10 +118,6 @@ require_once 'includes/header.php';
                                 <i class="fab fa-google me-2"></i> Continue with Google
                             </button>
                         </form>
-
-                        <div class="text-center mt-5">
-                            <p class="mb-0">Don't have an account? <a href="/register" class="text-primary fw-bold text-decoration-none">Register Now</a></p>
-                        </div>
 
                         <!-- Subtle Admin Access -->
                         <div class="text-center mt-4">
@@ -178,4 +176,4 @@ require_once 'includes/header.php';
     }
 </style>
 
-<?php require_once 'includes/footer.php'; ?>
+<?php require_once 'includes/footer.php'; ?>

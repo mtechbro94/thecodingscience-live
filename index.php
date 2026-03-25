@@ -68,7 +68,7 @@ switch ($path) {
         break;
 
     case 'register':
-        require 'views/register.php';
+        redirect('/login');
         break;
 
     case 'logout':
