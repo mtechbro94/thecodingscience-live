@@ -20,8 +20,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user = $stmt->fetch();
         
         if ($user) {
-            // Block password reset for students and trainers (Google-only roles)
-            if (in_array($user['role'], ['student', 'trainer'])) {
+            // Block password reset for students (Google-only role)
+            if ($user['role'] === 'student') {
                 set_flash('info', 'Your account is linked to your Google account. Please use the "Continue with Google" button on the <a href="/login" class="alert-link">Login page</a>.');
                 redirect('/forgot-password');
             }

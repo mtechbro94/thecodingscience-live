@@ -212,45 +212,63 @@ require_once 'includes/header.php';
 
                                         <!-- Trainer Auth Silo -->
                                         <div id="trainerAuth" class="auth-section d-none">
-                                            <div class="trainer-login-form p-3 border rounded-4 bg-light mb-3">
-                                                <form method="POST" action="">
-                                                    <!-- CSRF or hidden fields if any -->
-                                                    <input type="hidden" name="login_role" value="trainer">
-                                                    <div class="mb-3">
-                                                        <label class="form-label small fw-bold">Email Address</label>
-                                                        <input type="email" class="form-control" name="email"
-                                                            placeholder="trainer@example.com" required>
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <label class="form-label small fw-bold">Password</label>
-                                                        <input type="password" class="form-control" name="password"
-                                                            placeholder="••••••••" required>
-                                                    </div>
-                                                    <button type="submit" class="btn btn-primary w-100 fw-bold py-2"
-                                                        style="border-radius: 10px;">
-                                                        Trainer Sign In
-                                                    </button>
-                                                </form>
-                                            </div>
-
-                                            <div class="text-center my-3">
-                                                <span class="text-muted small">OR</span>
-                                            </div>
-
-                                            <button type="button" onclick="socialLogin('github')" class="github-btn w-100 p-0 border-0 bg-transparent">
-                                                <div class="github-btn-inner btn btn-dark w-100 py-2 d-flex align-items-center justify-content-center gap-2"
-                                                    style="border-radius: 10px;">
-                                                    <i class="fab fa-github fa-lg"></i>
-                                                    <span>Continue with GitHub</span>
+                                            <div id="trainerCredentialsArea">
+                                                <div class="trainer-login-form p-3 border rounded-4 bg-light mb-3">
+                                                    <form id="trainerLoginForm" onsubmit="handleTrainerSubmit(event)">
+                                                        <div class="mb-3">
+                                                            <label class="form-label small fw-bold">Email Address</label>
+                                                            <input type="email" class="form-control" id="trainerEmail"
+                                                                placeholder="trainer@example.com" required>
+                                                        </div>
+                                                        <div class="mb-3 d-flex justify-content-between align-items-center">
+                                                            <label class="form-label small fw-bold mb-0">Password</label>
+                                                            <a href="/forgot-password" class="text-primary small fw-semibold text-decoration-none">Forgot Password?</a>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <input type="password" class="form-control" id="trainerPassword"
+                                                                placeholder="••••••••" required>
+                                                        </div>
+                                                        <button type="submit" class="btn btn-primary w-100 fw-bold py-2" id="trainerSubmitBtn"
+                                                            style="border-radius: 10px;">
+                                                            Trainer Sign In
+                                                        </button>
+                                                    </form>
                                                 </div>
-                                            </button>
+
+                                                <div class="text-center my-3">
+                                                    <span class="text-muted small">OR</span>
+                                                </div>
+
+                                                <button type="button" onclick="socialLogin('github')" class="github-btn w-100 p-0 border-0 bg-transparent">
+                                                    <div class="github-btn-inner btn btn-dark w-100 py-2 d-flex align-items-center justify-content-center gap-2"
+                                                        style="border-radius: 10px;">
+                                                        <i class="fab fa-github fa-lg"></i>
+                                                        <span>Continue with GitHub</span>
+                                                    </div>
+                                                </button>
+                                            </div>
+
+                                            <!-- OTP Verification Area (Hidden) -->
+                                            <div id="trainerOtpArea" class="d-none text-center p-3 animate-fade-in">
+                                                <div class="mb-3">
+                                                    <div class="otp-icon-wrap text-primary mb-2">
+                                                        <i class="fas fa-envelope-open-text fa-2x"></i>
+                                                    </div>
+                                                    <h5 class="fw-bold">Verify Your Email</h5>
+                                                    <p class="small text-muted">We've sent a 6-digit code to <br><strong id="displayEmail"></strong></p>
+                                                </div>
+                                                <div class="otp-input-wrap mb-3 d-flex justify-content-center gap-2">
+                                                    <input type="text" maxlength="6" id="otpCode" class="form-control text-center fw-bold fs-4" style="letter-spacing: 5px; width: 200px;" placeholder="000000">
+                                                </div>
+                                                <button type="button" onclick="handleVerifyOTP()" class="btn btn-primary w-100 fw-bold py-2 mb-2" id="verifyOtpBtn">
+                                                    Verify & Login
+                                                </div>
+                                                <button type="button" onclick="resetTrainerAuth()" class="btn btn-link btn-sm text-muted text-decoration-none">
+                                                    <i class="fas fa-arrow-left me-1"></i>Back to login
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-
-                                    <!-- Terms -->
-                                    <p class="login-terms">
-                                        By continuing, you agree to our <a href="/terms">Terms</a> and <a href="/privacy">Privacy Policy</a>.
-                                    </p>
 
                                     <!-- Terms -->
                                     <p class="login-terms">
@@ -284,6 +302,86 @@ require_once 'includes/header.php';
         const url = new URL(window.location);
         url.searchParams.set('role', role);
         window.history.pushState({}, '', url);
+    }
+
+    async function handleTrainerSubmit(e) {
+        e.preventDefault();
+        const email = document.getElementById('trainerEmail').value;
+        const password = document.getElementById('trainerPassword').value;
+        const submitBtn = document.getElementById('trainerSubmitBtn');
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Sending...';
+
+        try {
+            const formData = new FormData();
+            formData.append('email', email);
+            formData.append('password', password);
+
+            const response = await fetch('/api/trainer_auth.php?action=send_otp', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+
+            if (result.success) {
+                document.getElementById('trainerCredentialsArea').classList.add('d-none');
+                document.getElementById('displayEmail').innerText = email;
+                document.getElementById('trainerOtpArea').classList.remove('d-none');
+            } else {
+                alert(result.message || 'Something went wrong.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Could not connect to the server.');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'Trainer Sign In';
+        }
+    }
+
+    async function handleVerifyOTP() {
+        const email = document.getElementById('trainerEmail').value;
+        const otp = document.getElementById('otpCode').value;
+        const verifyBtn = document.getElementById('verifyOtpBtn');
+
+        if (!otp || otp.length < 6) {
+            alert('Please enter a valid 6-digit OTP.');
+            return;
+        }
+
+        verifyBtn.disabled = true;
+        verifyBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Verifying...';
+
+        try {
+            const formData = new FormData();
+            formData.append('email', email);
+            formData.append('otp', otp);
+
+            const response = await fetch('/api/trainer_auth.php?action=verify_otp', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+
+            if (result.success) {
+                window.location.href = result.redirect || '/dashboard';
+            } else {
+                alert(result.message || 'Invalid OTP.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Could not connect to the server.');
+        } finally {
+            verifyBtn.disabled = false;
+            verifyBtn.innerText = 'Verify & Login';
+        }
+    }
+
+    function resetTrainerAuth() {
+        document.getElementById('trainerOtpArea').classList.add('d-none');
+        document.getElementById('trainerCredentialsArea').classList.remove('d-none');
+        document.getElementById('otpCode').value = '';
     }
 
     function socialLogin(provider) {
