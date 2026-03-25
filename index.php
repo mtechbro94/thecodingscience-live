@@ -112,6 +112,14 @@ switch ($path) {
         require 'views/trainer_dashboard.php';
         break;
 
+    case 'trainer-manage-course':
+        require 'views/trainer_course_manage.php';
+        break;
+
+    case 'trainer-actions':
+        require 'views/trainer_actions.php';
+        break;
+
     case 'trainer-blogs':
         require 'views/trainer_blogs.php';
         break;

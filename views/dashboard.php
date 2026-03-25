@@ -158,14 +158,26 @@ require_once 'includes/header.php';
                                             <?php endif; ?>
                                             <div>
                                                 <h5 class="card-title mb-1"><?php echo $enrollment['course_name']; ?></h5>
-                                                <?php if ($enrollment['status'] === 'completed'): ?>
-                                                    <span class="badge bg-success">Active</span>
-                                                <?php elseif ($enrollment['status'] === 'pending'): ?>
-                                                    <span class="badge bg-warning text-dark">Payment Pending</span>
-                                                <?php else: ?>
-                                                    <span
-                                                        class="badge bg-secondary"><?php echo ucfirst($enrollment['status']); ?></span>
-                                                <?php endif; ?>
+                                                <div class="mb-1">
+                                                    <?php if ($enrollment['status'] === 'completed'): ?>
+                                                        <span class="badge bg-success">Active</span>
+                                                        <span class="badge bg-light text-dark border ms-1 small">
+                                                            <i class="fas fa-clock text-primary me-1"></i>
+                                                            <?php
+                                                            // Fetch course timing if not already in result
+                                                            $stmt_time = $pdo->prepare("SELECT batch_timing FROM courses WHERE id = ?");
+                                                            $stmt_time->execute([$enrollment['course_id']]);
+                                                            $course_data = $stmt_time->fetch();
+                                                            echo htmlspecialchars($course_data['batch_timing'] ?: 'Full Access');
+                                                            ?>
+                                                        </span>
+                                                    <?php elseif ($enrollment['status'] === 'pending'): ?>
+                                                        <span class="badge bg-warning text-dark">Payment Pending</span>
+                                                    <?php else: ?>
+                                                        <span
+                                                            class="badge bg-secondary"><?php echo ucfirst($enrollment['status']); ?></span>
+                                                    <?php endif; ?>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -174,9 +186,15 @@ require_once 'includes/header.php';
                                                 <div class="progress-bar bg-success" role="progressbar" style="width: 100%"></div>
                                             </div>
                                             <a href="/course-content/<?php echo $enrollment['course_id']; ?>"
-                                                class="btn btn-primary btn-sm w-100 shadow-sm fw-bold">
+                                                class="btn btn-primary btn-sm w-100 shadow-sm fw-bold mb-2">
                                                 <i class="fas fa-graduation-cap me-1"></i> Go to Course Dashboard
                                             </a>
+                                            <?php if ($course_data['live_link']): ?>
+                                                <a href="<?php echo $course_data['live_link']; ?>" target="_blank"
+                                                    class="btn btn-success btn-sm w-100 shadow-sm fw-bold">
+                                                    <i class="fas fa-video me-1"></i> Join Live Class Now
+                                                </a>
+                                            <?php endif; ?>
                                         <?php elseif ($enrollment['status'] === 'pending'): ?>
                                             <div class="alert alert-light border border-warning small py-2 mb-3">
                                                 <i class="fas fa-clock text-warning"></i>

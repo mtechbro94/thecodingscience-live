@@ -102,6 +102,17 @@ require_once 'includes/header.php';
                     </div>
                 <?php endif; ?>
 
+                <?php
+                // Fetch stats for the trainer
+                $stmt = $pdo->prepare("SELECT COUNT(*) FROM courses WHERE trainer_id = ?");
+                $stmt->execute([$user['id']]);
+                $course_count = $stmt->fetchColumn();
+
+                $stmt = $pdo->prepare("SELECT COUNT(e.id) FROM enrollments e JOIN courses c ON e.course_id = c.id WHERE c.trainer_id = ? AND e.status = 'completed'");
+                $stmt->execute([$user['id']]);
+                $student_count = $stmt->fetchColumn();
+                ?>
+
                 <!-- Stats Overview -->
                 <div class="row mb-4">
                     <div class="col-md-4 mb-3">
@@ -110,7 +121,7 @@ require_once 'includes/header.php';
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
                                         <h6 class="card-title mb-0">My Courses</h6>
-                                        <h2 class="mt-2 mb-0">0</h2>
+                                        <h2 class="mt-2 mb-0"><?php echo $course_count; ?></h2>
                                     </div>
                                     <i class="fas fa-chalkboard fa-3x opacity-50"></i>
                                 </div>
@@ -123,7 +134,7 @@ require_once 'includes/header.php';
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
                                         <h6 class="card-title mb-0">Active Students</h6>
-                                        <h2 class="mt-2 mb-0">0</h2>
+                                        <h2 class="mt-2 mb-0"><?php echo $student_count; ?></h2>
                                     </div>
                                     <i class="fas fa-users fa-3x opacity-50"></i>
                                 </div>
@@ -145,16 +156,77 @@ require_once 'includes/header.php';
                     </div>
                 </div>
 
-                <!-- Recent Messages or Tasks -->
+                <!-- My Courses Section -->
                 <div class="card shadow-sm border-0 mt-4">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0">Upcoming Tasks</h5>
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                        <h5 class="mb-0 fw-bold"><i class="fas fa-chalkboard-teacher me-2 text-success"></i> My Assigned Courses</h5>
                     </div>
-                    <div class="card-body p-5 text-center">
-                        <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
-                        <h5>No tasks for now</h5>
-                        <p class="text-muted">When you are assigned to courses, your management panel will appear here.
-                        </p>
+                    <div class="card-body p-0">
+                        <?php
+                        // Fetch courses assigned to this trainer
+                        $stmt = $pdo->prepare("SELECT * FROM courses WHERE trainer_id = ? ORDER BY created_at DESC");
+                        $stmt->execute([$user['id']]);
+                        $trainer_courses = $stmt->fetchAll();
+
+                        if (empty($trainer_courses)):
+                        ?>
+                            <div class="text-center py-5">
+                                <i class="fas fa-book-open fa-3x text-muted opacity-25 mb-3"></i>
+                                <p class="text-muted">You are not currently assigned to any courses.</p>
+                            </div>
+                        <?php else: ?>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th class="ps-4">Course Details</th>
+                                            <th>Batch Timing</th>
+                                            <th>Status</th>
+                                            <th class="text-end pe-4">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($trainer_courses as $course): ?>
+                                            <tr>
+                                                <td class="ps-4">
+                                                    <div class="d-flex align-items-center">
+                                                        <?php if ($course['image']): ?>
+                                                            <img src="<?php echo get_image_url($course['image']); ?>" alt="" class="rounded me-3" style="width: 45px; height: 45px; object-fit: cover;">
+                                                        <?php else: ?>
+                                                            <div class="bg-success-subtle text-success p-2 rounded me-3">
+                                                                <i class="fas fa-code"></i>
+                                                            </div>
+                                                        <?php endif; ?>
+                                                        <div>
+                                                            <div class="fw-bold"><?php echo htmlspecialchars($course['name']); ?></div>
+                                                            <small class="text-muted"><?php echo htmlspecialchars($course['level']); ?></small>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-light text-dark border">
+                                                        <i class="fas fa-clock text-primary me-1"></i>
+                                                        <?php echo htmlspecialchars($course['batch_timing'] ?: 'Not Set'); ?>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <?php if ($course['live_link']): ?>
+                                                        <span class="badge bg-success-subtle text-success">Link Set</span>
+                                                    <?php else: ?>
+                                                        <span class="badge bg-warning-subtle text-warning">No Link</span>
+                                                    <?php endif; ?>
+                                                </td>
+                                                <td class="text-end pe-4">
+                                                    <a href="/trainer-manage-course/<?php echo $course['id']; ?>" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm">
+                                                        <i class="fas fa-cog me-1"></i> Manage Class
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
