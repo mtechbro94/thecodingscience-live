@@ -27,8 +27,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = "Password is required";
 
     if (empty($errors)) {
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
-        $stmt->execute([$email]);
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ? AND role = ?");
+        $stmt->execute([$email, $selected_role]);
         $user = $stmt->fetch();
 
         if ($user && password_verify($password, $user['password_hash'])) {
@@ -153,7 +153,7 @@ require_once 'includes/header.php';
                                         <p>Sign in or create your account seamlessly</p>
                                     </div>
 
-                                    <form id="loginForm" method="GET">
+                                    <div class="login-options-wrapper">
                                         <?php
                                         $role_param = $_GET['role'] ?? 'student';
                                         if (!in_array($role_param, ['student', 'trainer']))
@@ -214,16 +214,17 @@ require_once 'includes/header.php';
                                         <div id="trainerAuth" class="auth-section d-none">
                                             <div class="trainer-login-form p-3 border rounded-4 bg-light mb-3">
                                                 <form method="POST" action="">
+                                                    <!-- CSRF or hidden fields if any -->
                                                     <input type="hidden" name="login_role" value="trainer">
                                                     <div class="mb-3">
                                                         <label class="form-label small fw-bold">Email Address</label>
                                                         <input type="email" class="form-control" name="email"
-                                                            placeholder="trainer@example.com">
+                                                            placeholder="trainer@example.com" required>
                                                     </div>
                                                     <div class="mb-3">
                                                         <label class="form-label small fw-bold">Password</label>
                                                         <input type="password" class="form-control" name="password"
-                                                            placeholder="••••••••">
+                                                            placeholder="••••••••" required>
                                                     </div>
                                                     <button type="submit" class="btn btn-primary w-100 fw-bold py-2"
                                                         style="border-radius: 10px;">
@@ -236,7 +237,7 @@ require_once 'includes/header.php';
                                                 <span class="text-muted small">OR</span>
                                             </div>
 
-                                            <button type="button" onclick="socialLogin('github')" class="github-btn w-100">
+                                            <button type="button" onclick="socialLogin('github')" class="github-btn w-100 p-0 border-0 bg-transparent">
                                                 <div class="github-btn-inner btn btn-dark w-100 py-2 d-flex align-items-center justify-content-center gap-2"
                                                     style="border-radius: 10px;">
                                                     <i class="fab fa-github fa-lg"></i>
@@ -244,10 +245,7 @@ require_once 'includes/header.php';
                                                 </div>
                                             </button>
                                         </div>
-                                    </form>
-
-                                    <!-- Added separate form for JS-based social login to avoid nesting -->
-                                    <form id="socialLoginForm" style="display:none;"></form>
+                                    </div>
 
                                     <!-- Terms -->
                                     <p class="login-terms">
