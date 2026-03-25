@@ -215,20 +215,22 @@ require_once __DIR__ . '/functions.php';
                             </a>
                         </li>
                     <?php endif; ?>
+                    
+                    <!-- Responsive Search Form -->
+                    <li class="nav-item d-lg-flex align-items-center ms-lg-3 my-3 my-lg-0">
+                        <form action="/index.php" method="GET" class="d-flex w-100">
+                            <input type="hidden" name="_route_" value="search">
+                            <div class="input-group input-group-sm w-100" style="max-width: 250px;">
+                                <input type="text" name="q" class="form-control border-end-0 border-primary-subtle" placeholder="Search..." aria-label="Search" style="border-radius: 20px 0 0 20px; min-width: 130px;" required>
+                                <button class="btn btn-outline-primary border-start-0" type="submit" style="border-radius: 0 20px 20px 0;">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </li>
                 </ul>
                 
-                <!-- Search Form -->
-                <form action="/index.php" method="GET" class="d-flex mx-lg-4 my-2 my-lg-0">
-                    <input type="hidden" name="_route_" value="search">
-                    <div class="input-group input-group-sm">
-                        <input type="text" name="q" class="form-control border-end-0 border-primary-subtle" placeholder="Search courses..." aria-label="Search" style="border-radius: 20px 0 0 20px; width: 150px;" required>
-                        <button class="btn btn-outline-primary border-start-0" type="submit" style="border-radius: 0 20px 20px 0;">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                </form>
-
-                <div class="navbar-social">
+                <div class="navbar-social d-flex align-items-center gap-2 mt-3 mt-lg-0 ms-lg-3 justify-content-center justify-content-lg-start">
                     <?php if (get_setting('facebook_url')): ?>
                         <a class="social-link facebook-link" href="<?php echo get_setting('facebook_url'); ?>"
                             title="Facebook" target="_blank" rel="noopener noreferrer">
