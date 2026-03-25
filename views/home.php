@@ -313,40 +313,126 @@ if (!empty($hero_bg)) {
 </section>
 <?php endif; ?>
 
-<!-- Student Success Stories (only show if stories exist) -->
+<!-- Student Success Stories (Carousel) -->
 <?php if (!empty($dynamic_stories)): ?>
-<section class="py-5">
+<section class="py-5 bg-light-subtle">
     <div class="container">
-        <h2 class="text-center mb-5">Student Success Stories</h2>
-        <div class="row">
-            <?php foreach ($dynamic_stories as $story): ?>
-                <div class="col-md-4 mb-4" data-aos="fade-up">
-                    <div class="card h-100 shadow-sm border-0 bg-light">
-                        <div class="card-body p-4">
-                            <div class="mb-3 text-warning">
-                                <?php for ($i = 0; $i < $story['rating']; $i++): ?>
-                                    <i class="fas fa-star"></i>
-                                <?php endfor; ?>
-                            </div>
-                            <p class="text-muted italic">"<?php echo htmlspecialchars($story['content']); ?>"</p>
-                            <div class="d-flex align-items-center mt-4">
-                                <div class="avatar <?php echo $story['avatar_bg']; ?> text-white rounded-circle d-flex align-items-center justify-content-center me-3"
-                                    style="width: 40px; height: 40px;">
-                                    <?php echo strtoupper(substr($story['name'], 0, 1)); ?>
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="fw-bold">Student Success Stories</h2>
+            <p class="text-muted">Hear from our students who transformed their careers with us.</p>
+        </div>
+        
+        <div id="successCarousel" class="carousel slide testimonial-carousel" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                <?php foreach (array_chunk($dynamic_stories, 3) as $index => $story_chunk): ?>
+                    <div class="carousel-item <?php echo $index === 0 ? 'active' : ''; ?>">
+                        <div class="row g-4">
+                            <?php foreach ($story_chunk as $story): ?>
+                                <div class="col-md-4">
+                                    <div class="card h-100 shadow-sm border-0 testimonial-card hover-lift">
+                                        <div class="card-body p-4">
+                                            <div class="mb-3 text-warning">
+                                                <?php for ($i = 0; $i < ($story['rating'] ?? 5); $i++): ?>
+                                                    <i class="fas fa-star"></i>
+                                                <?php endfor; ?>
+                                            </div>
+                                            <p class="card-text mb-4 italic text-secondary">"<?php echo htmlspecialchars($story['content']); ?>"</p>
+                                            <div class="d-flex align-items-center mt-auto">
+                                                <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 48px; height: 48px; font-weight: bold;">
+                                                    <?php echo strtoupper(substr($story['name'], 0, 1)); ?>
+                                                </div>
+                                                <div>
+                                                    <h6 class="mb-0 fw-bold"><?php echo htmlspecialchars($story['name']); ?></h6>
+                                                    <small class="text-primary"><?php echo htmlspecialchars($story['title']); ?></small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h6 class="mb-0"><?php echo htmlspecialchars($story['name']); ?></h6>
-                                    <small class="text-muted"><?php echo htmlspecialchars($story['title']); ?></small>
-                                </div>
-                            </div>
+                            <?php endforeach; ?>
                         </div>
                     </div>
-                </div>
-            <?php endforeach; ?>
+                <?php endforeach; ?>
+            </div>
+            
+            <!-- Carousel Controls -->
+            <div class="carousel-controls mt-5 d-flex justify-content-center gap-3">
+                <button class="btn btn-outline-primary rounded-circle" type="button" data-bs-target="#successCarousel" data-bs-slide="prev" style="width: 45px; height: 45px;">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="btn btn-outline-primary rounded-circle" type="button" data-bs-target="#successCarousel" data-bs-slide="next" style="width: 45px; height: 45px;">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
         </div>
     </div>
 </section>
 <?php endif; ?>
+
+<!-- FAQ Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="text-center mb-5" data-aos="fade-up">
+                    <h2 class="fw-bold">Frequently Asked Questions</h2>
+                    <p class="text-muted">Have questions? We're here to help you understand our programs better.</p>
+                </div>
+                
+                <div class="accordion accordion-flush shadow-sm rounded-4 overflow-hidden border" id="faqAccordion" data-aos="fade-up">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                How do I enroll in a course?
+                            </button>
+                        </h2>
+                        <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body text-secondary">
+                                Enrolling is easy! Simply browse our courses, select the one you're interested in, and click the "Enroll Now" button. You'll be guided through the payment process via Razorpay.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                Do I get a certificate after completion?
+                            </button>
+                        </h2>
+                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body text-secondary">
+                                Yes! Upon successful completion of all course modules and assignments, you will receive a verified certificate from The Coding Science that you can share on LinkedIn or with employers.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                Are the courses live or recorded?
+                            </button>
+                        </h2>
+                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body text-secondary">
+                                Most of our flagship programs include a mix of pre-recorded high-quality video lessons and weekly live doubt-clearing sessions with industrial experts.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                Is there placement assistance provided?
+                            </button>
+                        </h2>
+                        <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body text-secondary">
+                                Absolutely. We provide resume reviews, mock interviews, and refer our top-performing students to our network of partner companies for internship and job opportunities.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 <!-- CTA Section -->
 <section class="py-5 bg-primary position-relative overflow-hidden">

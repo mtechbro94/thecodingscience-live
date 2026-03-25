@@ -40,6 +40,12 @@ $rating_data = $stmt->fetch();
 $avg_rating = $rating_data['avg_rating'] ? number_format($rating_data['avg_rating'], 1) : 0;
 $total_reviews = $rating_data['total_reviews'];
 
+// SEO Meta Tags
+$og_title = $course['name'] . " - Professional Training Course";
+$og_description = $course['summary'] ?: substr(strip_tags($course['description']), 0, 160);
+$og_image = get_image_url($course['image']);
+$og_type = 'product';
+
 require_once 'includes/header.php';
 ?>
 

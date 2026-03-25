@@ -50,7 +50,7 @@ require_once __DIR__ . '/functions.php';
     <meta property="og:type" content="<?php echo isset($og_type) ? $og_type : 'website'; ?>">
     <meta property="og:url" content="<?php echo isset($og_url) ? $og_url : SITE_URL . $_SERVER['REQUEST_URI']; ?>">
     <meta property="og:title"
-        content="<?php echo isset($og_title) ? htmlspecialchars($og_title) : (isset($page_title) ? $page_title : get_setting('site_name', SITE_NAME)); ?>">
+        content="<?php echo isset($og_title) ? htmlspecialchars($og_title) : (isset($page_title) ? $page_title . ' - ' . get_setting('site_name', SITE_NAME) : get_setting('site_name', SITE_NAME)); ?>">
     <meta property="og:description"
         content="<?php echo isset($og_description) ? htmlspecialchars($og_description) : 'Transform your career with specialized industry-led training in Web Development, Python, and AI.'; ?>">
     <meta property="og:image" content="<?php
@@ -216,7 +216,18 @@ require_once __DIR__ . '/functions.php';
                         </li>
                     <?php endif; ?>
                 </ul>
-                <div class="navbar-social ms-lg-4">
+                
+                <!-- Search Form -->
+                <form action="/search" method="GET" class="d-flex mx-lg-4 my-2 my-lg-0">
+                    <div class="input-group input-group-sm">
+                        <input type="text" name="q" class="form-control border-end-0 border-primary-subtle" placeholder="Search courses..." aria-label="Search" style="border-radius: 20px 0 0 20px; width: 150px;">
+                        <button class="btn btn-outline-primary border-start-0" type="submit" style="border-radius: 0 20px 20px 0;">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+
+                <div class="navbar-social">
                     <?php if (get_setting('facebook_url')): ?>
                         <a class="social-link facebook-link" href="<?php echo get_setting('facebook_url'); ?>"
                             title="Facebook" target="_blank" rel="noopener noreferrer">

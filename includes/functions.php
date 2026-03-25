@@ -476,3 +476,31 @@ function markdown_to_html($markdown)
 
     return $html;
 }
+
+/**
+ * Search across courses and blogs
+ */
+function search_content($query) {
+    global $pdo;
+    $results = [];
+    $search_term = "%$query%";
+
+    // Search Courses
+    $stmt = $pdo->prepare("SELECT 'course' as type, id, name as title, summary as content, image FROM courses WHERE name LIKE ? OR summary LIKE ? OR description LIKE ?");
+    $stmt->execute([$search_term, $search_term, $search_term]);
+    $results = array_merge($results, $stmt->fetchAll());
+
+    // Search Blogs
+    $stmt = $pdo->prepare("SELECT 'blog' as type, id, title, content, summary as summary, image FROM blogs WHERE title LIKE ? OR content LIKE ? OR summary LIKE ? AND is_published = 1");
+    $stmt->execute([$search_term, $search_term, $search_term]);
+    $blog_results = $stmt->fetchAll();
+    
+    // Ensure blog content matches search format
+    foreach($blog_results as &$blog) {
+        $blog['type'] = 'blog';
+    }
+    
+    $results = array_merge($results, $blog_results);
+
+    return $results;
+}

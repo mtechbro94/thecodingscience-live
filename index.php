@@ -71,6 +71,10 @@ switch ($path) {
         redirect('/login');
         break;
 
+    case 'search':
+        require 'views/search.php';
+        break;
+
     case 'logout':
         require 'views/logout.php';
         break;
