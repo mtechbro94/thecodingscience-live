@@ -412,7 +412,7 @@ if (!empty($hero_bg)) {
                         </h2>
                         <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                             <div class="accordion-body text-secondary">
-                                Most of our flagship programs include a mix of pre-recorded high-quality video lessons and weekly live doubt-clearing sessions with industrial experts.
+                                Currently, all our flagship programs are conducted through interactive <strong>Live Sessions</strong> with industrial experts, allowing for real-time engagement and doubt clearing.
                             </div>
                         </div>
                     </div>

@@ -196,9 +196,9 @@ require_once 'includes/header.php';
                             <h6><strong>Course Includes:</strong></h6>
                             <ul class="list-unstyled">
                                 <li><i class="fas fa-check text-success me-2"></i>
-                                    <?php echo $course['duration']; ?> of training
+                                    <?php echo $course['duration']; ?> of Live training
                                 </li>
-                                <li><i class="fas fa-check text-success me-2"></i> Live sessions</li>
+                                <li><i class="fas fa-check text-success me-2"></i> 100% Live sessions</li>
                                 <li><i class="fas fa-check text-success me-2"></i> Assignments & Projects</li>
                                 <li><i class="fas fa-check text-success me-2"></i> Certificate</li>
                                 <li><i class="fas fa-check text-success me-2"></i> Community access</li>
