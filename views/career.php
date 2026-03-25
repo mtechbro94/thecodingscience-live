@@ -543,6 +543,55 @@ $apply_link = $career_config['apply_link'];
         opacity: 0.5;
     }
 
+    /* ===== DARK MODE OVERRIDES ===== */
+    [data-theme="dark"] .career-page-wrapper {
+        background-color: #0f172a;
+    }
+    [data-theme="dark"] .section-title h2,
+    [data-theme="dark"] .section-title span,
+    [data-theme="dark"] .attr-box h3,
+    [data-theme="dark"] .role-list li h4,
+    [data-theme="dark"] .domain-card h4,
+    [data-theme="dark"] .pos-card-header h3 {
+        color: #f1f5f9 !important;
+    }
+    [data-theme="dark"] .section-title p,
+    [data-theme="dark"] .role-list li p,
+    [data-theme="dark"] .pos-card-body,
+    [data-theme="dark"] .attr-box p {
+        color: #94a3b8 !important;
+    }
+    [data-theme="dark"] .bg-white-section,
+    [data-theme="dark"] .attributes-section {
+        background: #0f172a !important;
+    }
+    [data-theme="dark"] .role-list li,
+    [data-theme="dark"] .domain-card,
+    [data-theme="dark"] .pos-card,
+    [data-theme="dark"] .attr-box {
+        background: #1e293b !important;
+        border-color: #334155 !important;
+    }
+    [data-theme="dark"] .feature-pill {
+        background: #1e293b !important;
+        color: #e2e8f0 !important;
+        border-color: #334155 !important;
+    }
+    [data-theme="dark"] .pos-card-header {
+        background: rgba(102, 126, 234, 0.08) !important;
+        border-color: #334155 !important;
+    }
+    [data-theme="dark"] .pos-meta {
+        color: #94a3b8 !important;
+    }
+    [data-theme="dark"] .req-list li {
+        color: #cbd5e1 !important;
+    }
+    [data-theme="dark"] .empty-positions {
+        background: rgba(102, 126, 234, 0.08) !important;
+        border-color: rgba(102, 126, 234, 0.3) !important;
+    }
+
 </style>
 
 <div class="career-page-wrapper">
