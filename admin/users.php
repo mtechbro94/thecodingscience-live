@@ -30,6 +30,10 @@ if (isset($_GET['edit'])) {
 
         // Handle form submission
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
+                set_flash('danger', 'Invalid request.');
+                redirect('/admin/users');
+            }
             $name = sanitize($_POST['name'] ?? '');
             $email = sanitize($_POST['email'] ?? '');
             $role = sanitize($_POST['role'] ?? 'student');
@@ -59,6 +63,7 @@ if (isset($_GET['edit'])) {
         <?php echo get_flash(); ?>
 
         <form method="POST">
+            <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
             <div class="row">
                 <div class="col-md-8">
                     <div class="card shadow-sm mb-4">
@@ -101,7 +106,6 @@ if (isset($_GET['edit'])) {
         </form>
         <?php
         require_once __DIR__ . '/includes/footer.php';
-        include_once __DIR__ . '/includes/footer.php';
         exit;
     }
 }

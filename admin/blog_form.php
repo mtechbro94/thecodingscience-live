@@ -1,15 +1,14 @@
 <?php
 // admin/blog_form.php
 
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+if (defined('DEBUG') && DEBUG) {
+    ini_set('display_errors', 1);
+    error_reporting(E_ALL);
+}
 error_log("blog_form.php started - ID: " . ($_GET['id'] ?? 'new'));
 
 require_once dirname(__DIR__) . '/includes/db.php';
 require_once BASE_PATH . '/includes/functions.php';
-
-
-
 
 if (!is_admin()) {
     redirect('/');
@@ -36,76 +35,81 @@ if ($is_edit) {
 
 // Handle Form Submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Detect if post_max_size was exceeded (empty $_POST but content-length > 0)
-    if (empty($_POST) && isset($_SERVER['CONTENT_LENGTH']) && $_SERVER['CONTENT_LENGTH'] > 0) {
-        $post_max = ini_get('post_max_size');
-        $errors[] = "The total request size exceeds the server limit ($post_max). Please try with a smaller image.";
-        error_log("POST size exceeded post_max_size: " . $_SERVER['CONTENT_LENGTH']);
+    // Validate CSRF token
+    if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
+        $errors[] = 'Invalid request. Please try again.';
     } else {
-        error_log("Processing POST request");
-        $title = sanitize($_POST['title'] ?? '');
-    $slug = sanitize($_POST['slug'] ?? generate_slug($title));
-    $excerpt = sanitize($_POST['excerpt'] ?? '');
-    $content = $_POST['content'] ?? '';
-    $author = sanitize($_POST['author'] ?? $_SESSION['user_name']);
-    $author_id = $_SESSION['user_id'] ?? null;
-    $is_published = isset($_POST['is_published']) ? 1 : 0;
-    $date = date('Y-m-d');
-
-    // Validation
-    if (empty($title)) $errors[] = "Title is required";
-    if (empty($content)) $errors[] = "Content is required";
-
-    // Handle Image Upload
-    $image = $is_edit ? ($blog['image'] ?? null) : null;
-    
-    if (isset($_FILES['image']) && is_array($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-        $allowed = ['jpg', 'jpeg', 'png', 'webp'];
-        $filename = $_FILES['image']['name'];
-        $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-
-        if (in_array($ext, $allowed)) {
-            $new_filename = uniqid('blog_', true) . '.' . $ext;
-            $upload_dir = dirname(__DIR__) . '/assets/images/';
-            
-            if (!is_dir($upload_dir)) {
-                mkdir($upload_dir, 0755, true);
-            }
-            
-            if (!is_writable($upload_dir)) {
-                $errors[] = "Upload directory is not writable. Contact admin.";
-                error_log("Upload dir not writable: " . $upload_dir);
-            } elseif (move_uploaded_file($_FILES['image']['tmp_name'], $upload_dir . $new_filename)) {
-                $image = $new_filename;
-            } else {
-                $errors[] = "Failed to upload image.";
-                error_log("move_uploaded_file failed");
-            }
+        // Detect if post_max_size was exceeded (empty $_POST but content-length > 0)
+        if (empty($_POST) && isset($_SERVER['CONTENT_LENGTH']) && $_SERVER['CONTENT_LENGTH'] > 0) {
+            $post_max = ini_get('post_max_size');
+            $errors[] = "The total request size exceeds the server limit ($post_max). Please try with a smaller image.";
+            error_log("POST size exceeded post_max_size: " . $_SERVER['CONTENT_LENGTH']);
         } else {
-            $errors[] = "Invalid file type. Allowed: jpg, jpeg, png, webp";
-        }
-    } elseif (isset($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE && $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
-        $errors[] = "Image upload error code: " . $_FILES['image']['error'];
-    }
+            error_log("Processing POST request");
+            $title = sanitize($_POST['title'] ?? '');
+            $slug = sanitize($_POST['slug'] ?? generate_slug($title));
+            $excerpt = sanitize($_POST['excerpt'] ?? '');
+            $content = $_POST['content'] ?? '';
+            $author = sanitize($_POST['author'] ?? $_SESSION['user_name']);
+            $author_id = $_SESSION['user_id'] ?? null;
+            $is_published = isset($_POST['is_published']) ? 1 : 0;
+            $date = date('Y-m-d');
 
-    if (empty($errors)) {
-        try {
-            if ($is_edit) {
-                $sql = "UPDATE blogs SET title = ?, slug = ?, excerpt = ?, content = ?, image = ?, author = ?, author_id = ?, is_published = ? WHERE id = ?";
-                $stmt = $pdo->prepare($sql);
-                $stmt->execute([$title, $slug, $excerpt, $content, $image, $author, $author_id, $is_published, $blog_id]);
-                set_flash('success', 'Blog post updated successfully.');
-            } else {
-                $sql = "INSERT INTO blogs (title, slug, excerpt, content, image, author, author_id, date, is_published, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
-                $stmt = $pdo->prepare($sql);
-                $stmt->execute([$title, $slug, $excerpt, $content, $image, $author, $author_id, $date, $is_published]);
-                set_flash('success', 'Blog post created successfully.');
+            // Validation
+            if (empty($title)) $errors[] = "Title is required";
+            if (empty($content)) $errors[] = "Content is required";
+
+            // Handle Image Upload
+            $image = $is_edit ? ($blog['image'] ?? null) : null;
+
+            if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+                $allowed = ['jpg', 'jpeg', 'png', 'webp'];
+                $filename = $_FILES['image']['name'];
+                $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+
+                if (in_array($ext, $allowed)) {
+                    $new_filename = uniqid('blog_', true) . '.' . $ext;
+                    $upload_dir = dirname(__DIR__) . '/assets/images/';
+
+                    if (!is_dir($upload_dir)) {
+                        mkdir($upload_dir, 0755, true);
+                    }
+
+                    if (!is_writable($upload_dir)) {
+                        $errors[] = "Upload directory is not writable. Contact admin.";
+                        error_log("Upload dir not writable: " . $upload_dir);
+                    } elseif (move_uploaded_file($_FILES['image']['tmp_name'], $upload_dir . $new_filename)) {
+                        $image = $new_filename;
+                    } else {
+                        $errors[] = "Failed to upload image.";
+                        error_log("move_uploaded_file failed");
+                    }
+                } else {
+                    $errors[] = "Invalid file type. Allowed: jpg, jpeg, png, webp";
+                }
+            } elseif (isset($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE && $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
+                $errors[] = "Image upload error code: " . $_FILES['image']['error'];
             }
-            redirect('/admin/blogs');
-        } catch (PDOException $e) {
-            $errors[] = "Database Error: " . $e->getMessage();
+
+            if (empty($errors)) {
+                try {
+                    if ($is_edit) {
+                        $sql = "UPDATE blogs SET title = ?, slug = ?, excerpt = ?, content = ?, image = ?, author = ?, author_id = ?, is_published = ? WHERE id = ?";
+                        $stmt = $pdo->prepare($sql);
+                        $stmt->execute([$title, $slug, $excerpt, $content, $image, $author, $author_id, $is_published, $blog_id]);
+                        set_flash('success', 'Blog post updated successfully.');
+                    } else {
+                        $sql = "INSERT INTO blogs (title, slug, excerpt, content, image, author, author_id, date, is_published, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+                        $stmt = $pdo->prepare($sql);
+                        $stmt->execute([$title, $slug, $excerpt, $content, $image, $author, $author_id, $date, $is_published]);
+                        set_flash('success', 'Blog post created successfully.');
+                    }
+                    redirect('/admin/blogs');
+                } catch (PDOException $e) {
+                    $errors[] = "Database Error: " . $e->getMessage();
+                }
+            }
         }
-    }
     }
 }
 
@@ -170,6 +174,7 @@ if (isset($image) && !empty($image)): ?>
 <?php endif; ?>
 
 <form method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
     <input type="hidden" name="MAX_FILE_SIZE" value="10485760"> <!-- 10MB Limit hint for PHP -->
     <div class="row">
         <div class="col-md-8">
