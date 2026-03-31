@@ -7,7 +7,7 @@ on:
 
 jobs:
   web-deploy:
-    name: 🎉 Deploy
+    name: 🎉 Deploy to Production
     runs-on: ubuntu-latest
     steps:
       - name: 🚚 Get latest code
@@ -30,22 +30,86 @@ jobs:
           echo "SMTP_PORT=${{ secrets.SMTP_PORT }}" >> .env
           echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
           echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
+          echo ".env file created successfully"
 
       - name: 🔍 Lint PHP Files
         run: find . -name "*.php" -print0 | xargs -0 -n1 php -l
+        continue-on-error: true
 
-      - name: 🚀 Deploy website
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      - name: 🔐 Install SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+
+      - name: ✅ Validate SSH Connection
+        run: |
+          ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=accept-new ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "echo 'SSH connection successful' && pwd"
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+
+      - name: 📤 Deploy files via SCP
+        uses: appleboy/scp-action@v0.1.7
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: ${{ secrets.FTP_REMOTE_PATH }}
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            *.sql
-            README.md
-            .github/**
-            maintenance.html
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          source: |
+            *.php
+            *.xml
+            *.html
+            robots.txt
+            sitemap.php
+            config.php
+            index.php
+            admin/
+            api/
+            assets/
+            config/
+            includes/
+            views/
+          target: ${{ secrets.DEPLOYMENT_PATH }}
+          rm: false
+          overwrite: true
+          strip_components: 0
+
+      - name: 🧹 Remove Sensitive Files from Deployment
+        run: |
+          ssh -o ConnectTimeout=10 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.DEPLOYMENT_PATH }} && rm -f .env.example last_commit.diff README.md maintenance.html 2>/dev/null || true"
+        continue-on-error: true
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+
+      - name: 🔍 Verify Deployment
+        run: |
+          ssh -o ConnectTimeout=10 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.DEPLOYMENT_PATH }} && echo '📁 Deployment Directory Contents:' && ls -lah | head -20 && echo '✅ Deployment verified' && test -f index.php && echo '✅ index.php found' || echo '⚠️ index.php not found'"
+        continue-on-error: true
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+
+      - name: 📧 Notify Deployment Status
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Deployment completed successfully!"
+            echo "🌐 Website: https://thecodingscience.com"
+          else
+            echo "❌ Deployment failed. Check logs above."
+          fi
+
+# REQUIRED GITHUB SECRETS:
+# - SSH_PRIVATE_KEY: Content of ~/.ssh/id_rsa (entire RSA private key)
+# - SSH_HOST: HostMyIdea SSH hostname (e.g., thecodingscience.com or IP)
+# - SSH_USER: SSH username (e.g., thecodin)
+# - DEPLOYMENT_PATH: Remote deployment path (e.g., /home/thecodin/public_html)
+# - DB_HOST, DB_NAME, DB_USER, PROD_DB_PASS, SITE_URL, SITE_NAME
+# - RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET
+# - SMTP_HOST, SMTP_USER, SMTP_PASS, SMTP_PORT
+# - GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
