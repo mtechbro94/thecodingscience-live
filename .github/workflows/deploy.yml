@@ -32,7 +32,7 @@ jobs:
           echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
 
       - name: 🔍 Lint PHP Files
-        run: find . -name "*.php" -print0 | xargs -0 -n1 php -l | grep -v "No syntax errors detected" || true
+        run: find . -name "*.php" -print0 | xargs -0 -n1 php -l
 
       - name: 🚀 Deploy website
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
