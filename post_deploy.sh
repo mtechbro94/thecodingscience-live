@@ -6,7 +6,7 @@
 set -e  # Exit on error
 
 echo "=================================="
-echo "🚀 Post-Deployment Script Started"
+echo "Post-Deployment Script Started"
 echo "=================================="
 echo "Date: $(date)"
 echo ""
@@ -22,14 +22,38 @@ DEPLOY_PATH="/home/thecodin/public_html"
 DB_HOST="${DB_HOST:-localhost}"
 DB_USER="${DB_USER:-thecodin}"
 DB_NAME="${DB_NAME:-thecodin_db}"
+DB_PASS="${DB_PASS:-}"
 
-# Check if we're in the right directory
-if [ ! -f "$DEPLOY_PATH/config.php" ]; then
-    echo -e "${RED}❌ Error: config.php not found in $DEPLOY_PATH${NC}"
-    exit 1
+# Load .env values (fallback) if not set
+function env_get() {
+  local key="$1"
+  local value
+  value=$(grep -E "^$key=" .env 2>/dev/null | tail -n1 | cut -d'=' -f2-)
+  echo "${value//\"/}"  # strip quotes
+}
+
+if [ -f ".env" ]; then
+  DB_HOST="${DB_HOST:-$(env_get DB_HOST)}"
+  DB_USER="${DB_USER:-$(env_get DB_USER)}"
+  DB_NAME="${DB_NAME:-$(env_get DB_NAME)}"
+  DB_PASS="${DB_PASS:-$(env_get DB_PASS)}"
+  if [ -z "$DB_PASS" ]; then
+    DB_PASS="${DB_PASS:-$(env_get PROD_DB_PASS)}"
+  fi
 fi
 
-cd "$DEPLOY_PATH"
+# Update MYSQL_PASS_ARG to use --password flag explicitly
+MYSQL_PASS_ARG=""
+if [ -n "$DB_PASS" ]; then
+  MYSQL_PASS_ARG="--password=\"$DB_PASS\""
+fi
+
+# Add debugging output to confirm password loading
+if [ -z "$DB_PASS" ]; then
+  echo -e "${YELLOW}⚠️  Warning: DB_PASS is empty. Check .env file.${NC}"
+else
+  echo -e "${GREEN}✅ DB_PASS loaded successfully.${NC}"
+fi
 
 # ============================================
 # Step 1: Verify .env file exists
@@ -37,8 +61,13 @@ cd "$DEPLOY_PATH"
 echo ""
 echo -e "${YELLOW}Step 1/5: Verifying configuration...${NC}"
 
+# Check if we're in the right directory
+if [ -d "$DEPLOY_PATH" ]; then
+    cd "$DEPLOY_PATH"
+fi
+
 if [ ! -f ".env" ]; then
-    echo -e "${RED}❌ Error: .env file not found!${NC}"
+    echo -e "${RED}❌ Error: .env file not found in $(pwd)!${NC}"
     echo "   Please create .env file with database and mail configuration"
     exit 1
 fi
@@ -80,11 +109,11 @@ if [ ! -f "database/migrate_auth_refactor.sql" ]; then
     echo -e "${YELLOW}⚠️  Migration file not found (this is OK if already migrated)${NC}"
 else
     # Check if migration already applied by checking for gmail_id column
-    COLUMN_EXISTS=$(mysql -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" -N -e "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='users' AND COLUMN_NAME='gmail_id';" || echo "0")
+    COLUMN_EXISTS=$(mysql -h "$DB_HOST" -u "$DB_USER" "$DB_NAME" "$MYSQL_PASS_ARG" -N -e "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='users' AND COLUMN_NAME='gmail_id';" || echo "0")
     
     if [ "$COLUMN_EXISTS" -eq 0 ]; then
         echo "Running migration..."
-        mysql -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < database/migrate_auth_refactor.sql || {
+        mysql -h "$DB_HOST" -u "$DB_USER" "$DB_NAME" "$MYSQL_PASS_ARG" < database/migrate_auth_refactor.sql || {
             echo -e "${RED}❌ Database migration failed${NC}"
             echo "   Make sure your database credentials are correct in .env"
             exit 1
@@ -158,7 +187,7 @@ fi
 
 # Check 3: Database connectivity
 echo "  • Checking database..."
-mysql -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" -N -e "SELECT 1;" || {
+mysql -h "$DB_HOST" -u "$DB_USER" "$DB_NAME" "$MYSQL_PASS_ARG" -N -e "SELECT 1;" || {
     echo -e "    ${RED}❌ Database connection failed${NC}"
     HEALTH_CHECK_PASSED=false
 }
@@ -168,7 +197,7 @@ fi
 
 # Check 4: New auth tables exist
 echo "  • Checking new database tables..."
-TABLES_OK=$(mysql -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" -N -e "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='$DB_NAME' AND TABLE_NAME IN ('users', 'otp_tokens');" || echo "0")
+TABLES_OK=$(mysql -h "$DB_HOST" -u "$DB_USER" "$DB_NAME" "$MYSQL_PASS_ARG" -N -e "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='$DB_NAME' AND TABLE_NAME IN ('users', 'otp_tokens');" || echo "0")
 if [ "$TABLES_OK" -eq 2 ]; then
     echo -e "    ${GREEN}✓ Auth tables exist${NC}"
 else

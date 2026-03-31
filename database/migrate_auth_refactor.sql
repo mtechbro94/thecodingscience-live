@@ -18,7 +18,7 @@ CREATE INDEX idx_otp_code ON `users`(`otp_code`);
 -- Create OTP tokens table for tracking (optional backup)
 CREATE TABLE IF NOT EXISTS `otp_tokens` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `user_id` INT(11) NOT NULL,
+  `user_id` INT(11) DEFAULT NULL,
   `email` VARCHAR(120) NOT NULL,
   `otp_code` VARCHAR(6) NOT NULL,
   `purpose` ENUM('login', 'registration', 'password_reset') DEFAULT 'login',
@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS `otp_tokens` (
   `expires_at` DATETIME NOT NULL,
   `used_at` DATETIME DEFAULT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `email_purpose` (`email`, `purpose`),
   KEY `user_id` (`user_id`),
   KEY `email` (`email`),
   KEY `otp_code` (`otp_code`),

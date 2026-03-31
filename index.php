@@ -67,6 +67,16 @@ switch ($path) {
         require 'views/login.php';
         break;
 
+    case 'trainer_login':
+    case 'trainer-login':
+        require 'views/trainer_login.php';
+        break;
+
+    case 'student_login':
+    case 'student-login':
+        require 'views/student_login.php';
+        break;
+
     case 'register':
         redirect('/login');
         break;
