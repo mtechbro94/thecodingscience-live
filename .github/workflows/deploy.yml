@@ -1,4 +1,4 @@
-name: Deploy to HostMyIdea (Rsync)
+name: Deploy to HostMyIdea
 
 on:
   push:
@@ -7,13 +7,13 @@ on:
 
 jobs:
   web-deploy:
-    name: 🎉 Deploy to Production
+    name: Deploy to Production
     runs-on: ubuntu-latest
     steps:
-      - name: 🚚 Get latest code
+      - name: Get latest code
         uses: actions/checkout@v4
 
-      - name: 🔧 Create .env file
+      - name: Create .env file
         run: |
           echo "ENVIRONMENT=production" >> .env
           echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
@@ -32,11 +32,11 @@ jobs:
           echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
           echo ".env file created successfully"
 
-      - name: 🔍 Lint PHP Files
+      - name: Lint PHP Files
         run: find . -name "*.php" -print0 | xargs -0 -n1 php -l
         continue-on-error: true
 
-      - name: 🔐 Install SSH Key
+      - name: Install SSH Key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
@@ -45,41 +45,22 @@ jobs:
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
 
-      - name: ✅ Validate SSH Connection
+      - name: Validate SSH Connection
         run: |
           ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=accept-new ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "echo 'SSH connection successful' && pwd"
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_USER: ${{ secrets.SSH_USER }}
 
-      - name: � Install rsync
+      - name: Deploy files via SSH/Tar+SCP
         run: |
-          sudo apt-get update
-          sudo apt-get install -y rsync
-
-      - name: �📤 Deploy files via SSH/rsync
-        run: |
-          # Create deployment directory if it doesn't exist
-          ssh -o ConnectTimeout=10 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p ${{ secrets.DEPLOYMENT_PATH }}"
-          
-          # Deploy using rsync with exclusions
-          rsync -avz --delete \
-            --exclude='.git' \
-            --exclude='.github' \
-            --exclude='node_modules' \
-            --exclude='.gitignore' \
-            --exclude='*.sql' \
-            --exclude='README.md' \
-            --exclude='maintenance.html' \
-            --exclude='last_commit.diff' \
-            --exclude='.env.example' \
-            -e "ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no" \
-            ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOYMENT_PATH }}/
+          set -e
+          tar --exclude='.git' --exclude='.github' --exclude='node_modules' --exclude='.gitignore' --exclude='*.sql' --exclude='README.md' --exclude='maintenance.html' --exclude='last_commit.diff' --exclude='.env.example' -czf /tmp/deploy.tar.gz . && scp -o ConnectTimeout=10 -o StrictHostKeyChecking=no /tmp/deploy.tar.gz ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/tmp/ && ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p ${{ secrets.DEPLOYMENT_PATH }} && cd ${{ secrets.DEPLOYMENT_PATH }} && tar -xzf /tmp/deploy.tar.gz && rm /tmp/deploy.tar.gz && echo 'Deployment complete'"
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_USER: ${{ secrets.SSH_USER }}
 
-      - name: 🧹 Remove Sensitive Files from Deployment
+      - name: Remove Sensitive Files from Deployment
         run: |
           ssh -o ConnectTimeout=10 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.DEPLOYMENT_PATH }} && rm -f .env.example last_commit.diff README.md maintenance.html 2>/dev/null || true"
         continue-on-error: true
@@ -87,30 +68,27 @@ jobs:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_USER: ${{ secrets.SSH_USER }}
 
-      - name: 🔍 Verify Deployment
+      - name: Verify Deployment
         run: |
-          ssh -o ConnectTimeout=10 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.DEPLOYMENT_PATH }} && echo '📁 Deployment Directory Contents:' && ls -lah | head -20 && echo '✅ Deployment verified' && test -f index.php && echo '✅ index.php found' || echo '⚠️ index.php not found'"
+          ssh -o ConnectTimeout=10 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.DEPLOYMENT_PATH }} && echo 'Deployment Directory Contents:' && ls -lah | head -20 && test -f index.php && echo 'index.php found' || echo 'index.php not found'"
         continue-on-error: true
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_USER: ${{ secrets.SSH_USER }}
 
-      - name: 📧 Notify Deployment Status
+      - name: Notify Deployment Status
         if: always()
         run: |
           if [ "${{ job.status }}" == "success" ]; then
-            echo "✅ Deployment completed successfully!"
-            echo "🌐 Website: https://thecodingscience.com"
+            echo "SUCCESS: Deployment completed!"
+            echo "Website: https://thecodingscience.com"
           else
-            echo "❌ Deployment failed. Check logs above."
+            echo "FAILURE: Deployment failed. Check logs above."
           fi
 
 # REQUIRED GITHUB SECRETS:
-# - SSH_PRIVATE_KEY: Content of ~/.ssh/id_rsa (entire RSA private key)
-# - SSH_HOST: HostMyIdea SSH hostname (e.g., thecodingscience.com or IP)
-# - SSH_USER: SSH username (e.g., thecodin)
-# - DEPLOYMENT_PATH: Remote deployment path (e.g., /home/thecodin/public_html)
-# - DB_HOST, DB_NAME, DB_USER, PROD_DB_PASS, SITE_URL, SITE_NAME
-# - RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET
-# - SMTP_HOST, SMTP_USER, SMTP_PASS, SMTP_PORT
-# - GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
+# - SSH_PRIVATE_KEY: Content of ~/.ssh/id_rsa
+# - SSH_HOST: HostMyIdea SSH hostname
+# - SSH_USER: SSH username
+# - DEPLOYMENT_PATH: Remote deployment path
+# - All database, Razorpay, SMTP, and Google OAuth secrets
