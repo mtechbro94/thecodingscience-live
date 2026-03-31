@@ -28,8 +28,13 @@ DB_PASS="${DB_PASS:-}"
 function env_get() {
   local key="$1"
   local value
+  # Use grep to find the line, cut to get the value, then strip ONLY leading/trailing quotes if they wrap the value
   value=$(grep -E "^$key=" .env 2>/dev/null | tail -n1 | cut -d'=' -f2-)
-  echo "${value//\"/}"  # strip quotes
+  # Only remove surrounding quotes if both exist
+  if [[ ($value == \"*\" || $value == \'*\' ) ]]; then
+    value="${value:1:-1}"
+  fi
+  echo "$value"
 }
 
 if [ -f ".env" ]; then
@@ -42,10 +47,9 @@ if [ -f ".env" ]; then
   fi
 fi
 
-# Update MYSQL_PASS_ARG to use --password flag explicitly
-MYSQL_PASS_ARG=""
+# Prepare database connection
 if [ -n "$DB_PASS" ]; then
-  MYSQL_PASS_ARG="--password=\"$DB_PASS\""
+  export MYSQL_PWD="$DB_PASS"
 fi
 
 # Add debugging output to confirm password loading
@@ -109,11 +113,11 @@ if [ ! -f "database/migrate_auth_refactor.sql" ]; then
     echo -e "${YELLOW}⚠️  Migration file not found (this is OK if already migrated)${NC}"
 else
     # Check if migration already applied by checking for gmail_id column
-    COLUMN_EXISTS=$(mysql -h "$DB_HOST" -u "$DB_USER" "$DB_NAME" "$MYSQL_PASS_ARG" -N -e "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='users' AND COLUMN_NAME='gmail_id';" || echo "0")
+    COLUMN_EXISTS=$(mysql -h "$DB_HOST" -u "$DB_USER" "$DB_NAME" -N -e "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='users' AND COLUMN_NAME='gmail_id';" 2>/dev/null || echo "0")
     
     if [ "$COLUMN_EXISTS" -eq 0 ]; then
         echo "Running migration..."
-        mysql -h "$DB_HOST" -u "$DB_USER" "$DB_NAME" "$MYSQL_PASS_ARG" < database/migrate_auth_refactor.sql || {
+        mysql -h "$DB_HOST" -u "$DB_USER" "$DB_NAME" < database/migrate_auth_refactor.sql || {
             echo -e "${RED}❌ Database migration failed${NC}"
             echo "   Make sure your database credentials are correct in .env"
             exit 1
@@ -187,7 +191,7 @@ fi
 
 # Check 3: Database connectivity
 echo "  • Checking database..."
-mysql -h "$DB_HOST" -u "$DB_USER" "$DB_NAME" "$MYSQL_PASS_ARG" -N -e "SELECT 1;" || {
+mysql -h "$DB_HOST" -u "$DB_USER" "$DB_NAME" -N -e "SELECT 1;" || {
     echo -e "    ${RED}❌ Database connection failed${NC}"
     HEALTH_CHECK_PASSED=false
 }
@@ -197,7 +201,7 @@ fi
 
 # Check 4: New auth tables exist
 echo "  • Checking new database tables..."
-TABLES_OK=$(mysql -h "$DB_HOST" -u "$DB_USER" "$DB_NAME" "$MYSQL_PASS_ARG" -N -e "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='$DB_NAME' AND TABLE_NAME IN ('users', 'otp_tokens');" || echo "0")
+TABLES_OK=$(mysql -h "$DB_HOST" -u "$DB_USER" "$DB_NAME" -N -e "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='$DB_NAME' AND TABLE_NAME IN ('users', 'otp_tokens');" 2>/dev/null || echo "0")
 if [ "$TABLES_OK" -eq 2 ]; then
     echo -e "    ${GREEN}✓ Auth tables exist${NC}"
 else
