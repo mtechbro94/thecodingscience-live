@@ -52,31 +52,27 @@ jobs:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_USER: ${{ secrets.SSH_USER }}
 
-      - name: 📤 Deploy files via SCP
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
-          source: |
-            *.php
-            *.xml
-            *.html
-            robots.txt
-            sitemap.php
-            config.php
-            index.php
-            admin/
-            api/
-            assets/
-            config/
-            includes/
-            views/
-          target: ${{ secrets.DEPLOYMENT_PATH }}
-          rm: false
-          overwrite: true
-          strip_components: 0
+      - name: 📤 Deploy files via SSH/rsync
+        run: |
+          # Create deployment directory if it doesn't exist
+          ssh -o ConnectTimeout=10 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p ${{ secrets.DEPLOYMENT_PATH }}"
+          
+          # Deploy using rsync with exclusions
+          rsync -avz --delete \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='node_modules' \
+            --exclude='.gitignore' \
+            --exclude='*.sql' \
+            --exclude='README.md' \
+            --exclude='maintenance.html' \
+            --exclude='last_commit.diff' \
+            --exclude='.env.example' \
+            -e "ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no" \
+            ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.DEPLOYMENT_PATH }}/
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
 
       - name: 🧹 Remove Sensitive Files from Deployment
         run: |
