@@ -47,13 +47,13 @@ if (!empty($hero_bg)) {
 }
 ?>
 <section class="hero-section" style="<?php echo $hero_style; ?>">
-    <div class="hero-overlay" data-aos="fade-up">
-        <h1><?php echo get_setting('hero_title', 'School of Technology and AI Innovations'); ?></h1>
-        <p class="hero-subtitle">
+    <div class="hero-overlay" style="animation: fadeInDown 1s ease;">
+        <h1 class="gradient-text"><?php echo get_setting('hero_title', 'School of Technology and AI Innovations'); ?></h1>
+        <p class="hero-subtitle" style="animation: fadeInUp 1s ease 0.2s both;">
             <?php echo get_setting('hero_subtitle', 'Empowering the Youth of Jammu and Kashmir to lead the world in AI, Data Science and Emerging Technologies'); ?>
         </p>
 
-        <a href="/courses" class="btn btn-primary btn-lg mt-4 shadow">Start Learning Now</a>
+        <a href="/courses" class="btn btn-primary btn-lg mt-4 shadow-lg hover-lift">Start Learning Now</a>
     </div>
 </section>
 
@@ -127,18 +127,12 @@ if (!empty($hero_bg)) {
                 </ul>
             </div>
             <div class="col-lg-6" data-aos="fade-left">
-                <div class="card shadow-lg about-card">
-                    <div class="card-body p-4 p-lg-5">
-                        <h4 class="card-title about-card-title mb-3"><i class="fas fa-eye text-primary me-2"></i>Our
-                            Vision</h4>
-                        <p class="about-card-text">To empower individuals with cutting-edge technology skills and
-                            nurture the next generation of innovation leaders.</p>
-                        <hr class="my-4">
-                        <h4 class="card-title about-card-title mb-3"><i
-                                class="fas fa-bullseye text-primary me-2"></i>Our Mission</h4>
-                        <p class="about-card-text mb-0">Deliver comprehensive, industry-aligned training that transforms
-                            careers and creates opportunities in the tech industry.</p>
-                    </div>
+                <div class="premium-card p-4 p-lg-5 story-card">
+                    <h4 class="card-title about-card-title mb-4 text-primary"><i class="fas fa-eye me-2"></i>Our Vision</h4>
+                    <p class="about-card-text">To empower individuals with cutting-edge technology skills and nurture the next generation of innovation leaders.</p>
+                    <hr class="my-4 opacity-25">
+                    <h4 class="card-title about-card-title mb-4 text-primary"><i class="fas fa-bullseye me-2"></i>Our Mission</h4>
+                    <p class="about-card-text mb-0">Deliver comprehensive, industry-aligned training that transforms careers and creates opportunities in the tech industry.</p>
                 </div>
             </div>
         </div>
@@ -161,21 +155,17 @@ if (!empty($hero_bg)) {
                                 alt="<?php echo htmlspecialchars($course['name']); ?>" class="card-img-top"
                                 style="height: 200px; object-fit: cover;">
                             <div class="position-absolute top-0 end-0 m-3">
-                                <span
-                                    class="badge bg-primary rounded-pill shadow-sm px-3"><?php echo htmlspecialchars($course['level']); ?></span>
+                                <span class="badge bg-primary rounded-pill shadow-sm px-3"><?php echo htmlspecialchars($course['level']); ?></span>
                             </div>
                         </div>
                         <div class="card-body p-4">
-                            <h5 class="card-title fw-bold mb-2">
-                                <?php echo htmlspecialchars($course['name']); ?>
-                            </h5>
+                            <h5 class="card-title fw-bold mb-2"><?php echo htmlspecialchars($course['name']); ?></h5>
                             <p class="card-text text-muted small mb-4">
                                 <?php echo htmlspecialchars(substr($course['summary'], 0, 100)) . (strlen($course['summary']) > 100 ? '...' : ''); ?>
                             </p>
                             <div class="d-flex justify-content-between align-items-center mt-auto">
                                 <div class="course-price">
-                                    <span
-                                        class="text-primary fw-bold h5 mb-0">₹<?php echo number_format($course['price']); ?></span>
+                                    <span class="text-primary fw-bold h5 mb-0">₹<?php echo number_format($course['price']); ?></span>
                                 </div>
                                 <div class="course-duration small text-muted">
                                     <i class="far fa-clock me-1"></i>
@@ -184,8 +174,7 @@ if (!empty($hero_bg)) {
                             </div>
                         </div>
                         <div class="card-footer bg-white border-0 p-4 pt-0">
-                            <a href="/courses" class="btn btn-primary w-100 rounded-pill">View
-                                Details</a>
+                            <a href="/courses" class="btn btn-primary w-100 rounded-pill hover-glow">View Details</a>
                         </div>
                     </div>
                 </div>
@@ -448,15 +437,16 @@ if (!empty($hero_bg)) {
 </section>
 
 <style>
-    .course-card {
-        transition: all 0.3s ease;
-    }
-
-    .hover-lift:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 1rem 3rem rgba(0, 0, 0, .175) !important;
+    .premium-card {
+        transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
     
+    .gradient-text {
+        background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
     .feature-box {
         border-radius: 15px;
         border: 1px solid rgba(0, 0, 0, 0.05);

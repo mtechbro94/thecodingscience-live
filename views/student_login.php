@@ -17,7 +17,7 @@ require_once 'includes/header.php';
         <div class="row justify-content-center">
             <div class="col-md-6 col-lg-5">
                 
-                <div class="card shadow-lg border-0 rounded-4">
+                <div class="premium-card p-2" style="animation: fadeInUp 0.8s ease;">
                     <div class="card-body p-4">
                         <div class="text-center mb-5">
                             <h2 class="fw-bold mb-2">Student Login</h2>
@@ -36,9 +36,9 @@ require_once 'includes/header.php';
                             <span class="fw-bold">Continue with Google</span>
                         </button>
 
-                        <div class="alert alert-info border-0 rounded-3 mt-4" role="alert">
-                            <p class="mb-2"><i class="fas fa-lock me-2"></i> <strong>Secure & Easy</strong></p>
-                            <small>We use Google Sign-In to keep your account secure. You'll need a Google account to proceed.</small>
+                        <div class="premium-card p-3 mt-4" style="background: rgba(99, 102, 241, 0.05); border-color: rgba(99, 102, 241, 0.1);">
+                            <p class="mb-2 text-primary"><i class="fas fa-lock me-2"></i> <strong>Secure & Easy</strong></p>
+                            <small class="text-muted">We use Google Sign-In to keep your account secure. You'll need a Google account to proceed.</small>
                         </div>
 
                         <hr class="my-4">

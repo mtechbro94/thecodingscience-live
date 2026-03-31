@@ -18,7 +18,7 @@ require_once 'includes/header.php';
             <div class="col-md-6 col-lg-5">
                 
                 <!-- Step 1: Credentials -->
-                <div id="credentialsStep" class="card shadow-lg border-0 rounded-4">
+                <div id="credentialsStep" class="premium-card p-2" style="animation: fadeInUp 0.8s ease;">
                     <div class="card-body p-4">
                         <div class="text-center mb-4">
                             <h2 class="fw-bold text-primary mb-2">Trainer Login</h2>
@@ -63,7 +63,7 @@ require_once 'includes/header.php';
                 </div>
 
                 <!-- Step 2: OTP Verification (Hidden) -->
-                <div id="otpStep" class="card shadow-lg border-0 rounded-4 d-none">
+                <div id="otpStep" class="premium-card p-2 d-none" style="animation: fadeInUp 0.8s ease;">
                     <div class="card-body p-4">
                         <button type="button" class="btn btn-link text-primary p-0 mb-3" onclick="resetTrainerForm()">
                             <i class="fas fa-arrow-left me-2"></i>Back
@@ -109,11 +109,11 @@ require_once 'includes/header.php';
         </div>
 
         <!-- Info Box -->
-        <div class="row justify-content-center mt-5">
+        <div class="row justify-content-center mt-5" style="animation: fadeInUp 0.8s ease 0.2s both;">
             <div class="col-md-6 col-lg-5">
-                <div class="alert alert-info border-0 rounded-3" role="alert">
-                    <p class="mb-2"><i class="fas fa-shield-alt me-2 text-info"></i> <strong>Secure Login</strong></p>
-                    <small>Your account is protected by OTP verification. Never share your verification code with anyone.</small>
+                <div class="premium-card p-3" style="background: rgba(99, 102, 241, 0.05); border-color: rgba(99, 102, 241, 0.1);">
+                    <p class="mb-2 text-primary"><i class="fas fa-shield-alt me-2"></i> <strong>Secure Login</strong></p>
+                    <small class="text-muted">Your account is protected by OTP verification. Never share your verification code with anyone.</small>
                 </div>
             </div>
         </div>
