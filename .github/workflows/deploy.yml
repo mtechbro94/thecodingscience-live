@@ -1,4 +1,4 @@
-name: Deploy to HostMyIdea
+name: Deploy to HostMyIdea (Rsync)
 
 on:
   push:
