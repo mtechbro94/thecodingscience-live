@@ -55,14 +55,14 @@ jobs:
       - name: Deploy files via SSH/Tar+SCP
         run: |
           set -e
-          tar --exclude='.git' --exclude='.github' --exclude='node_modules' --exclude='.gitignore' --exclude='*.sql' --exclude='README.md' --exclude='maintenance.html' --exclude='last_commit.diff' --exclude='.env.example' -czf /tmp/deploy.tar.gz . && scp -o ConnectTimeout=10 -o StrictHostKeyChecking=no /tmp/deploy.tar.gz ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/tmp/ && ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p ${{ secrets.DEPLOYMENT_PATH }} && cd ${{ secrets.DEPLOYMENT_PATH }} && tar -xzf /tmp/deploy.tar.gz && rm /tmp/deploy.tar.gz && echo 'Deployment complete'"
+          tar --exclude='.git' --exclude='.github' --exclude='node_modules' --exclude='.gitignore' --exclude='*.sql' --exclude='*.md' --exclude='maintenance.html' --exclude='last_commit.diff' --exclude='.env.example' -czf /tmp/deploy.tar.gz . && scp -o ConnectTimeout=10 -o StrictHostKeyChecking=no /tmp/deploy.tar.gz ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/tmp/ && ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p ${{ secrets.DEPLOYMENT_PATH }} && cd ${{ secrets.DEPLOYMENT_PATH }} && tar -xzf /tmp/deploy.tar.gz && rm /tmp/deploy.tar.gz && echo 'Deployment complete'"
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_USER: ${{ secrets.SSH_USER }}
 
       - name: Remove Sensitive Files from Deployment
         run: |
-          ssh -o ConnectTimeout=10 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.DEPLOYMENT_PATH }} && rm -f .env.example last_commit.diff README.md maintenance.html 2>/dev/null || true"
+          ssh -o ConnectTimeout=10 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.DEPLOYMENT_PATH }} && rm -f .env.example last_commit.diff maintenance.html *.md 2>/dev/null || true && echo 'Cleanup complete'"
         continue-on-error: true
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
