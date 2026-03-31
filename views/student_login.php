@@ -64,7 +64,7 @@ require_once 'includes/header.php';
 
 <script>
 // Initialize Google Sign-In
-let googleClientId = '<?php echo htmlspecialchars(getenv('GOOGLE_CLIENT_ID') ?? ''); ?>';
+let googleClientId = '<?php echo htmlspecialchars(GOOGLE_CLIENT_ID); ?>';
 
 function startGoogleLogin() {
     if (!googleClientId) {

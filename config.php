@@ -62,6 +62,10 @@ define('SMTP_USER', getenv('SMTP_USER') ?: '');
 define('SMTP_PASS', getenv('SMTP_PASS') ?: '');
 define('SMTP_PORT', getenv('SMTP_PORT') ?: 465);
 
+// Google OAuth Configuration
+define('GOOGLE_CLIENT_ID', getenv('GOOGLE_CLIENT_ID') ?: '');
+define('GOOGLE_CLIENT_SECRET', getenv('GOOGLE_CLIENT_SECRET') ?: '');
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }

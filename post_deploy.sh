@@ -78,6 +78,14 @@ fi
 
 echo -e "${GREEN}✅ .env file found${NC}"
 
+# Check for Google Client ID
+G_CLIENT_ID=$(env_get GOOGLE_CLIENT_ID)
+if [ -z "$G_CLIENT_ID" ]; then
+    echo -e "${YELLOW}⚠️  Warning: GOOGLE_CLIENT_ID is missing from .env. Gmail Login will not work!${NC}"
+else
+    echo -e "${GREEN}✅ GOOGLE_CLIENT_ID configured.${NC}"
+fi
+
 # ============================================
 # Step 2: Set file permissions
 # ============================================
