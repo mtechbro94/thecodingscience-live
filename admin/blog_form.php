@@ -35,15 +35,15 @@ if ($is_edit) {
 
 // Handle Form Submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Validate CSRF token
-    if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
-        $errors[] = 'Invalid request. Please try again.';
+    // Detect if post_max_size was exceeded (empty $_POST but content-length > 0)
+    if (empty($_POST) && isset($_SERVER['CONTENT_LENGTH']) && $_SERVER['CONTENT_LENGTH'] > 0) {
+        $post_max = ini_get('post_max_size');
+        $errors[] = "The total request size exceeds the server limit ($post_max). Please try with a smaller image.";
+        error_log("POST size exceeded post_max_size: " . $_SERVER['CONTENT_LENGTH']);
     } else {
-        // Detect if post_max_size was exceeded (empty $_POST but content-length > 0)
-        if (empty($_POST) && isset($_SERVER['CONTENT_LENGTH']) && $_SERVER['CONTENT_LENGTH'] > 0) {
-            $post_max = ini_get('post_max_size');
-            $errors[] = "The total request size exceeds the server limit ($post_max). Please try with a smaller image.";
-            error_log("POST size exceeded post_max_size: " . $_SERVER['CONTENT_LENGTH']);
+        // Validate CSRF token
+        if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
+            $errors[] = 'Invalid request. Please try again.';
         } else {
             error_log("Processing POST request");
             $title = sanitize($_POST['title'] ?? '');

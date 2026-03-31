@@ -112,6 +112,11 @@ if (isset($_GET['edit'])) {
 
 // Handle Actions
 if (isset($_GET['action']) && isset($_GET['id'])) {
+    if (!validate_csrf_token($_GET['csrf_token'] ?? '')) {
+        set_flash('danger', 'Invalid or expired action link.');
+        redirect('/admin/users');
+    }
+
     $action = $_GET['action'];
     $user_id = (int) $_GET['id'];
 
@@ -155,9 +160,9 @@ require_once __DIR__ . '/includes/header.php';
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">User Management</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
-        <a href="/admin/users/create" class="btn btn-sm btn-primary">
+        <!-- <a href="/admin/users/create" class="btn btn-sm btn-primary">
             <i class="fas fa-plus"></i> Add User
-        </a>
+        </a> -->
     </div>
 </div>
 
@@ -229,7 +234,7 @@ require_once __DIR__ . '/includes/header.php';
                             <td>
                                 <div class="btn-group btn-group-sm">
                                     <?php if ($user['role'] === 'trainer' && !$user['is_approved']): ?>
-                                        <a href="/admin/users?action=approve_trainer&id=<?php echo $user['id']; ?>"
+                                        <a href="/admin/users?action=approve_trainer&id=<?php echo $user['id']; ?>&csrf_token=<?php echo generate_csrf_token(); ?>"
                                             class="btn btn-success" title="Approve Trainer">
                                             <i class="fas fa-check"></i>
                                         </a>
@@ -239,7 +244,7 @@ require_once __DIR__ . '/includes/header.php';
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <?php if ($user['id'] !== current_user()['id']): ?>
-                                        <a href="/admin/users?action=delete&id=<?php echo $user['id']; ?>"
+                                        <a href="/admin/users?action=delete&id=<?php echo $user['id']; ?>&csrf_token=<?php echo generate_csrf_token(); ?>"
                                             class="btn btn-outline-danger"
                                             onclick="return confirm('Are you sure you want to delete this user?');"
                                             title="Delete">
