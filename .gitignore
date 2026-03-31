@@ -1,40 +1,9 @@
-# Environment variables
+# Production Environment
 .env
 .env.local
 .env.*.local
 
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-*.egg-info/
-dist/
-build/
-*.egg
-
-# Virtual Environment
-.venv/
-venv/
-ENV/
-env/
-bin/
-lib/
-
-# Flask
-instance/
-.webassets-cache
-*.db
-*.sqlite
-*.sqlite3
-
-# Database backups
-*.db.backup
-*.sqlite.backup
-*.db.*
-
-# IDE
+# Development & IDE
 .vscode/
 .idea/
 *.swp
@@ -59,6 +28,28 @@ logs/
 *.temp
 *.bak
 *~
+last_commit.diff
+
+# Database backups
+*.db.backup
+*.sqlite.backup
+*.db.*
+
+# Uploaded user content (dynamically created)
+assets/uploads/
+
+# Cache and backup
+*.cache
+.cache/
+
+# Node/NPM (if using frontend build tools)
+node_modules/
+package-lock.json
+npm-debug.log
+
+# Composer (if using PHP dependencies)
+vendor/
+composer.lock
 
 # Testing
 .pytest_cache/
@@ -70,18 +61,7 @@ htmlcov/
 .dmypy.json
 dmypy.json
 
-# Secrets
-secrets/
-credentials.json
-
-# Windows Reserved
-nul
-
-# Uploaded images (user uploaded content)
-assets/images/bg*.jpg
-assets/images/bg*.png
-assets/images/hero-*
-assets/images/blog-*.png
-assets/images/blog-*.jpg
-assets/uploads/
-
+# Misc
+.tern-port
+*.pem
+*.key

@@ -1,12 +1,6 @@
 <?php
 // admin/blog_form.php
 
-if (defined('DEBUG') && DEBUG) {
-    ini_set('display_errors', 1);
-    error_reporting(E_ALL);
-}
-error_log("blog_form.php started - ID: " . ($_GET['id'] ?? 'new'));
-
 require_once dirname(__DIR__) . '/includes/db.php';
 require_once BASE_PATH . '/includes/functions.php';
 
@@ -166,11 +160,6 @@ require_once __DIR__ . '/includes/header.php';
     <div class="alert alert-danger">
         <ul class="mb-0"><?php foreach ($errors as $error): ?><li><?php echo $error; ?></li><?php endforeach; ?></ul>
     </div>
-<?php endif; 
-
-// DEBUG: Show image value being saved
-if (isset($image) && !empty($image)): ?>
-    <div class="alert alert-info">Image being saved: <?php echo htmlspecialchars($image); ?></div>
 <?php endif; ?>
 
 <form method="POST" enctype="multipart/form-data">
