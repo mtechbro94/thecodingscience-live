@@ -51,6 +51,15 @@ function is_trainer()
 }
 
 /**
+ * Check if current user is student
+ */
+function is_student()
+{
+    $user = current_user();
+    return $user && ($user['role'] === 'student');
+}
+
+/**
  * Redirect to a specific URL
  */
 function redirect($url)

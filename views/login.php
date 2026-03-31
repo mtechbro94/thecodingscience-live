@@ -234,18 +234,6 @@ require_once 'includes/header.php';
                                                         </button>
                                                     </form>
                                                 </div>
-
-                                                <div class="text-center my-3">
-                                                    <span class="text-muted small">OR</span>
-                                                </div>
-
-                                                <button type="button" onclick="socialLogin('github')" class="github-btn w-100 p-0 border-0 bg-transparent">
-                                                    <div class="github-btn-inner btn btn-dark w-100 py-2 d-flex align-items-center justify-content-center gap-2"
-                                                        style="border-radius: 10px;">
-                                                        <i class="fab fa-github fa-lg"></i>
-                                                        <span>Continue with GitHub</span>
-                                                    </div>
-                                                </button>
                                             </div>
 
                                             <!-- OTP Verification Area (Hidden) -->

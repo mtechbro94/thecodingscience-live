@@ -3,10 +3,10 @@
 require_once 'includes/SocialAuth.php';
 
 $provider = $match[1] ?? ''; // From router regex
-$allowed_providers = ['google', 'github'];
+$allowed_providers = ['google']; // Only Google OAuth for students
 
 if (!in_array($provider, $allowed_providers)) {
-    set_flash('danger', 'Invalid social provider.');
+    set_flash('danger', 'Invalid social provider. Only Google is supported for student login.');
     redirect('/login');
 }
 

@@ -7,6 +7,7 @@ class SocialAuth
 
     public function __construct()
     {
+        // Only Google OAuth for students
         $this->config = [
             'google' => [
                 'client_id' => getenv('GOOGLE_CLIENT_ID'),
@@ -15,14 +16,6 @@ class SocialAuth
                 'token_url' => 'https://oauth2.googleapis.com/token',
                 'user_info_url' => 'https://www.googleapis.com/oauth2/v3/userinfo',
                 'scope' => 'openid email profile'
-            ],
-            'github' => [
-                'client_id' => getenv('GITHUB_CLIENT_ID'),
-                'client_secret' => getenv('GITHUB_CLIENT_SECRET'),
-                'auth_url' => 'https://github.com/login/oauth/authorize',
-                'token_url' => 'https://github.com/login/oauth/access_token',
-                'user_info_url' => 'https://api.github.com/user',
-                'scope' => 'user:email'
             ]
         ];
     }
@@ -99,20 +92,7 @@ class SocialAuth
             ];
         }
 
-        if ($provider === 'github') {
-            // GitHub doesn't always return email in the main user object if it's private
-            $email = $data['email'] ?? null;
-            if (!$email) {
-                // Secondary call to fetch emails if needed (keeping it simple for now)
-            }
-            return [
-                'id' => $data['id'],
-                'name' => $data['name'] ?? $data['login'],
-                'email' => $email,
-                'avatar' => $data['avatar_url']
-            ];
-        }
-
+        // Only Google OAuth is supported for student authentication
         return $data;
     }
 }

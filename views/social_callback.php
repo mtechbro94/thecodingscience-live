@@ -1,14 +1,22 @@
 <?php
-// views/social_callback.php
+// views/social_callback.php - OAuth Callback Handler
+// Now only supports Google for student login
+
 require_once 'includes/SocialAuth.php';
 
 $provider = $match[1] ?? '';
 $code = $_GET['code'] ?? '';
 $state = $_GET['state'] ?? '';
 
+// Only Google is allowed
+if ($provider !== 'google') {
+    set_flash('danger', 'Invalid OAuth provider.');
+    redirect('/student_login');
+}
+
 if (empty($code) || $state !== ($_SESSION['oauth_state'] ?? '')) {
     set_flash('danger', 'Invalid authentication request.');
-    redirect('/login');
+    redirect('/student_login');
 }
 
 unset($_SESSION['oauth_state']);
@@ -20,99 +28,89 @@ $tokenData = $socialAuth->exchangeCode($provider, $code, $redirect_uri);
 $accessToken = $tokenData['access_token'] ?? null;
 
 if (!$accessToken) {
-    set_flash('danger', 'Failed to obtain access token.');
-    redirect('/login');
+    set_flash('danger', 'Failed to obtain access token from Google.');
+    redirect('/student_login');
 }
 
 $profile = $socialAuth->getUserInfo($provider, $accessToken);
 
 if (!$profile || empty($profile['email'])) {
-    set_flash('danger', 'Failed to retrieve user profile.');
-    redirect('/login');
+    set_flash('danger', 'Failed to retrieve your Google profile.');
+    redirect('/student_login');
 }
 
-// Get requested role
-$role = $_SESSION['oauth_role'] ?? 'student';
-unset($_SESSION['oauth_role']);
+try {
+    // Check if student exists by Gmail ID
+    $stmt = $pdo->prepare("SELECT id, name, profile_image, is_active FROM users WHERE gmail_id = ? AND role = 'student'");
+    $stmt->execute([$profile['sub'] ?? $profile['id']]);
+    $student = $stmt->fetch();
 
-// 1. Check if user exists by OAuth ID and Role
-$stmt = $pdo->prepare("SELECT * FROM users WHERE oauth_provider = ? AND oauth_id = ? AND role = ?");
-$stmt->execute([$provider, $profile['id'], $role]);
-$user = $stmt->fetch();
+    // If not found by Gmail ID, check by email
+    if (!$student) {
+        $stmt = $pdo->prepare("SELECT id, name, profile_image, is_active FROM users WHERE email = ? AND role = 'student'");
+        $stmt->execute([$profile['email']]);
+        $student = $stmt->fetch();
 
-// 2. If not found by OAuth, check by Email and Role
-if (!$user) {
-    if (empty($profile['email'])) {
-        set_flash('danger', 'Email not provided by ' . ucfirst($provider) . '.');
-        redirect('/login');
+        if ($student) {
+            // Link Gmail ID to existing student email account
+            $stmt = $pdo->prepare("UPDATE users SET gmail_id = ?, updated_at = NOW() WHERE id = ?");
+            $stmt->execute([$profile['sub'] ?? $profile['id'], $student['id']]);
+        }
     }
 
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ? AND role = ?");
-    $stmt->execute([$profile['email'], $role]);
-    $user = $stmt->fetch();
+    // If still not found, create new student account
+    if (!$student) {
+        $name = $profile['name'];
+        $email = $profile['email'];
+        $gmail_id = $profile['sub'] ?? $profile['id'];
+        
+        // Generate random password for Gmail-only students
+        $random_password = bin2hex(random_bytes(16));
+        $password_hash = password_hash($random_password, PASSWORD_DEFAULT);
 
-    if ($user) {
-        // Link social account to existing email/role record
-        $stmt = $pdo->prepare("UPDATE users SET oauth_provider = ?, oauth_id = ?, profile_image = COALESCE(profile_image, ?) WHERE id = ?");
-        $stmt->execute([$provider, $profile['id'], $profile['avatar'] ?? null, $user['id']]);
-    }
-}
+        $stmt = $pdo->prepare("
+            INSERT INTO users (email, gmail_id, password_hash, name, role, is_active, created_at, updated_at)
+            VALUES (?, ?, ?, ?, 'student', 1, NOW(), NOW())
+        ");
+        $stmt->execute([$email, $gmail_id, $password_hash, $name]);
 
-// 3. If still not found, create new user
-if (!$user) {
-    $name = $profile['name'];
-    $email = $profile['email'];
-    $oauth_id = $profile['id'];
-    $avatar = $profile['avatar'] ?? null;
+        $student_id = $pdo->lastInsertId();
 
-    // Students are approved immediately, trainers need approval
-    $is_approved = ($role === 'student') ? 1 : 0;
-
-    $sql = "INSERT INTO users (name, email, role, oauth_provider, oauth_id, profile_image, is_approved, created_at) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([$name, $email, $role, $provider, $oauth_id, $avatar, $is_approved]);
-
-    $user_id = $pdo->lastInsertId();
-
-    // Fetch the new user
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
-    $stmt->execute([$user_id]);
-    $user = $stmt->fetch();
-}
-
-// 4. Perform Login
-if ($user) {
-    if (empty($user['is_active']) && isset($user['is_active'])) {
-        set_flash('danger', 'Your account is deactivated.');
-        redirect('/login');
+        $stmt = $pdo->prepare("SELECT id, name, profile_image, is_active FROM users WHERE id = ?");
+        $stmt->execute([$student_id]);
+        $student = $stmt->fetch();
     }
 
-    if ($user['role'] === 'trainer' && empty($user['is_approved'])) {
-        set_flash('warning', 'Your trainer account is pending approval.');
-        redirect('/login');
-    }
+    if ($student) {
+        // Verify student is active
+        if ($student['is_active'] == 0) {
+            set_flash('danger', 'Your account has been deactivated. Please contact support.');
+            redirect('/student_login');
+        }
 
-    $_SESSION['user_id'] = $user['id'];
-    $_SESSION['user_name'] = $user['name'];
-    $_SESSION['user_role'] = $user['role'];
-    $_SESSION['user_email'] = $user['email'];
-    $_SESSION['user_profile_image'] = $user['profile_image'];
-    $_SESSION['is_approved'] = $user['is_approved'] ?? 1;
+        // Login student
+        $_SESSION['user_id'] = $student['id'];
+        $_SESSION['user_name'] = $student['name'];
+        $_SESSION['user_role'] = 'student';
+        $_SESSION['user_email'] = $profile['email'];
+        $_SESSION['user_profile_image'] = $student['profile_image'];
 
-    session_regenerate_id(true);
+        session_regenerate_id(true);
 
-    set_flash('success', 'Welcome back, ' . $user['name'] . '!');
-
-    if ($user['role'] === 'admin') {
-        redirect('/admin/dashboard');
-    } elseif ($user['role'] === 'trainer') {
-        redirect('/trainer-dashboard');
-    } else {
+        set_flash('success', 'Welcome back, ' . $student['name'] . '!');
         redirect('/dashboard');
+
+    } else {
+        set_flash('danger', 'Failed to create account. Please try again.');
+        redirect('/student_login');
     }
-} else {
-    set_flash('danger', 'Authentication failed.');
-    redirect('/login');
+
+} catch (Exception $e) {
+    error_log("Google OAuth Callback Error: " . $e->getMessage());
+    set_flash('danger', 'An error occurred during authentication. Please try again.');
+    redirect('/student_login');
+}
+?>
+
 }
 ?>
