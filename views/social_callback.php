@@ -40,10 +40,16 @@ if (!$profile || empty($profile['email'])) {
 }
 
 try {
+    $has_gmail_id = table_has_column('users', 'gmail_id');
+    $has_updated_at = table_has_column('users', 'updated_at');
+
     // Check if student exists by Gmail ID
-    $stmt = $pdo->prepare("SELECT id, name, profile_image, is_active FROM users WHERE gmail_id = ? AND role = 'student'");
-    $stmt->execute([$profile['sub'] ?? $profile['id']]);
-    $student = $stmt->fetch();
+    $student = false;
+    if ($has_gmail_id) {
+        $stmt = $pdo->prepare("SELECT id, name, profile_image, is_active FROM users WHERE gmail_id = ? AND role = 'student'");
+        $stmt->execute([$profile['sub'] ?? $profile['id']]);
+        $student = $stmt->fetch();
+    }
 
     // If not found by Gmail ID, check by email
     if (!$student) {
@@ -51,9 +57,14 @@ try {
         $stmt->execute([$profile['email']]);
         $student = $stmt->fetch();
 
-        if ($student) {
+        if ($student && $has_gmail_id) {
             // Link Gmail ID to existing student email account
-            $stmt = $pdo->prepare("UPDATE users SET gmail_id = ?, updated_at = NOW() WHERE id = ?");
+            $update_sql = "UPDATE users SET gmail_id = ?";
+            if ($has_updated_at) {
+                $update_sql .= ", updated_at = NOW()";
+            }
+            $update_sql .= " WHERE id = ?";
+            $stmt = $pdo->prepare($update_sql);
             $stmt->execute([$profile['sub'] ?? $profile['id'], $student['id']]);
         }
     }
@@ -68,11 +79,31 @@ try {
         $random_password = bin2hex(random_bytes(16));
         $password_hash = password_hash($random_password, PASSWORD_DEFAULT);
 
+        $columns = ['email'];
+        $placeholders = ['?'];
+        $values = [$email];
+
+        if ($has_gmail_id) {
+            $columns[] = 'gmail_id';
+            $placeholders[] = '?';
+            $values[] = $gmail_id;
+        }
+
+        $columns = array_merge($columns, ['password_hash', 'name', 'role', 'is_active', 'created_at']);
+        $placeholders = array_merge($placeholders, ['?', '?', "'student'", '1', 'NOW()']);
+        $values[] = $password_hash;
+        $values[] = $name;
+
+        if ($has_updated_at) {
+            $columns[] = 'updated_at';
+            $placeholders[] = 'NOW()';
+        }
+
         $stmt = $pdo->prepare("
-            INSERT INTO users (email, gmail_id, password_hash, name, role, is_active, created_at, updated_at)
-            VALUES (?, ?, ?, ?, 'student', 1, NOW(), NOW())
+            INSERT INTO users (" . implode(', ', $columns) . ")
+            VALUES (" . implode(', ', $placeholders) . ")
         ");
-        $stmt->execute([$email, $gmail_id, $password_hash, $name]);
+        $stmt->execute($values);
 
         $student_id = $pdo->lastInsertId();
 

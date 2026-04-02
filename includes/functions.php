@@ -122,6 +122,37 @@ function get_setting($key, $default = '')
 }
 
 /**
+ * Check whether a database table has a given column.
+ */
+function table_has_column($table, $column)
+{
+    static $column_cache = [];
+    global $pdo;
+
+    $cache_key = $table . '.' . $column;
+    if (array_key_exists($cache_key, $column_cache)) {
+        return $column_cache[$cache_key];
+    }
+
+    try {
+        $stmt = $pdo->prepare("
+            SELECT COUNT(*)
+            FROM INFORMATION_SCHEMA.COLUMNS
+            WHERE TABLE_SCHEMA = ?
+              AND TABLE_NAME = ?
+              AND COLUMN_NAME = ?
+        ");
+        $stmt->execute([DB_NAME, $table, $column]);
+        $column_cache[$cache_key] = ((int) $stmt->fetchColumn()) > 0;
+    } catch (PDOException $e) {
+        error_log("Schema inspection failed for {$cache_key}: " . $e->getMessage());
+        $column_cache[$cache_key] = false;
+    }
+
+    return $column_cache[$cache_key];
+}
+
+/**
  * Get the full URL for an image
  */
 function get_image_url($path, $type = 'common')
