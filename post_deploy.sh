@@ -116,25 +116,108 @@ echo "    User: $DB_USER"
 echo "    Name: $DB_NAME"
 echo "    Password: (passed via -p flag)" # Do not print actual password
 
-# Check if migration file exists
-if [ ! -f "database/migrate_auth_refactor.sql" ]; then
-    echo -e "${YELLOW}⚠️  Migration file not found (this is OK if already migrated)${NC}"
-else
-    # Check if migration already applied by checking for gmail_id column
-    COLUMN_EXISTS=$(mysql -h "$DB_HOST" -u "$DB_USER" "$DB_NAME" -N -e "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='users' AND COLUMN_NAME='gmail_id';" 2>/dev/null || echo "0")
-    
-    if [ "$COLUMN_EXISTS" -eq 0 ]; then
-        echo "Running migration..."
-        mysql -h "$DB_HOST" -u "$DB_USER" "$DB_NAME" < database/migrate_auth_refactor.sql || {
-            echo -e "${RED}❌ Database migration failed${NC}"
-            echo "   Make sure your database credentials are correct in .env"
-            exit 1
-        }
-        echo -e "${GREEN}✅ Database migration completed${NC}"
-    else
-        echo -e "${GREEN}✅ Migration already applied${NC}"
-    fi
+column_exists() {
+    local table_name="$1"
+    local column_name="$2"
+    mysql -h "$DB_HOST" -u "$DB_USER" "$DB_NAME" -N -B -e "
+        SELECT COUNT(*)
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = '$DB_NAME'
+          AND TABLE_NAME = '$table_name'
+          AND COLUMN_NAME = '$column_name';
+    " 2>/dev/null | tr -d '[:space:]'
+}
+
+index_exists() {
+    local table_name="$1"
+    local index_name="$2"
+    mysql -h "$DB_HOST" -u "$DB_USER" "$DB_NAME" -N -B -e "
+        SELECT COUNT(*)
+        FROM INFORMATION_SCHEMA.STATISTICS
+        WHERE TABLE_SCHEMA = '$DB_NAME'
+          AND TABLE_NAME = '$table_name'
+          AND INDEX_NAME = '$index_name';
+    " 2>/dev/null | tr -d '[:space:]'
+}
+
+table_exists() {
+    local table_name="$1"
+    mysql -h "$DB_HOST" -u "$DB_USER" "$DB_NAME" -N -B -e "
+        SELECT COUNT(*)
+        FROM INFORMATION_SCHEMA.TABLES
+        WHERE TABLE_SCHEMA = '$DB_NAME'
+          AND TABLE_NAME = '$table_name';
+    " 2>/dev/null | tr -d '[:space:]'
+}
+
+run_sql() {
+    local sql="$1"
+    mysql -h "$DB_HOST" -u "$DB_USER" "$DB_NAME" -e "$sql" || {
+        echo -e "${RED}❌ Database migration failed${NC}"
+        echo "   Failed SQL: $sql"
+        exit 1
+    }
+}
+
+echo "Running incremental auth migration..."
+
+if [ "$(column_exists users username)" = "0" ]; then
+    run_sql "ALTER TABLE \`users\` ADD COLUMN \`username\` VARCHAR(100) UNIQUE DEFAULT NULL AFTER \`email\`;"
 fi
+
+if [ "$(column_exists users gmail_id)" = "0" ]; then
+    run_sql "ALTER TABLE \`users\` ADD COLUMN \`gmail_id\` VARCHAR(255) UNIQUE DEFAULT NULL AFTER \`username\`;"
+fi
+
+if [ "$(column_exists users otp_code)" = "0" ]; then
+    run_sql "ALTER TABLE \`users\` ADD COLUMN \`otp_code\` VARCHAR(6) DEFAULT NULL AFTER \`gmail_id\`;"
+fi
+
+if [ "$(column_exists users otp_expires_at)" = "0" ]; then
+    run_sql "ALTER TABLE \`users\` ADD COLUMN \`otp_expires_at\` DATETIME DEFAULT NULL AFTER \`otp_code\`;"
+fi
+
+if [ "$(column_exists users otp_verified)" = "0" ]; then
+    run_sql "ALTER TABLE \`users\` ADD COLUMN \`otp_verified\` TINYINT(1) DEFAULT 0 AFTER \`otp_expires_at\`;"
+fi
+
+if [ "$(column_exists users updated_at)" = "0" ]; then
+    run_sql "ALTER TABLE \`users\` ADD COLUMN \`updated_at\` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP AFTER \`created_at\`;"
+fi
+
+if [ "$(index_exists users idx_username)" = "0" ]; then
+    run_sql "CREATE INDEX \`idx_username\` ON \`users\`(\`username\`);"
+fi
+
+if [ "$(index_exists users idx_gmail_id)" = "0" ]; then
+    run_sql "CREATE INDEX \`idx_gmail_id\` ON \`users\`(\`gmail_id\`);"
+fi
+
+if [ "$(index_exists users idx_otp_code)" = "0" ]; then
+    run_sql "CREATE INDEX \`idx_otp_code\` ON \`users\`(\`otp_code\`);"
+fi
+
+if [ "$(table_exists otp_tokens)" = "0" ]; then
+    run_sql "CREATE TABLE \`otp_tokens\` (
+      \`id\` INT(11) NOT NULL AUTO_INCREMENT,
+      \`user_id\` INT(11) DEFAULT NULL,
+      \`email\` VARCHAR(120) NOT NULL,
+      \`otp_code\` VARCHAR(6) NOT NULL,
+      \`purpose\` ENUM('login', 'registration', 'password_reset') DEFAULT 'login',
+      \`created_at\` DATETIME DEFAULT CURRENT_TIMESTAMP,
+      \`expires_at\` DATETIME NOT NULL,
+      \`used_at\` DATETIME DEFAULT NULL,
+      PRIMARY KEY (\`id\`),
+      UNIQUE KEY \`email_purpose\` (\`email\`, \`purpose\`),
+      KEY \`user_id\` (\`user_id\`),
+      KEY \`email\` (\`email\`),
+      KEY \`otp_code\` (\`otp_code\`),
+      KEY \`expires_at\` (\`expires_at\`),
+      CONSTRAINT \`fk_otp_user\` FOREIGN KEY (\`user_id\`) REFERENCES \`users\` (\`id\`) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;"
+fi
+
+echo -e "${GREEN}✅ Database migration completed${NC}"
 
 # ============================================
 # Step 4: Clear old sessions and cache
