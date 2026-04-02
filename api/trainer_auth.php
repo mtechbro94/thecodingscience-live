@@ -22,6 +22,12 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'message' => 'Invalid request. Please refresh and try again.']);
+    exit;
+}
+
 $email = filter_var($_POST['email'] ?? '', FILTER_SANITIZE_EMAIL);
 $password = $_POST['password'] ?? '';
 
@@ -33,6 +39,11 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 }
 
 if ($action === 'send_otp') {
+    if (!rate_limit_check('trainer_send_otp', 5, 600)) {
+        http_response_code(429);
+        echo json_encode(['success' => false, 'message' => 'Too many OTP requests. Please wait a few minutes and try again.']);
+        exit;
+    }
     
     if (empty($password)) {
         http_response_code(400);
@@ -119,6 +130,11 @@ if ($action === 'send_otp') {
     }
 
 } elseif ($action === 'verify_otp') {
+    if (!rate_limit_check('trainer_verify_otp', 10, 600)) {
+        http_response_code(429);
+        echo json_encode(['success' => false, 'message' => 'Too many verification attempts. Please wait a few minutes and try again.']);
+        exit;
+    }
     
     $otp_code = sanitize($_POST['otp'] ?? '');
 

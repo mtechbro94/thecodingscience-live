@@ -111,14 +111,14 @@ if (isset($_GET['edit'])) {
 }
 
 // Handle Actions
-if (isset($_GET['action']) && isset($_GET['id'])) {
-    if (!validate_csrf_token($_GET['csrf_token'] ?? '')) {
-        set_flash('danger', 'Invalid or expired action link.');
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'], $_POST['id'])) {
+    if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
+        set_flash('danger', 'Invalid or expired action request.');
         redirect('/admin/users');
     }
 
-    $action = $_GET['action'];
-    $user_id = (int) $_GET['id'];
+    $action = $_POST['action'];
+    $user_id = (int) $_POST['id'];
 
     if ($action === 'approve_trainer') {
         $stmt = $pdo->prepare("UPDATE users SET is_approved = 1 WHERE id = ?");
@@ -234,22 +234,29 @@ require_once __DIR__ . '/includes/header.php';
                             <td>
                                 <div class="btn-group btn-group-sm">
                                     <?php if ($user['role'] === 'trainer' && !$user['is_approved']): ?>
-                                        <a href="/admin/users?action=approve_trainer&id=<?php echo $user['id']; ?>&csrf_token=<?php echo generate_csrf_token(); ?>"
-                                            class="btn btn-success" title="Approve Trainer">
-                                            <i class="fas fa-check"></i>
-                                        </a>
+                                        <form method="POST" class="d-inline">
+                                            <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
+                                            <input type="hidden" name="action" value="approve_trainer">
+                                            <input type="hidden" name="id" value="<?php echo $user['id']; ?>">
+                                            <button type="submit" class="btn btn-success" title="Approve Trainer">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </form>
                                     <?php endif; ?>
                                     <a href="/admin/users?edit=<?php echo $user['id']; ?>" class="btn btn-outline-secondary"
                                         title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <?php if ($user['id'] !== current_user()['id']): ?>
-                                        <a href="/admin/users?action=delete&id=<?php echo $user['id']; ?>&csrf_token=<?php echo generate_csrf_token(); ?>"
-                                            class="btn btn-outline-danger"
-                                            onclick="return confirm('Are you sure you want to delete this user?');"
-                                            title="Delete">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
+                                        <form method="POST" class="d-inline"
+                                            onsubmit="return confirm('Are you sure you want to delete this user?');">
+                                            <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
+                                            <input type="hidden" name="action" value="delete">
+                                            <input type="hidden" name="id" value="<?php echo $user['id']; ?>">
+                                            <button type="submit" class="btn btn-outline-danger" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
                                     <?php endif; ?>
                                 </div>
                             </td>

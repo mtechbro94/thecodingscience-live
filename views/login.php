@@ -215,6 +215,7 @@ require_once 'includes/header.php';
                                             <div id="trainerCredentialsArea">
                                                 <div class="trainer-login-form p-3 border rounded-4 bg-light mb-3">
                                                     <form id="trainerLoginForm" onsubmit="handleTrainerSubmit(event)">
+                                                        <input type="hidden" id="trainerCsrfToken" value="<?php echo generate_csrf_token(); ?>">
                                                         <div class="mb-3">
                                                             <label class="form-label small fw-bold">Email Address</label>
                                                             <input type="email" class="form-control" id="trainerEmail"
@@ -250,7 +251,7 @@ require_once 'includes/header.php';
                                                 </div>
                                                 <button type="button" onclick="handleVerifyOTP()" class="btn btn-primary w-100 fw-bold py-2 mb-2" id="verifyOtpBtn">
                                                     Verify & Login
-                                                </div>
+                                                </button>
                                                 <button type="button" onclick="resetTrainerAuth()" class="btn btn-link btn-sm text-muted text-decoration-none">
                                                     <i class="fas fa-arrow-left me-1"></i>Back to login
                                                 </button>
@@ -305,6 +306,7 @@ require_once 'includes/header.php';
             const formData = new FormData();
             formData.append('email', email);
             formData.append('password', password);
+            formData.append('csrf_token', document.getElementById('trainerCsrfToken').value);
 
             const response = await fetch('/api/trainer_auth.php?action=send_otp', {
                 method: 'POST',
@@ -345,6 +347,7 @@ require_once 'includes/header.php';
             const formData = new FormData();
             formData.append('email', email);
             formData.append('otp', otp);
+            formData.append('csrf_token', document.getElementById('trainerCsrfToken').value);
 
             const response = await fetch('/api/trainer_auth.php?action=verify_otp', {
                 method: 'POST',

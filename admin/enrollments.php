@@ -14,9 +14,14 @@ if (!is_admin()) {
 $page_title = "Enrollments";
 
 // Handle Actions
-if (isset($_GET['action']) && isset($_GET['id'])) {
-    $action = $_GET['action'];
-    $enrollment_id = (int) $_GET['id'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'], $_POST['id'])) {
+    if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
+        set_flash('danger', 'Invalid request.');
+        redirect('/admin/enrollments');
+    }
+
+    $action = $_POST['action'];
+    $enrollment_id = (int) $_POST['id'];
 
     if ($action === 'verify_payment') {
         $stmt = $pdo->prepare("UPDATE enrollments SET status = 'completed', verified_at = NOW() WHERE id = ?");
@@ -138,17 +143,24 @@ require_once __DIR__ . '/includes/header.php';
                             <td>
                                 <div class="btn-group btn-group-sm">
                                     <?php if ($enrollment['status'] === 'pending'): ?>
-                                        <a href="/admin/enrollments?action=verify_payment&id=<?php echo $enrollment['id']; ?>"
-                                            class="btn btn-success" title="Verify Payment">
-                                            <i class="fas fa-check-double"></i> Verify
-                                        </a>
+                                        <form method="POST" class="d-inline">
+                                            <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
+                                            <input type="hidden" name="action" value="verify_payment">
+                                            <input type="hidden" name="id" value="<?php echo $enrollment['id']; ?>">
+                                            <button type="submit" class="btn btn-success" title="Verify Payment">
+                                                <i class="fas fa-check-double"></i> Verify
+                                            </button>
+                                        </form>
                                     <?php endif; ?>
-                                    <a href="/admin/enrollments?action=delete&id=<?php echo $enrollment['id']; ?>"
-                                        class="btn btn-outline-danger"
-                                        onclick="return confirm('Are you sure you want to delete this enrollment?');"
-                                        title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
+                                    <form method="POST" class="d-inline"
+                                        onsubmit="return confirm('Are you sure you want to delete this enrollment?');">
+                                        <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="id" value="<?php echo $enrollment['id']; ?>">
+                                        <button type="submit" class="btn btn-outline-danger" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>

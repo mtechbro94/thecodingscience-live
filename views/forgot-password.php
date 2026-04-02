@@ -9,6 +9,16 @@ $page_title = "Forgot Password";
 
 // Handle Forgot Password Form Submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
+        set_flash('danger', 'Invalid request. Please try again.');
+        redirect('/forgot-password');
+    }
+
+    if (!rate_limit_check('forgot_password', 5, 900)) {
+        set_flash('danger', 'Too many reset attempts. Please wait a few minutes and try again.');
+        redirect('/forgot-password');
+    }
+
     $email = sanitize($_POST['email'] ?? '');
     
     if (empty($email)) {
@@ -59,18 +69,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </html>
             ";
             
-            $headers = "MIME-Version: 1.0" . "\r\n";
-            $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-            $headers .= "From: " . SMTP_USER . "\r\n";
-            
-            if (mail($email, $subject, $message, $headers)) {
-                set_flash('success', 'Password reset link has been sent to your email.');
+            if (send_email($email, $subject, $message, true)) {
+                set_flash('success', 'If the account exists and is eligible, a password reset link has been sent.');
             } else {
-                // For demo purposes, show the link
-                set_flash('info', 'Reset link: <a href="' . $reset_link . '">Click here to reset password</a> (Email sending failed - for demo)');
+                error_log('Forgot password email delivery failed for: ' . $email);
+                set_flash('info', 'If the account exists and is eligible, a password reset link has been sent.');
             }
         } else {
-            set_flash('danger', 'No account found with this email address.');
+            set_flash('info', 'If the account exists and is eligible, a password reset link has been sent.');
         }
     }
 }
@@ -98,6 +104,7 @@ require_once 'includes/header.php';
                         <?php endif; ?>
 
                         <form method="POST" action="">
+                            <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
                             <div class="mb-4">
                                 <label class="form-label"><i class="fas fa-envelope"></i> Email Address</label>
                                 <input type="email" class="form-control" name="email" required placeholder="your@email.com" autofocus>

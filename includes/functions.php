@@ -348,6 +348,31 @@ function validate_csrf_token($token) {
 }
 
 /**
+ * Basic session-backed rate limiter.
+ */
+function rate_limit_check($key, $max_attempts, $window_seconds)
+{
+    if (!isset($_SESSION['rate_limits']) || !is_array($_SESSION['rate_limits'])) {
+        $_SESSION['rate_limits'] = [];
+    }
+
+    $now = time();
+    $attempts = $_SESSION['rate_limits'][$key] ?? [];
+    $attempts = array_values(array_filter($attempts, function ($timestamp) use ($now, $window_seconds) {
+        return ($now - (int) $timestamp) < $window_seconds;
+    }));
+
+    if (count($attempts) >= $max_attempts) {
+        $_SESSION['rate_limits'][$key] = $attempts;
+        return false;
+    }
+
+    $attempts[] = $now;
+    $_SESSION['rate_limits'][$key] = $attempts;
+    return true;
+}
+
+/**
  * Validate coupon code and calculate discount
  */
 function validate_coupon($code, $total_amount, $pdo)

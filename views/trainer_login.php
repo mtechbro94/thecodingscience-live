@@ -26,6 +26,7 @@ require_once 'includes/header.php';
                         </div>
 
                         <form id="trainerForm" onsubmit="handleTrainerSubmit(event)">
+                            <input type="hidden" id="trainerCsrfToken" value="<?php echo generate_csrf_token(); ?>">
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Email Address</label>
                                 <input type="email" class="form-control form-control-lg" id="trainerEmail" 
@@ -148,7 +149,8 @@ async function handleTrainerSubmit(e) {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: new URLSearchParams({
                 email: email,
-                password: password
+                password: password,
+                csrf_token: document.getElementById('trainerCsrfToken').value
             })
         });
 
@@ -194,7 +196,8 @@ async function handleVerifyOTP(e) {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: new URLSearchParams({
                 email: trainerEmail,
-                otp: otp
+                otp: otp,
+                csrf_token: document.getElementById('trainerCsrfToken').value
             })
         });
 
@@ -251,7 +254,8 @@ async function resendOTP() {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: new URLSearchParams({
                 email: trainerEmail,
-                password: document.getElementById('trainerPassword').value
+                password: document.getElementById('trainerPassword').value,
+                csrf_token: document.getElementById('trainerCsrfToken').value
             })
         });
 

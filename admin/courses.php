@@ -14,9 +14,14 @@ if (!is_admin()) {
 $page_title = "Courses";
 
 // Handle Actions
-if (isset($_GET['action']) && isset($_GET['id'])) {
-    $action = $_GET['action'];
-    $course_id = (int) $_GET['id'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'], $_POST['id'])) {
+    if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
+        set_flash('danger', 'Invalid request.');
+        redirect('/admin/courses');
+    }
+
+    $action = $_POST['action'];
+    $course_id = (int) $_POST['id'];
 
     if ($action === 'delete') {
         // Check if there are enrollments
@@ -130,12 +135,15 @@ require_once __DIR__ . '/includes/header.php';
                                         class="btn btn-outline-primary" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <a href="/admin/courses?action=delete&id=<?php echo $course['id']; ?>"
-                                        class="btn btn-outline-danger"
-                                        onclick="return confirm('Are you sure you want to delete this course?');"
-                                        title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
+                                    <form method="POST" class="d-inline"
+                                        onsubmit="return confirm('Are you sure you want to delete this course?');">
+                                        <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="id" value="<?php echo $course['id']; ?>">
+                                        <button type="submit" class="btn btn-outline-danger" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>

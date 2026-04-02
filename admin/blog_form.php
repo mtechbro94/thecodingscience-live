@@ -100,7 +100,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                     redirect('/admin/blogs');
                 } catch (PDOException $e) {
-                    $errors[] = "Database Error: " . $e->getMessage();
+                    error_log("Blog form database error: " . $e->getMessage());
+                    $errors[] = "Failed to save the blog post. Please try again.";
                 }
             }
         }
@@ -357,4 +358,3 @@ require_once __DIR__ . '/includes/header.php';
 </script>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>
-

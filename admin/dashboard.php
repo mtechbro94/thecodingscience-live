@@ -212,11 +212,11 @@ $recent_enrollments = $stmt->fetchAll();
             </div>
             <div class="card-body">
                 <div class="d-grid gap-2">
-                    <a href="/admin/courses/create" class="btn btn-outline-primary">
+                    <a href="/admin/course_form" class="btn btn-outline-primary">
                         <i class="fas fa-plus-circle me-2"></i> Add New Course
                     </a>
-                    <a href="/admin/users/create" class="btn btn-outline-secondary">
-                        <i class="fas fa-user-plus me-2"></i> Add User
+                    <a href="/admin/users" class="btn btn-outline-secondary">
+                        <i class="fas fa-users me-2"></i> Manage Users
                     </a>
                     <a href="/admin/messages" class="btn btn-outline-info">
                         <i class="fas fa-envelope me-2"></i> View Messages

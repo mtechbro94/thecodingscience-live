@@ -7,6 +7,21 @@ $page_title = "Contact Us";
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Content-Type: application/json');
 
+    if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
+        echo json_encode(['status' => 'error', 'message' => 'Invalid request. Please refresh and try again.']);
+        exit;
+    }
+
+    if (!empty($_POST['company'])) {
+        echo json_encode(['status' => 'success', 'message' => 'Thank you! Your message has been sent.']);
+        exit;
+    }
+
+    if (!rate_limit_check('contact_form', 5, 600)) {
+        echo json_encode(['status' => 'error', 'message' => 'Too many messages submitted. Please wait a few minutes and try again.']);
+        exit;
+    }
+
     $name = sanitize($_POST['name'] ?? '');
     $email = sanitize($_POST['email'] ?? '');
     $phone = sanitize($_POST['phone'] ?? '');
@@ -152,6 +167,8 @@ require_once 'includes/header.php';
                     <div class="card-body p-5">
                         <h4 class="mb-4">Send us a Message</h4>
                         <form id="contactForm">
+                            <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
+                            <input type="text" name="company" class="d-none" tabindex="-1" autocomplete="off">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Full Name</label>

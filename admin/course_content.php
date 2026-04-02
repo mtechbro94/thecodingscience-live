@@ -28,6 +28,11 @@ $page_title = "Manage Content: " . htmlspecialchars($course['name']);
 
 // Handle Resource Upload
 if (isset($_POST['add_resource'])) {
+    if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
+        set_flash('danger', 'Invalid request.');
+        redirect('/admin/course-content?id=' . $course_id);
+    }
+
     $title = sanitize($_POST['resource_title'] ?? '');
     
     if (empty($title)) {
@@ -63,6 +68,11 @@ if (isset($_POST['add_resource'])) {
 
 // Handle Recording Add
 if (isset($_POST['add_recording'])) {
+    if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
+        set_flash('danger', 'Invalid request.');
+        redirect('/admin/course-content?id=' . $course_id);
+    }
+
     $title = sanitize($_POST['recording_title'] ?? '');
     $url = sanitize($_POST['recording_url'] ?? '');
 
@@ -77,8 +87,13 @@ if (isset($_POST['add_recording'])) {
 }
 
 // Handle Delete Resource
-if (isset($_GET['delete_resource'])) {
-    $res_id = (int)$_GET['delete_resource'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_resource'])) {
+    if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
+        set_flash('danger', 'Invalid request.');
+        redirect('/admin/course-content?id=' . $course_id);
+    }
+
+    $res_id = (int)$_POST['delete_resource'];
     $stmt = $pdo->prepare("SELECT file_path FROM course_resources WHERE id = ? AND course_id = ?");
     $stmt->execute([$res_id, $course_id]);
     $res = $stmt->fetch();
@@ -94,8 +109,13 @@ if (isset($_GET['delete_resource'])) {
 }
 
 // Handle Delete Recording
-if (isset($_GET['delete_recording'])) {
-    $rec_id = (int)$_GET['delete_recording'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_recording'])) {
+    if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
+        set_flash('danger', 'Invalid request.');
+        redirect('/admin/course-content?id=' . $course_id);
+    }
+
+    $rec_id = (int)$_POST['delete_recording'];
     $pdo->prepare("DELETE FROM course_recordings WHERE id = ? AND course_id = ?")->execute([$rec_id, $course_id]);
     set_flash('success', 'Recording deleted.');
     redirect('/admin/course-content?id=' . $course_id);
@@ -171,10 +191,13 @@ require_once __DIR__ . '/includes/header.php';
                                             <a href="<?php echo $rec['recording_url']; ?>" target="_blank" class="btn btn-sm btn-outline-info">
                                                 <i class="fas fa-external-link-alt"></i>
                                             </a>
-                                            <a href="?id=<?php echo $course_id; ?>&delete_recording=<?php echo $rec['id']; ?>" 
-                                               class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this recording?')">
-                                                <i class="fas fa-trash"></i>
-                                            </a>
+                                            <form method="POST" class="d-inline" onsubmit="return confirm('Delete this recording?')">
+                                                <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
+                                                <input type="hidden" name="delete_recording" value="<?php echo $rec['id']; ?>">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -220,10 +243,13 @@ require_once __DIR__ . '/includes/header.php';
                                             <a href="/assets/uploads/resources/<?php echo $res['file_path']; ?>" target="_blank" class="btn btn-sm btn-outline-info">
                                                 <i class="fas fa-download"></i>
                                             </a>
-                                            <a href="?id=<?php echo $course_id; ?>&delete_resource=<?php echo $res['id']; ?>" 
-                                               class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this resource?')">
-                                                <i class="fas fa-trash"></i>
-                                            </a>
+                                            <form method="POST" class="d-inline" onsubmit="return confirm('Delete this resource?')">
+                                                <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
+                                                <input type="hidden" name="delete_resource" value="<?php echo $res['id']; ?>">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -240,6 +266,7 @@ require_once __DIR__ . '/includes/header.php';
 <div class="modal fade" id="addRecordingModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <form method="POST" class="modal-content">
+            <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
             <div class="modal-header">
                 <h5 class="modal-title">Add Class Recording</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -266,6 +293,7 @@ require_once __DIR__ . '/includes/header.php';
 <div class="modal fade" id="addResourceModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <form method="POST" enctype="multipart/form-data" class="modal-content">
+            <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
             <div class="modal-header">
                 <h5 class="modal-title">Upload Resource</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>

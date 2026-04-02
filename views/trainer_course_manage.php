@@ -78,6 +78,7 @@ require_once 'includes/header.php';
                     </div>
                     <div class="card-body">
                         <form action="/trainer-actions" method="POST">
+                            <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
                             <input type="hidden" name="action" value="update_live_settings">
                             <input type="hidden" name="course_id" value="<?php echo $course_id; ?>">
                             
@@ -146,10 +147,16 @@ require_once 'includes/header.php';
                                                 <td class="text-end pe-4">
                                                     <div class="btn-group btn-group-sm">
                                                         <a href="<?php echo $rec['recording_url']; ?>" target="_blank" class="btn btn-outline-primary">Watch</a>
-                                                        <a href="/trainer-actions?action=delete_recording&id=<?php echo $rec['id']; ?>&course_id=<?php echo $course_id; ?>" 
-                                                           class="btn btn-outline-danger" onclick="return confirm('Delete this recording?')">
-                                                            <i class="fas fa-trash"></i>
-                                                        </a>
+                                                        <form action="/trainer-actions" method="POST" class="d-inline"
+                                                           onsubmit="return confirm('Delete this recording?')">
+                                                            <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
+                                                            <input type="hidden" name="action" value="delete_recording">
+                                                            <input type="hidden" name="id" value="<?php echo $rec['id']; ?>">
+                                                            <input type="hidden" name="course_id" value="<?php echo $course_id; ?>">
+                                                            <button type="submit" class="btn btn-outline-danger">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </form>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -187,10 +194,16 @@ require_once 'includes/header.php';
                                                 </td>
                                                 <td class="text-end pe-4">
                                                     <div class="btn-group btn-group-sm">
-                                                        <a href="/trainer-actions?action=delete_resource&id=<?php echo $res['id']; ?>&course_id=<?php echo $course_id; ?>" 
-                                                           class="btn btn-outline-danger" onclick="return confirm('Delete this resource?')">
-                                                            <i class="fas fa-trash"></i>
-                                                        </a>
+                                                        <form action="/trainer-actions" method="POST" class="d-inline"
+                                                           onsubmit="return confirm('Delete this resource?')">
+                                                            <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
+                                                            <input type="hidden" name="action" value="delete_resource">
+                                                            <input type="hidden" name="id" value="<?php echo $res['id']; ?>">
+                                                            <input type="hidden" name="course_id" value="<?php echo $course_id; ?>">
+                                                            <button type="submit" class="btn btn-outline-danger">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </form>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -210,6 +223,7 @@ require_once 'includes/header.php';
 <div class="modal fade" id="addRecordingModal" tabindex="-1">
     <div class="modal-dialog">
         <form action="/trainer-actions" method="POST" class="modal-content">
+            <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
             <input type="hidden" name="action" value="add_recording">
             <input type="hidden" name="course_id" value="<?php echo $course_id; ?>">
             <div class="modal-header">
@@ -238,6 +252,7 @@ require_once 'includes/header.php';
 <div class="modal fade" id="addResourceModal" tabindex="-1">
     <div class="modal-dialog">
         <form action="/trainer-actions" method="POST" enctype="multipart/form-data" class="modal-content">
+            <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
             <input type="hidden" name="action" value="add_resource">
             <input type="hidden" name="course_id" value="<?php echo $course_id; ?>">
             <div class="modal-header">

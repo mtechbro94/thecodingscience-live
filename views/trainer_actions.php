@@ -10,8 +10,18 @@ if ($user['role'] !== 'trainer' && $user['role'] !== 'admin') {
     redirect('/dashboard');
 }
 
-$action = $_REQUEST['action'] ?? '';
-$course_id = (int)($_REQUEST['course_id'] ?? 0);
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    set_flash('danger', 'Invalid request method.');
+    redirect('/trainer-dashboard');
+}
+
+if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
+    set_flash('danger', 'Invalid request.');
+    redirect('/trainer-dashboard');
+}
+
+$action = $_POST['action'] ?? '';
+$course_id = (int)($_POST['course_id'] ?? 0);
 
 if ($course_id <= 0) {
     set_flash('danger', 'Invalid request.');
@@ -54,7 +64,7 @@ switch ($action) {
         break;
 
     case 'delete_recording':
-        $rec_id = (int)($_GET['id'] ?? 0);
+        $rec_id = (int)($_POST['id'] ?? 0);
         $stmt = $pdo->prepare("DELETE FROM course_recordings WHERE id = ? AND course_id = ?");
         $stmt->execute([$rec_id, $course_id]);
         set_flash('success', 'Recording deleted.');
@@ -89,7 +99,7 @@ switch ($action) {
         break;
 
     case 'delete_resource':
-        $res_id = (int)($_GET['id'] ?? 0);
+        $res_id = (int)($_POST['id'] ?? 0);
         // Fetch filename to delete from disk
         $stmt = $pdo->prepare("SELECT file_path FROM course_resources WHERE id = ? AND course_id = ?");
         $stmt->execute([$res_id, $course_id]);

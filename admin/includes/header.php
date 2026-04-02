@@ -10,6 +10,8 @@ if (!is_admin()) {
     set_flash('danger', 'Access denied. Administrator privileges required.');
     redirect('/login');
 }
+
+$profile_img = $_SESSION['user_profile_image'] ?? null;
 ?>
 <!DOCTYPE html>
 <html lang="en">

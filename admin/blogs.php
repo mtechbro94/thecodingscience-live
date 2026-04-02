@@ -14,14 +14,20 @@ if (!is_admin()) {
 $page_title = "Blog Management";
 
 // Handle Deletion
-if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
-    $id = (int) $_GET['id'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delete' && isset($_POST['id'])) {
+    if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
+        set_flash('danger', 'Invalid request.');
+        redirect('/admin/blogs');
+    }
+
+    $id = (int) $_POST['id'];
     try {
         $stmt = $pdo->prepare("DELETE FROM blogs WHERE id = ?");
         $stmt->execute([$id]);
         set_flash('success', 'Blog post deleted successfully.');
     } catch (PDOException $e) {
-        set_flash('danger', 'Error deleting blog: ' . $e->getMessage());
+        error_log('Blog delete failed: ' . $e->getMessage());
+        set_flash('danger', 'Error deleting blog post. Please try again.');
     }
     redirect('/admin/blogs');
 }
@@ -135,12 +141,15 @@ require_once __DIR__ . '/includes/header.php';
                                         target="_blank" title="View">
                                         <i class="fas fa-external-link-alt"></i>
                                     </a>
-                                    <a href="/admin/blogs?action=delete&id=<?php echo $blog['id']; ?>"
-                                        class="btn btn-outline-danger"
-                                        onclick="return confirm('Are you sure you want to delete this post?');"
-                                        title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
+                                    <form method="POST" class="d-inline"
+                                        onsubmit="return confirm('Are you sure you want to delete this post?');">
+                                        <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="id" value="<?php echo $blog['id']; ?>">
+                                        <button type="submit" class="btn btn-outline-danger" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>

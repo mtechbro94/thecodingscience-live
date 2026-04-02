@@ -117,6 +117,11 @@ $discount_amount = 0;
 
 // Handle coupon code
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_coupon'])) {
+    if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
+        set_flash('danger', 'Invalid request. Please try again.');
+        redirect($_SERVER['REQUEST_URI']);
+    }
+
     $coupon_code = $_POST['coupon_code'] ?? '';
     
     if (!empty($coupon_code)) {
@@ -152,6 +157,11 @@ if (!empty($course_id) && !isset($course['is_combo']) && !isset($course['is_trac
 
 // Handle Enrollment
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['enroll_now'])) {
+    if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
+        set_flash('danger', 'Invalid request. Please try again.');
+        redirect($_SERVER['REQUEST_URI']);
+    }
+
     $payment_method = $_POST['payment_method'] ?? 'upi';
     $amount_to_pay = $_POST['final_amount'] ?? $final_price;
     $applied_coupon = $_POST['applied_coupon'] ?? '';
@@ -219,7 +229,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['enroll_now'])) {
         redirect('/razorpay-payment/' . $enrollment_id . '?from=enroll');
 
     } catch (PDOException $e) {
-        set_flash('danger', 'Enrollment failed: ' . $e->getMessage());
+        error_log('Enrollment failed: ' . $e->getMessage());
+        set_flash('danger', 'Enrollment failed. Please try again or contact support if the issue continues.');
     }
 }
 
@@ -295,6 +306,7 @@ require_once 'includes/header.php';
                         
                         <!-- Coupon Code -->
                         <form method="POST" class="mb-4">
+                            <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
                             <label class="form-label fw-semibold">Have a coupon code?</label>
                             <div class="coupon-input-group input-group">
                                 <input type="text" class="form-control" name="coupon_code" placeholder="Enter coupon code" 
@@ -311,6 +323,7 @@ require_once 'includes/header.php';
                         
                         <!-- Enrollment Form -->
                         <form method="POST">
+                            <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
                             <input type="hidden" name="final_amount" value="<?php echo $final_price; ?>">
                             <input type="hidden" name="applied_coupon" value="<?php echo $coupon_applied ? $coupon_applied['code'] : ''; ?>">
                             
