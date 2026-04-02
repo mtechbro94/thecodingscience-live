@@ -127,7 +127,7 @@ $page_title = "My Profile";
             <!-- Page Header -->
             <div class="d-flex justify-content-between align-items-center mb-5">
                 <h1 class="fw-bold mb-0">My Profile</h1>
-                <a href="<?php echo is_trainer() ? '/trainer_dashboard' : '/dashboard'; ?>" class="btn btn-outline-primary">
+                <a href="<?php echo is_trainer() ? '/trainer-dashboard' : '/dashboard'; ?>" class="btn btn-outline-primary">
                     <i class="fas fa-arrow-left me-2"></i>Back
                 </a>
             </div>

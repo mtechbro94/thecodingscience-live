@@ -110,7 +110,3 @@ try {
     set_flash('danger', 'An error occurred during authentication. Please try again.');
     redirect('/student_login');
 }
-?>
-
-}
-?>

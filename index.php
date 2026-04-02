@@ -119,6 +119,7 @@ switch ($path) {
         break;
 
     case 'trainer-dashboard':
+    case 'trainer_dashboard':
         require 'views/trainer_dashboard.php';
         break;
 

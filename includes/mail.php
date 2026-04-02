@@ -4,57 +4,55 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-/**
- * Send Email using PHPMailer
- * Make sure to install: composer require phpmailer/phpmailer
- */
-function send_email($to, $subject, $body, $attachments = [])
-{
-    try {
-        require __DIR__ . '/../vendor/autoload.php';
+if (!function_exists('send_email_via_phpmailer')) {
+    /**
+     * Send email via PHPMailer when the dependency is installed.
+     */
+    function send_email_via_phpmailer($to, $subject, $body, $attachments = [])
+    {
+        $autoload_path = __DIR__ . '/../vendor/autoload.php';
+        if (!file_exists($autoload_path)) {
+            return false;
+        }
 
-        $mail = new PHPMailer(true);
+        try {
+            require_once $autoload_path;
 
-        // Server settings
-        $mail->isSMTP();
-        $mail->Host = getenv('SMTP_HOST') ?? 'smtp.gmail.com';
-        $mail->SMTPAuth = true;
-        $mail->Username = getenv('SMTP_USER') ?? getenv('MAIL_USERNAME');
-        $mail->Password = getenv('SMTP_PASS') ?? getenv('MAIL_PASSWORD');
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port = getenv('SMTP_PORT') ?? 587;
+            $mail = new PHPMailer(true);
+            $mail->isSMTP();
+            $mail->Host = getenv('SMTP_HOST') ?? 'smtp.gmail.com';
+            $mail->SMTPAuth = true;
+            $mail->Username = getenv('SMTP_USER') ?? getenv('MAIL_USERNAME');
+            $mail->Password = getenv('SMTP_PASS') ?? getenv('MAIL_PASSWORD');
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port = getenv('SMTP_PORT') ?? 587;
 
-        // Recipients
-        $mail->setFrom(getenv('MAIL_FROM') ?? 'noreply@thecodingscience.com', SITE_NAME);
-        $mail->addAddress($to);
+            $mail->setFrom(getenv('MAIL_FROM') ?? 'noreply@thecodingscience.com', SITE_NAME);
+            $mail->addAddress($to);
+            $mail->isHTML(true);
+            $mail->Subject = $subject;
+            $mail->Body = $body;
+            $mail->AltBody = strip_tags($body);
 
-        // Content
-        $mail->isHTML(true);
-        $mail->Subject = $subject;
-        $mail->Body = $body;
-        $mail->AltBody = strip_tags($body);
-
-        // Attachments
-        if (!empty($attachments)) {
             foreach ($attachments as $file) {
                 if (file_exists($file)) {
                     $mail->addAttachment($file);
                 }
             }
+
+            $mail->send();
+            return true;
+        } catch (Exception $e) {
+            error_log("Email Error: " . $e->getMessage());
+            return false;
         }
-
-        $mail->send();
-        return true;
-
-    } catch (Exception $e) {
-        error_log("Email Error: " . $e->getMessage());
-        return false;
     }
 }
 
 /**
  * Send OTP via Email (simplified version if PHPMailer not available)
  */
+if (!function_exists('send_otp_email')) {
 function send_otp_email($email, $otp_code, $purpose = 'login')
 {
     $subject = "Your Verification Code - " . SITE_NAME;
@@ -94,13 +92,18 @@ function send_otp_email($email, $otp_code, $purpose = 'login')
             </p>
         </div>
     ";
+    if (function_exists('send_email_via_phpmailer') && send_email_via_phpmailer($email, $subject, $message)) {
+        return true;
+    }
 
-    return send_email($email, $subject, $message);
+    return function_exists('send_email') ? send_email($email, $subject, $message) : false;
+}
 }
 
 /**
  * Clean up expired OTP tokens
  */
+if (!function_exists('cleanup_expired_otps')) {
 function cleanup_expired_otps()
 {
     global $pdo;
@@ -112,5 +115,6 @@ function cleanup_expired_otps()
         error_log("OTP Cleanup Error: " . $e->getMessage());
         return false;
     }
+}
 }
 ?>

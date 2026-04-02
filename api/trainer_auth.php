@@ -159,7 +159,7 @@ if ($action === 'send_otp') {
             echo json_encode([
                 'success' => true,
                 'message' => 'Authentication successful!',
-                'redirect' => '/trainer_dashboard'
+                'redirect' => '/trainer-dashboard'
             ]);
 
         } else {
@@ -204,7 +204,7 @@ if ($action === 'send_otp') {
                 echo json_encode([
                     'success' => true,
                     'message' => 'Account created successfully! Awaiting admin approval.',
-                    'redirect' => '/trainer_dashboard',
+                    'redirect' => '/trainer-dashboard',
                     'pending_approval' => true
                 ]);
 

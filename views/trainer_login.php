@@ -3,7 +3,7 @@
 // Trainer login with Email/Username + Password + OTP verification
 
 if (is_logged_in() && is_trainer()) {
-    redirect('/trainer_dashboard');
+    redirect('/trainer-dashboard');
 } elseif (is_logged_in()) {
     redirect('/dashboard');
 }
@@ -203,7 +203,7 @@ async function handleVerifyOTP(e) {
         if (data.success) {
             showAlert('success', data.message);
             setTimeout(() => {
-                window.location.href = data.redirect || '/trainer_dashboard';
+                window.location.href = data.redirect || '/trainer-dashboard';
             }, 1500);
         } else {
             showAlert('danger', data.message || 'OTP verification failed');

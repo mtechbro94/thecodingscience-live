@@ -42,7 +42,11 @@ if ($action === 'verify_gmail') {
 
     try {
         // Check if student exists
-        $stmt = $pdo->prepare("SELECT id, name, profile_image, is_active FROM users WHERE gmail_id = ? OR (email = ? AND role = 'student')");
+        $stmt = $pdo->prepare("
+            SELECT id, name, profile_image, is_active, gmail_id
+            FROM users
+            WHERE role = 'student' AND (gmail_id = ? OR email = ?)
+        ");
         $stmt->execute([$gmail_id, $email]);
         $student = $stmt->fetch();
 
