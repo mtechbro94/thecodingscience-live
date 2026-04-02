@@ -50,15 +50,15 @@ require_once 'includes/header.php';
                         <hr class="my-4">
 
                         <p class="text-center text-muted small">
-                            New to our platform? 
+                            Need a student account?
                             <a href="#" onclick="showStudentLogin()" class="text-primary fw-bold text-decoration-none">
-                                Are you a student?
+                                Go to student login
                             </a>
                         </p>
 
                         <p class="text-center text-muted small">
-                            Interested in becoming a trainer? 
-                            <a href="/contact" class="text-primary fw-bold text-decoration-none">Contact us</a>
+                            Trainer accounts are created by the team.
+                            <a href="/contact" class="text-primary fw-bold text-decoration-none">Request access</a>
                         </p>
                     </div>
                 </div>

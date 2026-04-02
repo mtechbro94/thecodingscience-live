@@ -21,8 +21,13 @@ if ($user['role'] === 'admin' && !isset($_GET['view_as_trainer'])) {
 
 $page_title = "My Blogs";
 
-if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
-    $id = (int) $_GET['id'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delete' && isset($_POST['id'])) {
+    if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
+        set_flash('danger', 'Invalid request.');
+        redirect('/trainer-blogs');
+    }
+
+    $id = (int) $_POST['id'];
     try {
         $stmt = $pdo->prepare("DELETE FROM blogs WHERE id = ? AND author_id = ?");
         $stmt->execute([$id, $user['id']]);
@@ -32,7 +37,8 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
             set_flash('danger', 'You do not have permission to delete this post.');
         }
     } catch (PDOException $e) {
-        set_flash('danger', 'Error deleting blog: ' . $e->getMessage());
+        error_log('Trainer blog delete failed: ' . $e->getMessage());
+        set_flash('danger', 'Error deleting blog post. Please try again.');
     }
     redirect('/trainer-blogs');
 }
@@ -43,7 +49,8 @@ try {
     $blogs = $stmt->fetchAll();
 } catch (PDOException $e) {
     $blogs = [];
-    set_flash('danger', 'Error fetching blogs: ' . $e->getMessage());
+    error_log('Trainer blog fetch failed: ' . $e->getMessage());
+    set_flash('danger', 'Unable to load your blogs right now.');
 }
 
 require_once 'includes/header.php';
@@ -114,11 +121,15 @@ require_once 'includes/header.php';
                                                             <i class="bi bi-eye"></i> View
                                                         </a>
                                                     <?php endif; ?>
-                                                    <a href="/trainer-blogs?action=delete&id=<?php echo $blog['id']; ?>" 
-                                                       class="btn btn-outline-danger"
-                                                       onclick="return confirm('Are you sure you want to delete this post?');">
-                                                        <i class="bi bi-trash"></i>
-                                                    </a>
+                                                    <form method="POST" class="d-inline"
+                                                       onsubmit="return confirm('Are you sure you want to delete this post?');">
+                                                        <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
+                                                        <input type="hidden" name="action" value="delete">
+                                                        <input type="hidden" name="id" value="<?php echo $blog['id']; ?>">
+                                                        <button type="submit" class="btn btn-outline-danger">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </form>
                                                 </div>
                                             </div>
                                         </div>

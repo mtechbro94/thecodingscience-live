@@ -12,6 +12,11 @@ $page_title = "Manage Coupons";
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
+        set_flash('danger', 'Invalid request.');
+        redirect('/admin/coupons');
+    }
+
     if (isset($_POST['add_coupon'])) {
         $code = strtoupper(trim($_POST['code']));
         $discount_type = $_POST['discount_type'];
@@ -32,7 +37,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($e->getCode() == 23000) {
                     set_flash('danger', 'Coupon code already exists');
                 } else {
-                    set_flash('danger', 'Error creating coupon: ' . $e->getMessage());
+                    error_log('Coupon create failed: ' . $e->getMessage());
+                    set_flash('danger', 'Error creating coupon. Please try again.');
                 }
             }
         }
@@ -69,6 +75,7 @@ require_once __DIR__ . '/includes/header.php';
     </div>
     <div class="card-body">
         <form method="POST" class="row g-3">
+            <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
             <div class="col-md-3">
                 <label class="form-label">Coupon Code *</label>
                 <input type="text" class="form-control" name="code" placeholder="e.g., SAVE20" required>
@@ -179,6 +186,7 @@ require_once __DIR__ . '/includes/header.php';
                                 </td>
                                 <td>
                                     <form method="POST" class="d-inline">
+                                        <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
                                         <input type="hidden" name="coupon_id" value="<?php echo $coupon['id']; ?>">
                                         <input type="hidden" name="is_active" value="<?php echo $coupon['is_active'] ? 0 : 1; ?>">
                                         <button type="submit" name="toggle_coupon" class="btn btn-sm btn-outline-<?php echo $coupon['is_active'] ? 'warning' : 'success'; ?>" title="<?php echo $coupon['is_active'] ? 'Deactivate' : 'Activate'; ?>">
@@ -186,6 +194,7 @@ require_once __DIR__ . '/includes/header.php';
                                         </button>
                                     </form>
                                     <form method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this coupon?');">
+                                        <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
                                         <input type="hidden" name="coupon_id" value="<?php echo $coupon['id']; ?>">
                                         <button type="submit" name="delete_coupon" class="btn btn-sm btn-outline-danger" title="Delete">
                                             <i class="fas fa-trash"></i>

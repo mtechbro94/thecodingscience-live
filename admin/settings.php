@@ -17,6 +17,11 @@ $errors = [];
 
 // Handle Form Submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
+        set_flash('danger', 'Invalid request.');
+        redirect('/admin/settings');
+    }
+
     // Check if POST data was discarded (usually due to post_max_size)
     if (empty($_POST) && $_SERVER['CONTENT_LENGTH'] > 0) {
         $max_post = ini_get('post_max_size');
@@ -29,7 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $pdo->prepare("INSERT INTO site_settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value` = ?");
             $stmt->execute([$key, $value, $value]);
         } catch (PDOException $e) {
-            $errors[] = "Failed to update $key: " . $e->getMessage();
+            error_log("Settings update failed for {$key}: " . $e->getMessage());
+            $errors[] = "Failed to update {$key}.";
         }
     }
 
@@ -113,6 +119,7 @@ require_once __DIR__ . '/includes/header.php';
 </div>
 
 <form method="POST" enctype="multipart/form-data" class="mb-5">
+    <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
     <div class="row">
         <div class="col-md-6">
             <div class="card shadow-sm mb-4">

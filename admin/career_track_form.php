@@ -44,6 +44,10 @@ if ($is_edit) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
+        $errors[] = 'Invalid request. Please refresh and try again.';
+    }
+
     $name = sanitize($_POST['name'] ?? '');
     $slug = sanitize($_POST['slug'] ?? '');
     $description = $_POST['description'] ?? '';
@@ -135,7 +139,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             set_flash('success', 'Career track ' . ($is_edit ? 'updated' : 'created') . ' successfully.');
             redirect('/admin/career_tracks');
         } catch (PDOException $e) {
-            $errors[] = "Database Error: " . $e->getMessage();
+            error_log("Career track save failed: " . $e->getMessage());
+            $errors[] = "Failed to save the career track. Please try again.";
         }
     }
 }
@@ -164,6 +169,7 @@ require_once __DIR__ . '/includes/header.php';
 <?php endif; ?>
 
 <form method="POST" enctype="multipart/form-data" class="mb-5">
+    <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
     <div class="row">
         <div class="col-md-8">
             <div class="card shadow-sm mb-4">

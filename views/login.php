@@ -234,6 +234,10 @@ require_once 'includes/header.php';
                                                             Trainer Sign In
                                                         </button>
                                                     </form>
+                                                    <p class="text-muted small text-center mt-3 mb-0">
+                                                        Trainer accounts are provisioned by the team.
+                                                        <a href="/contact" class="text-primary fw-semibold text-decoration-none">Request access</a>
+                                                    </p>
                                                 </div>
                                             </div>
 

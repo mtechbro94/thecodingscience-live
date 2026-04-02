@@ -38,6 +38,10 @@ if ($is_edit) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
+        $errors[] = 'Invalid request. Please refresh and try again.';
+    }
+
     $title = sanitize($_POST['title'] ?? '');
     $slug = sanitize($_POST['slug'] ?? generate_slug($title));
     $excerpt = sanitize($_POST['excerpt'] ?? '');
@@ -90,7 +94,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             redirect('/trainer-blogs');
         } catch (PDOException $e) {
-            $errors[] = "Database Error: " . $e->getMessage();
+            error_log("Trainer blog form database error: " . $e->getMessage());
+            $errors[] = "Failed to save the blog post. Please try again.";
         }
     }
 }
@@ -172,6 +177,7 @@ require_once 'includes/header.php';
         <?php endif; ?>
 
         <form method="POST" enctype="multipart/form-data" id="blogForm">
+            <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
             <div class="row">
                 <div class="col-lg-8">
                     <div class="card shadow-sm mb-4">

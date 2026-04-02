@@ -34,6 +34,10 @@ if ($is_edit) {
 
 // Handle Form Submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
+        $errors[] = 'Invalid request. Please refresh and try again.';
+    }
+
     $title = sanitize($_POST['title'] ?? '');
     $description = $_POST['description'] ?? ''; // Allow HTML
     $duration = sanitize($_POST['duration'] ?? '');
@@ -74,11 +78,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             redirect('/admin/internships');
         } catch (PDOException $e) {
-            $errors[] = "Database Error: " . $e->getMessage();
             error_log("Database Error in internship_form.php: " . $e->getMessage());
+            $errors[] = "Failed to save the internship. Please try again.";
         } catch (Exception $e) {
-            $errors[] = "Error: " . $e->getMessage();
             error_log("Error in internship_form.php: " . $e->getMessage());
+            $errors[] = "Failed to save the internship. Please try again.";
         }
     }
 }
@@ -111,6 +115,7 @@ require_once __DIR__ . '/includes/header.php';
 <?php endif; ?>
 
 <form method="POST" class="mb-5">
+    <input type="hidden" name="csrf_token" value="<?php echo generate_csrf_token(); ?>">
     <div class="row">
         <div class="col-md-8">
             <div class="card shadow-sm mb-4">
