@@ -158,13 +158,14 @@ require_once 'includes/header.php';
                                         $role_param = $_GET['role'] ?? 'student';
                                         if (!in_array($role_param, ['student', 'trainer', 'admin']))
                                             $role_param = 'student';
+                                        $is_admin_login = $role_param === 'admin';
                                         ?>
                                         <!-- Role Selection -->
                                         <div class="role-selector">
                                             <label class="role-label">I am a</label>
                                             <div class="role-toggle">
                                                 <input type="radio" class="btn-check" name="login_role" id="roleStudent"
-                                                    value="student" <?php echo ($role_param !== 'trainer') ? 'checked' : ''; ?>
+                                                    value="student" <?php echo ($role_param !== 'trainer' && !$is_admin_login) ? 'checked' : ''; ?>
                                                     onchange="updateRoleUI()">
                                                 <label class="role-option" for="roleStudent">
                                                     <div class="role-icon"><i class="fas fa-user-graduate"></i></div>
@@ -184,26 +185,11 @@ require_once 'includes/header.php';
                                                         <span class="role-desc">Teach & inspire</span>
                                                     </div>
                                                 </label>
-
-                                                <input type="radio" class="btn-check" name="login_role" id="roleAdmin"
-                                                    value="admin" <?php echo ($role_param === 'admin') ? 'checked' : ''; ?>
-                                                    onchange="updateRoleUI()">
-                                                <label class="role-option" for="roleAdmin">
-                                                    <div class="role-icon"><i class="fas fa-user-shield"></i></div>
-                                                    <div class="role-text">
-                                                        <span class="role-name">Admin</span>
-                                                        <span class="role-desc">Manage platform</span>
-                                                    </div>
-                                                </label>
                                             </div>
-                                            <p class="text-center small mt-3 mb-0">
-                                                Need administrator access?
-                                                <a href="/login?role=admin" class="text-primary fw-semibold text-decoration-none">Open admin sign in</a>
-                                            </p>
                                         </div>
 
                                         <!-- Student Auth Silo -->
-                                        <div id="studentAuth" class="auth-section">
+                                        <div id="studentAuth" class="auth-section<?php echo $is_admin_login ? ' d-none' : ''; ?>">
                                             <div class="security-badge">
                                                 <i class="fas fa-shield-alt"></i>
                                                 <span>Secured by Google — fast, safe, and private</span>
@@ -226,7 +212,7 @@ require_once 'includes/header.php';
                                         </div>
 
                                         <!-- Trainer Auth Silo -->
-                                        <div id="trainerAuth" class="auth-section d-none">
+                                        <div id="trainerAuth" class="auth-section<?php echo $role_param === 'trainer' ? '' : ' d-none'; ?>">
                                             <div id="trainerCredentialsArea">
                                                 <div class="trainer-login-form p-3 border rounded-4 bg-light mb-3">
                                                     <form id="trainerLoginForm" onsubmit="handleTrainerSubmit(event)">
@@ -278,7 +264,7 @@ require_once 'includes/header.php';
                                         </div>
 
                                         <!-- Admin Auth Silo -->
-                                        <div id="adminAuth" class="auth-section d-none">
+                                        <div id="adminAuth" class="auth-section<?php echo $is_admin_login ? '' : ' d-none'; ?>">
                                             <div class="trainer-login-form p-3 border rounded-4 bg-light mb-3">
                                                 <form method="POST" action="/login">
                                                     <input type="hidden" name="login_role" value="admin">
@@ -305,6 +291,11 @@ require_once 'includes/header.php';
                                                 </p>
                                             </div>
                                         </div>
+
+                                        <p class="text-center small mt-3 mb-0">
+                                            Need administrator access?
+                                            <a href="/login?role=admin" class="text-primary fw-semibold text-decoration-none">Open admin sign in</a>
+                                        </p>
                                     </div>
 
                                     <!-- Terms -->
