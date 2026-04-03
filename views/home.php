@@ -327,9 +327,16 @@ if (!empty($hero_bg)) {
                                             </div>
                                             <p class="card-text mb-4 italic text-secondary">"<?php echo htmlspecialchars($story['content']); ?>"</p>
                                             <div class="d-flex align-items-center mt-auto">
-                                                <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 48px; height: 48px; font-weight: bold;">
-                                                    <?php echo strtoupper(substr($story['name'], 0, 1)); ?>
-                                                </div>
+                                                <?php if (!empty($story['photo_path'])): ?>
+                                                    <img src="<?php echo htmlspecialchars(get_image_url($story['photo_path'])); ?>"
+                                                        alt="<?php echo htmlspecialchars($story['name']); ?>"
+                                                        class="rounded-circle me-3 shadow-sm"
+                                                        style="width: 48px; height: 48px; object-fit: cover;">
+                                                <?php else: ?>
+                                                    <div class="avatar <?php echo htmlspecialchars($story['avatar_bg'] ?? 'bg-primary'); ?> text-white rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 48px; height: 48px; font-weight: bold;">
+                                                        <?php echo strtoupper(substr($story['name'], 0, 1)); ?>
+                                                    </div>
+                                                <?php endif; ?>
                                                 <div>
                                                     <h6 class="mb-0 fw-bold"><?php echo htmlspecialchars($story['name']); ?></h6>
                                                     <small class="text-primary"><?php echo htmlspecialchars($story['title']); ?></small>

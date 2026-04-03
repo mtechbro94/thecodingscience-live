@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS success_stories (
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
     rating INT DEFAULT 5,
+    photo_path VARCHAR(255) DEFAULT NULL,
     avatar_bg VARCHAR(50) DEFAULT 'bg-primary',
     is_active TINYINT(1) DEFAULT 1,
     sort_order INT DEFAULT 0,

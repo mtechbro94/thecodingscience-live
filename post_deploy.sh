@@ -217,6 +217,25 @@ if [ "$(table_exists otp_tokens)" = "0" ]; then
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;"
 fi
 
+if [ "$(table_exists success_stories)" = "0" ]; then
+    run_sql "CREATE TABLE \`success_stories\` (
+      \`id\` INT AUTO_INCREMENT PRIMARY KEY,
+      \`name\` VARCHAR(255) NOT NULL,
+      \`title\` VARCHAR(255) NOT NULL,
+      \`content\` TEXT NOT NULL,
+      \`rating\` INT DEFAULT 5,
+      \`photo_path\` VARCHAR(255) DEFAULT NULL,
+      \`avatar_bg\` VARCHAR(50) DEFAULT 'bg-primary',
+      \`is_active\` TINYINT(1) DEFAULT 1,
+      \`sort_order\` INT DEFAULT 0,
+      \`created_at\` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;"
+fi
+
+if [ "$(column_exists success_stories photo_path)" = "0" ]; then
+    run_sql "ALTER TABLE \`success_stories\` ADD COLUMN \`photo_path\` VARCHAR(255) DEFAULT NULL AFTER \`rating\`;"
+fi
+
 echo -e "${GREEN}✅ Database migration completed${NC}"
 
 # ============================================

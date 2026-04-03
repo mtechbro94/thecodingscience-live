@@ -8,12 +8,37 @@ if (!is_admin()) {
     redirect('/');
 }
 
+function success_story_image_full_path($relative_path)
+{
+    if (empty($relative_path)) {
+        return null;
+    }
+
+    $normalized = ltrim(str_replace('\\', '/', $relative_path), '/');
+    if (strpos($normalized, 'success-stories/') !== 0) {
+        return null;
+    }
+
+    return BASE_PATH . '/assets/images/' . $normalized;
+}
+
 $page_title = "Success Stories Management";
+$has_photo_path = table_has_column('success_stories', 'photo_path');
 
 // Handle Deletion
 if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
     $id = (int) $_GET['id'];
     try {
+        if ($has_photo_path) {
+            $stmt = $pdo->prepare("SELECT photo_path FROM success_stories WHERE id = ?");
+            $stmt->execute([$id]);
+            $story_to_delete = $stmt->fetch();
+            $old_file = success_story_image_full_path($story_to_delete['photo_path'] ?? null);
+            if ($old_file && file_exists($old_file)) {
+                @unlink($old_file);
+            }
+        }
+
         $stmt = $pdo->prepare("DELETE FROM success_stories WHERE id = ?");
         $stmt->execute([$id]);
         set_flash('success', 'Success story deleted successfully.');
@@ -67,6 +92,7 @@ require_once __DIR__ . '/includes/header.php';
                         <th>Sort</th>
                         <th>Name</th>
                         <th>Title</th>
+                        <th>Photo</th>
                         <th>Rating</th>
                         <th>Status</th>
                         <th>Actions</th>
@@ -75,7 +101,7 @@ require_once __DIR__ . '/includes/header.php';
                 <tbody>
                     <?php if (empty($stories)): ?>
                         <tr>
-                            <td colspan="6" class="text-center p-4 text-muted">No success stories found.</td>
+                            <td colspan="7" class="text-center p-4 text-muted">No success stories found.</td>
                         </tr>
                     <?php endif; ?>
                     <?php foreach ($stories as $story): ?>
@@ -96,6 +122,13 @@ require_once __DIR__ . '/includes/header.php';
                             </td>
                             <td>
                                 <?php echo htmlspecialchars($story['title']); ?>
+                            </td>
+                            <td>
+                                <?php if ($has_photo_path && !empty($story['photo_path'])): ?>
+                                    <img src="<?php echo htmlspecialchars(get_image_url($story['photo_path'])); ?>" alt="<?php echo htmlspecialchars($story['name']); ?>" class="rounded-circle border" style="width: 40px; height: 40px; object-fit: cover;">
+                                <?php else: ?>
+                                    <span class="text-muted small">No photo</span>
+                                <?php endif; ?>
                             </td>
                             <td>
                                 <div class="text-warning">
