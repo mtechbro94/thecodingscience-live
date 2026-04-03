@@ -156,7 +156,7 @@ require_once 'includes/header.php';
                                     <div class="login-options-wrapper">
                                         <?php
                                         $role_param = $_GET['role'] ?? 'student';
-                                        if (!in_array($role_param, ['student', 'trainer']))
+                                        if (!in_array($role_param, ['student', 'trainer', 'admin']))
                                             $role_param = 'student';
                                         ?>
                                         <!-- Role Selection -->
@@ -184,7 +184,22 @@ require_once 'includes/header.php';
                                                         <span class="role-desc">Teach & inspire</span>
                                                     </div>
                                                 </label>
+
+                                                <input type="radio" class="btn-check" name="login_role" id="roleAdmin"
+                                                    value="admin" <?php echo ($role_param === 'admin') ? 'checked' : ''; ?>
+                                                    onchange="updateRoleUI()">
+                                                <label class="role-option" for="roleAdmin">
+                                                    <div class="role-icon"><i class="fas fa-user-shield"></i></div>
+                                                    <div class="role-text">
+                                                        <span class="role-name">Admin</span>
+                                                        <span class="role-desc">Manage platform</span>
+                                                    </div>
+                                                </label>
                                             </div>
+                                            <p class="text-center small mt-3 mb-0">
+                                                Need administrator access?
+                                                <a href="/login?role=admin" class="text-primary fw-semibold text-decoration-none">Open admin sign in</a>
+                                            </p>
                                         </div>
 
                                         <!-- Student Auth Silo -->
@@ -261,6 +276,35 @@ require_once 'includes/header.php';
                                                 </button>
                                             </div>
                                         </div>
+
+                                        <!-- Admin Auth Silo -->
+                                        <div id="adminAuth" class="auth-section d-none">
+                                            <div class="trainer-login-form p-3 border rounded-4 bg-light mb-3">
+                                                <form method="POST" action="/login">
+                                                    <input type="hidden" name="login_role" value="admin">
+                                                    <div class="mb-3">
+                                                        <label class="form-label small fw-bold">Admin Email Address</label>
+                                                        <input type="email" class="form-control" name="email"
+                                                            placeholder="admin@example.com" required autocomplete="email">
+                                                    </div>
+                                                    <div class="mb-3 d-flex justify-content-between align-items-center">
+                                                        <label class="form-label small fw-bold mb-0">Password</label>
+                                                        <a href="/forgot-password" class="text-primary small fw-semibold text-decoration-none">Forgot Password?</a>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <input type="password" class="form-control" name="password"
+                                                            placeholder="••••••••" required autocomplete="current-password">
+                                                    </div>
+                                                    <button type="submit" class="btn btn-dark w-100 fw-bold py-2"
+                                                        style="border-radius: 10px;">
+                                                        Admin Sign In
+                                                    </button>
+                                                </form>
+                                                <p class="text-muted small text-center mt-3 mb-0">
+                                                    Restricted to administrator accounts.
+                                                </p>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <!-- Terms -->
@@ -282,13 +326,20 @@ require_once 'includes/header.php';
         const role = document.querySelector('input[name="login_role"]:checked').value;
         const studentAuth = document.getElementById('studentAuth');
         const trainerAuth = document.getElementById('trainerAuth');
+        const adminAuth = document.getElementById('adminAuth');
         
         if (role === 'trainer') {
             studentAuth.classList.add('d-none');
             trainerAuth.classList.remove('d-none');
+            adminAuth.classList.add('d-none');
+        } else if (role === 'admin') {
+            studentAuth.classList.add('d-none');
+            trainerAuth.classList.add('d-none');
+            adminAuth.classList.remove('d-none');
         } else {
             studentAuth.classList.remove('d-none');
             trainerAuth.classList.add('d-none');
+            adminAuth.classList.add('d-none');
         }
 
         // Update URL without reloading for bookmarking/sharing
@@ -641,11 +692,13 @@ require_once 'includes/header.php';
 
     .role-toggle {
         display: flex;
+        flex-wrap: wrap;
         gap: 0.75rem;
     }
 
     .role-option {
-        flex: 1;
+        flex: 1 1 120px;
+        min-width: 0;
         display: flex;
         align-items: center;
         gap: 0.75rem;

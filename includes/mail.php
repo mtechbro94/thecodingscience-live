@@ -58,7 +58,6 @@ function send_otp_email($email, $otp_code, $purpose = 'login')
     $subject = "Your Verification Code - " . SITE_NAME;
 
     $purpose_text = match ($purpose) {
-        'registration' => 'Welcome to ' . SITE_NAME . '! Your verification code is:',
         'password_reset' => 'Reset your password. Your verification code is:',
         default => 'Your verification code for ' . SITE_NAME . ' is:'
     };
