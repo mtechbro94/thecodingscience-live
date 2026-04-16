@@ -299,7 +299,19 @@ if [ "$HEALTH_CHECK_PASSED" = true ]; then
     echo -e "    ${GREEN}✓ All required files present${NC}"
 fi
 
-# Check 3: Database connectivity
+# Check 3: PHP PDO MySQL Extension
+echo "  • Checking PHP PDO MySQL extension..."
+php -m | grep -q "pdo_mysql" || {
+    echo -e "    ${RED}❌ PDO MySQL extension (pdo_mysql) is NOT loaded${NC}"
+    echo -e "    ${YELLOW}Fix: Contact HostMyIdea support to enable pdo_mysql extension${NC}"
+    echo -e "    ${YELLOW}Or check cPanel > Select PHP Version > Extensions > Enable pdo_mysql${NC}"
+    HEALTH_CHECK_PASSED=false
+}
+if php -m | grep -q "pdo_mysql"; then
+    echo -e "    ${GREEN}✓ PDO MySQL extension is loaded${NC}"
+fi
+
+# Check 4: Database connectivity
 echo "  • Checking database..."
 mysql -h "$DB_HOST" -u "$DB_USER" "$DB_NAME" -N -e "SELECT 1;" || {
     echo -e "    ${RED}❌ Database connection failed${NC}"
@@ -309,7 +321,7 @@ if [ "$HEALTH_CHECK_PASSED" = true ]; then
     echo -e "    ${GREEN}✓ Database connection successful${NC}"
 fi
 
-# Check 4: New auth tables exist
+# Check 5: New auth tables exist
 echo "  • Checking new database tables..."
 TABLES_OK=$(mysql -h "$DB_HOST" -u "$DB_USER" "$DB_NAME" -N -e "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='$DB_NAME' AND TABLE_NAME IN ('users', 'otp_tokens');" 2>/dev/null || echo "0")
 if [ "$TABLES_OK" -eq 2 ]; then
