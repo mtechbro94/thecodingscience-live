@@ -190,20 +190,37 @@ def blog_form():
                 image = uploaded
 
             if not errors:
+                from app.helpers import table_has_column
+
+                has_author_id = table_has_column("blogs", "author_id")
                 try:
                     if is_edit:
-                        db().execute(
-                            "UPDATE blogs SET title=%s, slug=%s, excerpt=%s, content=%s, image=%s, "
-                            "author=%s, author_id=%s, is_published=%s WHERE id=%s",
-                            (title, slug, excerpt, content, image, author, author_id, is_published, blog_id),
-                        )
+                        if has_author_id:
+                            db().execute(
+                                "UPDATE blogs SET title=%s, slug=%s, excerpt=%s, content=%s, image=%s, "
+                                "author=%s, author_id=%s, is_published=%s WHERE id=%s",
+                                (title, slug, excerpt, content, image, author, author_id, is_published, blog_id),
+                            )
+                        else:
+                            db().execute(
+                                "UPDATE blogs SET title=%s, slug=%s, excerpt=%s, content=%s, image=%s, "
+                                "author=%s, is_published=%s WHERE id=%s",
+                                (title, slug, excerpt, content, image, author, is_published, blog_id),
+                            )
                         set_flash("success", "Blog post updated successfully.")
                     else:
-                        db().insert(
-                            "INSERT INTO blogs (title, slug, excerpt, content, image, author, author_id, "
-                            "date, is_published, created_at) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())",
-                            (title, slug, excerpt, content, image, author, author_id, date, is_published),
-                        )
+                        if has_author_id:
+                            db().insert(
+                                "INSERT INTO blogs (title, slug, excerpt, content, image, author, author_id, "
+                                "date, is_published, created_at) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())",
+                                (title, slug, excerpt, content, image, author, author_id, date, is_published),
+                            )
+                        else:
+                            db().insert(
+                                "INSERT INTO blogs (title, slug, excerpt, content, image, author, "
+                                "date, is_published, created_at) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW())",
+                                (title, slug, excerpt, content, image, author, date, is_published),
+                            )
                         set_flash("success", "Blog post created successfully.")
                     return redirect("/admin/blogs")
                 except Exception:

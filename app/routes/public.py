@@ -33,11 +33,17 @@ def home():
             courses = []
 
     try:
-        blogs = db().fetch_all(
-            "SELECT b.*, u.name AS author_name, u.profile_image AS author_image "
-            "FROM blogs b LEFT JOIN users u ON b.author_id = u.id "
-            "WHERE b.is_published = 1 ORDER BY b.created_at DESC LIMIT 3"
-        )
+        if table_has_column("blogs", "author_id"):
+            blogs = db().fetch_all(
+                "SELECT b.*, u.name AS author_name, u.profile_image AS author_image "
+                "FROM blogs b LEFT JOIN users u ON b.author_id = u.id "
+                "WHERE b.is_published = 1 ORDER BY b.created_at DESC LIMIT 3"
+            )
+        else:
+            blogs = db().fetch_all(
+                "SELECT b.*, b.author AS author_name, NULL AS author_image "
+                "FROM blogs b WHERE b.is_published = 1 ORDER BY b.created_at DESC LIMIT 3"
+            )
     except Exception:
         blogs = []
 
@@ -249,16 +255,26 @@ def course_detail(course_id):
 def blogs():
     from flask import request
 
+    from app.helpers import table_has_column
+
     category = request.args.get("category", "").strip()
-    sql = "SELECT b.*, u.name AS author_name FROM blogs b LEFT JOIN users u ON b.author_id = u.id WHERE b.is_published = 1"
+    blogs_have_category = table_has_column("blogs", "category")
+    if table_has_column("blogs", "author_id"):
+        author_select = "b.*, u.name AS author_name FROM blogs b LEFT JOIN users u ON b.author_id = u.id"
+    else:
+        author_select = "b.*, b.author AS author_name FROM blogs b"
+    sql = f"SELECT {author_select} WHERE b.is_published = 1"
     params = []
-    if category:
+    if category and blogs_have_category:
         sql += " AND b.category = %s"
         params.append(category)
 
     all_blogs = db().fetch_all(sql + " ORDER BY b.created_at DESC", params)
 
-    categories = db().fetch_all("SELECT DISTINCT category FROM blogs WHERE is_published = 1")
+    if blogs_have_category:
+        categories = db().fetch_all("SELECT DISTINCT category FROM blogs WHERE is_published = 1")
+    else:
+        categories = []
 
     return render_template(
         "public/blogs.html",
@@ -273,11 +289,16 @@ def blogs():
 def blog_detail(slug):
     from flask import abort
 
-    from app.helpers import markdown_to_html
+    from app.helpers import markdown_to_html, table_has_column
+
+    if table_has_column("blogs", "author_id"):
+        author_select = "b.*, u.name AS author_name, u.profile_image AS author_image " \
+            "FROM blogs b LEFT JOIN users u ON b.author_id = u.id"
+    else:
+        author_select = "b.*, b.author AS author_name, NULL AS author_image FROM blogs b"
 
     blog = db().fetch_one(
-        "SELECT b.*, u.name AS author_name, u.profile_image AS author_image "
-        "FROM blogs b LEFT JOIN users u ON b.author_id = u.id "
+        f"SELECT {author_select} "
         "WHERE b.slug = %s AND b.is_published = 1",
         (slug,),
     )
@@ -320,18 +341,24 @@ def career_track(slug):
 
     from app.career_settings import CAREER_SETTINGS
 
-    track = db().fetch_one(
-        "SELECT * FROM career_tracks WHERE slug = %s AND is_active = 1", (slug,)
-    )
+    try:
+        track = db().fetch_one(
+            "SELECT * FROM career_tracks WHERE slug = %s AND is_active = 1", (slug,)
+        )
+    except Exception:
+        return redirect("/career")
     if not track:
         return redirect("/courses")
 
-    track_courses = db().fetch_all(
-        "SELECT c.*, ct.sort_order FROM career_track_courses ct "
-        "JOIN courses c ON c.id = ct.course_id "
-        "WHERE ct.track_id = %s ORDER BY ct.sort_order ASC",
-        (track["id"],),
-    )
+    try:
+        track_courses = db().fetch_all(
+            "SELECT c.*, ct.sort_order FROM career_track_courses ct "
+            "JOIN courses c ON c.id = ct.course_id "
+            "WHERE ct.track_id = %s ORDER BY ct.sort_order ASC",
+            (track["id"],),
+        )
+    except Exception:
+        track_courses = []
 
     curriculum = track.get("curriculum")
     curriculum = json.loads(curriculum) if curriculum else []
@@ -379,13 +406,14 @@ def sitemap():
     today = datetime.now().strftime("%Y-%m-%d")
 
     blogs_have_updated = table_has_column("blogs", "updated_at")
+    blogs_update_col = "slug, updated_at" if blogs_have_updated else "slug, created_at AS updated_at"
     blogs = db().fetch_all(
-        "SELECT slug, updated_at FROM blogs WHERE is_published = 1 ORDER BY id DESC"
+        f"SELECT {blogs_update_col} FROM blogs WHERE is_published = 1 ORDER BY id DESC"
     ) if table_has_column("blogs", "is_published") else db().fetch_all(
-        "SELECT slug, updated_at FROM blogs ORDER BY id DESC"
+        f"SELECT {blogs_update_col} FROM blogs ORDER BY id DESC"
     )
     for blog in blogs:
-        lastmod = blog["updated_at"].strftime("%Y-%m-%d") if blogs_have_updated and blog.get("updated_at") else today
+        lastmod = blog["updated_at"].strftime("%Y-%m-%d") if blog.get("updated_at") else today
         entries.append({
             "loc": base + "/blog/" + blog["slug"],
             "changefreq": "weekly",
@@ -395,14 +423,15 @@ def sitemap():
 
     courses_have_published = table_has_column("courses", "is_published")
     courses_have_updated = table_has_column("courses", "updated_at")
+    courses_update_col = "id, updated_at" if courses_have_updated else "id, created_at AS updated_at"
     if courses_have_published:
         courses = db().fetch_all(
-            "SELECT id, updated_at FROM courses WHERE is_published = 1 ORDER BY id DESC"
+            f"SELECT {courses_update_col} FROM courses WHERE is_published = 1 ORDER BY id DESC"
         )
     else:
-        courses = db().fetch_all("SELECT id, updated_at FROM courses ORDER BY id DESC")
+        courses = db().fetch_all(f"SELECT {courses_update_col} FROM courses ORDER BY id DESC")
     for course in courses:
-        lastmod = course["updated_at"].strftime("%Y-%m-%d") if courses_have_updated and course.get("updated_at") else today
+        lastmod = course["updated_at"].strftime("%Y-%m-%d") if course.get("updated_at") else today
         entries.append({
             "loc": base + "/course/" + str(course["id"]),
             "changefreq": "weekly",
