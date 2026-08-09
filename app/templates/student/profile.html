@@ -104,7 +104,7 @@
                         {% if is_trainer() and not user_data.get('is_approved') %}
                             <p class="mb-0"><strong class="text-warning">Account Status:</strong> <span class="badge bg-warning">Pending Admin Approval</span></p>
                         {% endif %}
-                        <p class="mb-0"><small class="text-muted">Member since {{ user_data.get('created_at').strftime('%B %-d, %Y') if user_data.get('created_at') else '' }}</small></p>
+                        <p class="mb-0"><small class="text-muted">Member since {{ user_data.get('created_at') | pretty_date }}</small></p>
                     </div>
 
                     {# Save Button #}

@@ -262,6 +262,8 @@ def validate_coupon(code, total_amount):
     except TypeError:
         pass
 
+    total_amount = float(total_amount)
+
     if float(coupon.get("min_purchase") or 0) > 0 and total_amount < float(coupon["min_purchase"]):
         return {
             "success": False,

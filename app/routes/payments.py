@@ -131,7 +131,7 @@ def _resolve_course(course_id, course_name, track_slug, combo_name):
     return course, course_id
 
 
-@bp.route("/enroll")
+@bp.route("/enroll", methods=["GET", "POST"])
 @bp.route("/enroll/<int:course_id>", methods=["GET", "POST"])
 def enroll(course_id=0):
     if not is_logged_in():

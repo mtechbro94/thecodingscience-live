@@ -63,3 +63,24 @@ def test_404_handler(app):
     client = app.test_client()
     rv = client.get("/does-not-exist-xyz")
     assert rv.status_code == 404
+
+
+def test_student_profile_renders_with_date(client, fakedb):
+    from datetime import datetime
+
+    fakedb._one = {
+        "id": 1, "name": "Test Student", "email": "s@example.com", "role": "student",
+        "phone": None, "education": None, "expertise": None, "bio": None,
+        "is_active": 1, "is_approved": 1, "profile_image": None,
+        "created_at": datetime(2026, 1, 5),
+    }
+    with client.session_transaction() as sess:
+        sess["user_id"] = 1
+        sess["user_role"] = "student"
+        sess["user_name"] = "Test Student"
+        sess["user_email"] = "s@example.com"
+    rv = client.get("/profile")
+    assert rv.status_code == 200
+    body = rv.get_data(as_text=True)
+    assert "My Profile" in body
+    assert "Member since" in body

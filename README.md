@@ -2,18 +2,14 @@
 
 Production-ready Flask website for The Coding Science, including public marketing pages, student enrollment flows, trainer tools, and an admin panel.
 
-Live site: `https://thecodingscience.com`
-
 ## Stack
 
 - Flask (Python 3.11) with blueprint-based routing
 - MySQL/MariaDB (PyMySQL, PDO-style query helpers)
-- Gunicorn as the production WSGI server
 - Bootstrap-based frontend with custom CSS/JS
 - Google OAuth for student authentication
 - Email OTP for trainer authentication
 - Razorpay payment integration
-- GitHub Actions deployment to HostMyIdea via SSH
 
 ## Core Features
 
@@ -51,14 +47,11 @@ app/                 Flask application package
   social.py          Google OAuth
   auth.py            Route decorators (login/admin/trainer/student required)
 config.py            Environment and app configuration
-wsgi.py              WSGI entrypoint for Gunicorn
-gunicorn.conf.py     Gunicorn server config
+wsgi.py              WSGI entrypoint
 run.py               Local development server (port 8000)
 assets/              CSS, JS, images
 database/            Schema and migration SQL
 tests/               Pytest smoke tests (DB mocked)
-.github/workflows/   GitHub Actions deployment workflow
-post_deploy.sh       Server-side post-deploy script
 ```
 
 ## Local Setup
@@ -127,41 +120,8 @@ python -m pytest -q
 
 Tests mock the database layer, so they run without a MySQL server.
 
-## Deployment
-
-Production deployment is handled by GitHub Actions:
-
-- Workflow: [.github/workflows/deploy.yml](/c:/Users/Mtechbro-94/Desktop/thecodingscience-live/.github/workflows/deploy.yml)
-- Trigger: push to `main`
-- Steps: run pytest -> create `.env` from secrets -> tarball upload over SSH to HostMyIdea -> run [post_deploy.sh](/c:/Users/Mtechbro-94/Desktop/thecodingscience-live/post_deploy.sh)
-- Post-deploy tasks: venv setup, dependency install, incremental database migrations, Gunicorn restart
-
-### Required GitHub Secrets
-
-- `SSH_PRIVATE_KEY`
-- `SSH_HOST`
-- `SSH_USER`
-- `DEPLOYMENT_PATH`
-- `SECRET_KEY`
-- `DB_HOST`
-- `DB_NAME`
-- `DB_USER`
-- `PROD_DB_PASS`
-- `SITE_URL`
-- `SITE_NAME`
-- `RAZORPAY_KEY_ID`
-- `RAZORPAY_KEY_SECRET`
-- `SMTP_HOST`
-- `SMTP_USER`
-- `SMTP_PASS`
-- `SMTP_PORT`
-- `GOOGLE_CLIENT_ID`
-- `GOOGLE_CLIENT_SECRET`
-
 ## Production Notes
 
-- Markdown files are intentionally excluded from deployment.
-- `post_deploy.sh` creates a Python venv, installs dependencies, runs incremental database updates, and restarts Gunicorn (systemd or supervisor, if a unit is configured).
 - Admin pages require an authenticated user with role `admin`.
 - Trainer access is provisioned by the team; trainer self-registration is not part of the active production flow.
 
@@ -169,8 +129,7 @@ Production deployment is handled by GitHub Actions:
 
 - Verify Google OAuth credentials after domain or callback changes
 - Verify SMTP delivery for OTP and password reset emails
-- Confirm Razorpay keys in production before payment testing
-- Review GitHub Actions logs after each deploy
+- Confirm Razorpay keys before payment testing
 - Check file permissions for profile uploads on the server
 
 ## License

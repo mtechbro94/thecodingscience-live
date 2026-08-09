@@ -86,6 +86,76 @@ def test_enroll_now_creates_enrollment(client, fakedb):
     assert len(inserts) == 1
 
 
+def test_enroll_now_track_accepts_post(client, fakedb):
+    """Track bundle enrollment must accept POST on /enroll (regression for 405)."""
+    from decimal import Decimal
+
+    track = {
+        "id": 1, "name": "AI Track", "slug": "ai-track", "price": Decimal("11999.00"),
+        "original_price": Decimal("18999.00"), "image": None, "duration": "6 months",
+        "outcomes": "Learn AI", "requirements": "Python", "curriculum": None,
+    }
+
+    def router(sql, params=None):
+        if "FROM career_tracks" in sql:
+            return track
+        if "FROM courses" in sql and "JOIN career_track_courses" in sql:
+            return []
+        if "FROM enrollments" in sql:
+            return None
+        return None
+
+    fakedb._one_router = router
+    fakedb._all = []
+    fakedb._insert = 55
+    _login(client)
+
+    client.get("/enroll?track=ai-track")
+    with client.session_transaction() as sess:
+        token = sess.get("csrf_token")
+
+    rv = client.post(
+        "/enroll?track=ai-track",
+        data={"csrf_token": token, "enroll_now": "1", "final_amount": "11999"},
+    )
+    assert rv.status_code == 302
+    assert rv.headers.get("Location") == "/razorpay-payment/55?from=enroll"
+
+
+def test_coupon_percentage_decimal_amount(client, fakedb):
+    """Percentage coupon must work when total_amount is a Decimal (regression)."""
+    from decimal import Decimal
+
+    course_row = dict(COURSE_ROW)
+    course_row["price"] = Decimal("4499.00")
+
+    def router(sql, params=None):
+        if "FROM coupons" in sql:
+            return {
+                "id": 1, "code": "SAVE20", "discount_type": "percentage",
+                "discount_value": Decimal("20.00"), "min_purchase": Decimal("0.00"),
+                "max_uses": 100, "used_count": 0, "valid_from": None, "valid_until": None,
+            }
+        if "FROM enrollments" in sql:
+            return None
+        return course_row
+
+    fakedb._one_router = router
+    _login(client)
+
+    client.get("/enroll/3")
+    with client.session_transaction() as sess:
+        token = sess.get("csrf_token")
+
+    rv = client.post(
+        "/enroll/3",
+        data={"csrf_token": token, "apply_coupon": "1", "coupon_code": "SAVE20"},
+    )
+    assert rv.status_code == 200
+    body = rv.get_data(as_text=True)
+    assert "SAVE20" in body
+
+
 def test_enroll_now_requires_csrf(client, fakedb):
     _login(client)
     rv = client.post("/enroll/3", data={"csrf_token": "", "enroll_now": "1", "final_amount": "100"})

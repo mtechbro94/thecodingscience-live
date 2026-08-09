@@ -118,6 +118,16 @@ def create_app(config_class=Config):
     app.jinja_env.filters["number_format"] = lambda n, decimals=0: (
         f"{{:,.{decimals}f}}".format(float(n or 0))
     )
+
+    def pretty_date(value):
+        if not value:
+            return ""
+        try:
+            return value.strftime("%B %d, %Y").replace(" 0", " ")
+        except (AttributeError, ValueError):
+            return ""
+
+    app.jinja_env.filters["pretty_date"] = pretty_date
     app.jinja_env.globals["now"] = datetime
 
     @app.errorhandler(404)
