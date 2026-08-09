@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="py-5" style="margin-top: 80px;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/blogs">Blog</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">
+                            {{ blog['title'] }}
+                        </li>
+                    </ol>
+                </nav>
+
+                {% if blog['image'] %}
+                    <img src="{{ get_image_url(blog['image']) }}" class="img-fluid rounded shadow-sm mb-4"
+                        alt="{{ blog['title'] }}"
+                        style="width: 100%; max-height: 450px; object-fit: cover;">
+                {% endif %}
+
+                <div class="d-flex align-items-center mb-4 text-muted">
+                    <div class="d-flex align-items-center me-4">
+                        {% set author_name = blog['author_name'] or blog['author'] or 'Admin' %}
+                        {% if blog.get('author_image') %}
+                            {% set author_data = {'profile_image': blog['author_image'], 'name': author_name} %}
+                            <img src="{{ get_avatar(author_data) }}"
+                                alt="{{ author_name }}" class="rounded-circle me-2"
+                                style="width: 40px; height: 40px; object-fit: cover;">
+                        {% else %}
+                            <div class="bg-primary text-white rounded-circle me-2 d-flex align-items-center justify-content-center"
+                                style="width: 40px; height: 40px; font-size: 16px;">
+                                {{ author_name[:1] | upper }}
+                            </div>
+                        {% endif %}
+                        <div>
+                            <span class="fw-bold text-dark d-block">
+                                {{ author_name }}
+                            </span>
+                            {% if blog.get('author_email') %}
+                                <small class="text-muted">{{ blog['author_email'] }}</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-calendar-alt me-2"></i>
+                        <span>
+                            {{ blog['created_at'].strftime('%b %d, %Y') }}
+                        </span>
+                    </div>
+                </div>
+
+                <h1 class="display-4 font-weight-bold mb-4">
+                    {{ blog['title'] }}
+                </h1>
+
+                <!-- Markdown Content -->
+                <div id="blogContent" class="blog-content" style="line-height: 1.8; color: #333; font-size: 1.1rem;">
+                    {{ blog_content | safe }}
+                </div>
+
+                <hr class="my-5">
+
+                <div class="d-flex justify-content-between">
+                    <a href="/blogs" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-2"></i> Back to Blog
+                    </a>
+                    {% set full_url = SITE_URL ~ '/blog/' ~ blog['slug'] %}
+                    {% set encoded_url = full_url | urlencode %}
+                    {% set encoded_title = blog['title'] | urlencode %}
+                    {% set whatsapp_text = (blog['title'] ~ '\n\n' ~ full_url) | urlencode %}
+
+                    <div class="share-buttons">
+                        <span class="me-2 text-muted">Share:</span>
+                        <a href="https://wa.me/?text={{ whatsapp_text }}" target="_blank"
+                            class="btn btn-sm btn-outline-success rounded-circle me-2" title="Share on WhatsApp"><i
+                                class="fab fa-whatsapp"></i></a>
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ encoded_url }}" target="_blank"
+                            class="btn btn-sm btn-outline-primary rounded-circle me-2" title="Share on Facebook"><i
+                                class="fab fa-facebook-f"></i></a>
+                        <a href="https://twitter.com/intent/tweet?url={{ encoded_url }}&text={{ encoded_title }}" target="_blank"
+                            class="btn btn-sm btn-outline-dark rounded-circle me-2" title="Share on X/Twitter"><i
+                                class="fab fa-twitter"></i></a>
+                        <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ encoded_url }}&title={{ encoded_title }}" target="_blank"
+                            class="btn btn-sm btn-outline-primary rounded-circle" title="Share on LinkedIn"><i
+                                class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

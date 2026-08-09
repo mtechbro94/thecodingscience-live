@@ -1,0 +1,115 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Enrollment Management</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <button type="button" class="btn btn-sm btn-outline-secondary">Export CSV</button>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Student</th>
+                        <th>Course</th>
+                        <th>Amount</th>
+                        <th>Payment Method</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for enrollment in enrollments %}
+                        <tr>
+                            <td>{{ enrollment['id'] }}</td>
+                            <td>
+                                <div class="fw-bold">{{ enrollment['user_name'] }}</div>
+                                <small class="text-muted">{{ enrollment['user_email'] }}</small>
+                            </td>
+                            <td>{{ enrollment['course_name'] }}</td>
+                            <td>₹{{ enrollment['amount_paid']|number_format(2) }}</td>
+                            <td>
+                                <span class="badge bg-light text-dark border">
+                                    {{ (enrollment['payment_method'] or '')|upper }}
+                                </span>
+                                {% if enrollment['utr'] %}
+                                    <div class="mt-1">
+                                        <span class="badge bg-info text-dark">UTR: {{ enrollment['utr'] }}</span>
+                                    </div>
+                                {% endif %}
+                                {% if enrollment['payment_id'] %}
+                                    <div class="small text-muted mt-1" title="Payment ID">
+                                        <i class="fas fa-receipt"></i>
+                                        {{ (enrollment['payment_id'] or '')[:10] }}...
+                                    </div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if enrollment['status'] == 'completed' %}
+                                    <span class="badge bg-success">Completed</span>
+                                {% elif enrollment['status'] == 'pending' %}
+                                    <span class="badge bg-warning text-dark">Pending verification</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ (enrollment['status'] or '')[:1]|upper }}{{ (enrollment['status'] or '')[1:] }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ enrollment['enrolled_at_display'] }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    {% if enrollment['status'] == 'pending' %}
+                                        <form method="POST" class="d-inline">
+                                            <input type="hidden" name="csrf_token" value="{{ generate_csrf_token() }}">
+                                            <input type="hidden" name="action" value="verify_payment">
+                                            <input type="hidden" name="id" value="{{ enrollment['id'] }}">
+                                            <button type="submit" class="btn btn-success" title="Verify Payment">
+                                                <i class="fas fa-check-double"></i> Verify
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                    <form method="POST" class="d-inline"
+                                        onsubmit="return confirm('Are you sure you want to delete this enrollment?');">
+                                        <input type="hidden" name="csrf_token" value="{{ generate_csrf_token() }}">
+                                        <input type="hidden" name="action" value="delete">
+                                        <input type="hidden" name="id" value="{{ enrollment['id'] }}">
+                                        <button type="submit" class="btn btn-outline-danger" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center py-3">No enrollments found</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if total_pages > 1 %}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item {{ 'disabled' if page <= 1 else '' }}">
+                        <a class="page-link" href="?page={{ page - 1 }}">Previous</a>
+                    </li>
+                    {% for i in range(1, total_pages + 1) %}
+                        <li class="page-item {{ 'active' if page == i else '' }}">
+                            <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                        </li>
+                    {% endfor %}
+                    <li class="page-item {{ 'disabled' if page >= total_pages else '' }}">
+                        <a class="page-link" href="?page={{ page + 1 }}">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

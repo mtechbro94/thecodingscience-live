@@ -1,7 +1,7 @@
 #!/bin/bash
-# post_deploy.sh - Post-Deployment Script
+# post_deploy.sh - Post-Deployment Script (Flask/Gunicorn)
 # This script runs on the server after deployment via GitHub Actions
-# It handles: database migrations, cache clearing, permissions, health checks
+# It handles: venv setup, dependency install, database migrations, permissions, service restart
 
 set -e  # Exit on error
 
@@ -18,7 +18,15 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Configuration
-DEPLOY_PATH="/home/thecodin/public_html"
+DEPLOY_PATH="${DEPLOY_PATH:-/home/thecodin/public_html}"
+APP_DIR="$(pwd)"
+VENV_DIR="$APP_DIR/venv"
+
+# Optional override via environment (set by GitHub Actions)
+if [ -n "${DEPLOYMENT_PATH}" ]; then
+  DEPLOY_PATH="${DEPLOYMENT_PATH}"
+fi
+
 DB_HOST="${DB_HOST:-localhost}"
 DB_USER="${DB_USER:-thecodin}"
 DB_NAME="${DB_NAME:-thecodin_db}"
@@ -28,9 +36,7 @@ DB_PASS="${DB_PASS:-}"
 function env_get() {
   local key="$1"
   local value
-  # Use grep to find the line, cut to get the value, then strip ONLY leading/trailing quotes if they wrap the value
   value=$(grep -E "^$key=" .env 2>/dev/null | tail -n1 | cut -d'=' -f2-)
-  # Only remove surrounding quotes if both exist
   if [[ ($value == \"*\" || $value == \'*\' ) ]]; then
     value="${value:1:-1}"
   fi
@@ -47,74 +53,84 @@ if [ -f ".env" ]; then
   fi
 fi
 
-# Prepare database connection
 if [ -n "$DB_PASS" ]; then
   export MYSQL_PWD="$DB_PASS"
 fi
 
-# Add debugging output to confirm password loading
 if [ -z "$DB_PASS" ]; then
-  echo -e "${YELLOW}⚠️  Warning: DB_PASS is empty. Check .env file.${NC}"
+  echo -e "${YELLOW}??  Warning: DB_PASS is empty. Check .env file.${NC}"
 else
-  echo -e "${GREEN}✅ DB_PASS loaded successfully.${NC}"
+  echo -e "${GREEN}? DB_PASS loaded successfully.${NC}"
 fi
 
 # ============================================
 # Step 1: Verify .env file exists
 # ============================================
 echo ""
-echo -e "${YELLOW}Step 1/5: Verifying configuration...${NC}"
+echo -e "${YELLOW}Step 1/6: Verifying configuration...${NC}"
 
-# Check if we're in the right directory
-if [ -d "$DEPLOY_PATH" ]; then
-    cd "$DEPLOY_PATH"
-fi
+cd "$APP_DIR"
 
 if [ ! -f ".env" ]; then
-    echo -e "${RED}❌ Error: .env file not found in $(pwd)!${NC}"
+    echo -e "${RED}? Error: .env file not found in $(pwd)!${NC}"
     echo "   Please create .env file with database and mail configuration"
     exit 1
 fi
 
-echo -e "${GREEN}✅ .env file found${NC}"
+echo -e "${GREEN}? .env file found${NC}"
 
-# Check for Google Client ID
 G_CLIENT_ID=$(env_get GOOGLE_CLIENT_ID)
 if [ -z "$G_CLIENT_ID" ]; then
-    echo -e "${YELLOW}⚠️  Warning: GOOGLE_CLIENT_ID is missing from .env. Gmail Login will not work!${NC}"
+    echo -e "${YELLOW}??  Warning: GOOGLE_CLIENT_ID is missing from .env. Gmail Login will not work!${NC}"
 else
-    echo -e "${GREEN}✅ GOOGLE_CLIENT_ID configured.${NC}"
+    echo -e "${GREEN}? GOOGLE_CLIENT_ID configured.${NC}"
 fi
 
 # ============================================
 # Step 2: Set file permissions
 # ============================================
 echo ""
-echo -e "${YELLOW}Step 2/5: Setting file permissions...${NC}"
+echo -e "${YELLOW}Step 2/6: Setting file permissions...${NC}"
 
-# Make directories writable
 chmod 755 assets/images/profiles/ 2>/dev/null || mkdir -p assets/images/profiles/ && chmod 755 assets/images/profiles/
-chmod 755 storage/ 2>/dev/null || mkdir -p storage && chmod 755 storage/
-chmod 755 logs/ 2>/dev/null || mkdir -p logs && chmod 755 logs/
-
-# Ensure config files are readable
-chmod 644 config.php
+chmod 755 assets/uploads/resources/ 2>/dev/null || mkdir -p assets/uploads/resources/ && chmod 755 assets/uploads/resources/
 chmod 644 .env 2>/dev/null || true
 
-echo -e "${GREEN}✅ File permissions set${NC}"
+echo -e "${GREEN}? File permissions set${NC}"
 
 # ============================================
-# Step 3: Run Database Migration
+# Step 3: Python venv + dependencies
 # ============================================
 echo ""
-echo -e "${YELLOW}Step 3/5: Running database migration...${NC}"
+echo -e "${YELLOW}Step 3/6: Setting up Python environment...${NC}"
 
-# Debugging: Print database connection parameters
-echo "  • Attempting DB connection with:"
+if ! command -v python3 >/dev/null 2>&1; then
+    echo -e "${RED}? Error: python3 not found. Install Python 3.11+ first.${NC}"
+    exit 1
+fi
+
+if [ ! -d "$VENV_DIR" ]; then
+    python3 -m venv "$VENV_DIR"
+    echo -e "${GREEN}? Virtual environment created${NC}"
+else
+    echo -e "${GREEN}? Virtual environment already exists${NC}"
+fi
+
+"$VENV_DIR/bin/pip" install --upgrade pip --quiet
+"$VENV_DIR/bin/pip" install -r requirements.txt --quiet
+echo -e "${GREEN}? Dependencies installed${NC}"
+
+# ============================================
+# Step 4: Run Database Migration
+# ============================================
+echo ""
+echo -e "${YELLOW}Step 4/6: Running database migration...${NC}"
+
+echo "  Attempting DB connection with:"
 echo "    Host: $DB_HOST"
 echo "    User: $DB_USER"
 echo "    Name: $DB_NAME"
-echo "    Password: (passed via -p flag)" # Do not print actual password
+echo "    Password: (passed via env)"
 
 column_exists() {
     local table_name="$1"
@@ -153,7 +169,7 @@ table_exists() {
 run_sql() {
     local sql="$1"
     mysql -h "$DB_HOST" -u "$DB_USER" "$DB_NAME" -e "$sql" || {
-        echo -e "${RED}❌ Database migration failed${NC}"
+        echo -e "${RED}? Database migration failed${NC}"
         echo "   Failed SQL: $sql"
         exit 1
     }
@@ -236,98 +252,79 @@ if [ "$(column_exists success_stories photo_path)" = "0" ]; then
     run_sql "ALTER TABLE \`success_stories\` ADD COLUMN \`photo_path\` VARCHAR(255) DEFAULT NULL AFTER \`rating\`;"
 fi
 
-echo -e "${GREEN}✅ Database migration completed${NC}"
-
-# ============================================
-# Step 4: Clear old sessions and cache
-# ============================================
-echo ""
-echo -e "${YELLOW}Step 4/5: Clearing cache and old sessions...${NC}"
-
-# Clear PHP sessions (if accessible)
-if [ -d "/tmp/php_sessions" ]; then
-    find /tmp/php_sessions -name "sess_*" -mtime +7 -delete 2>/dev/null || true
-fi
-
-# Clear application cache if any
-if [ -d "$DEPLOY_PATH/storage/cache" ]; then
-    rm -rf $DEPLOY_PATH/storage/cache/* 2>/dev/null || true
-fi
-
-echo -e "${GREEN}✅ Cache and sessions cleared${NC}"
+echo -e "${GREEN}? Database migration completed${NC}"
 
 # ============================================
 # Step 5: Health Checks
 # ============================================
 echo ""
-echo -e "${YELLOW}Step 5/5: Running health checks...${NC}"
+echo -e "${YELLOW}Step 5/6: Running health checks...${NC}"
 
 HEALTH_CHECK_PASSED=true
 
-# Check 1: PHP syntax validation
-echo "  • Checking PHP files..."
-for php_file in api/*.php includes/*.php views/*.php; do
-    if [ -f "$php_file" ]; then
-        php -l "$php_file" > /dev/null 2>&1 || {
-            echo -e "    ${RED}❌ Syntax error in $php_file${NC}"
-            HEALTH_CHECK_PASSED=false
-        }
-    fi
-done
+# Check 1: Python syntax + app boots
+echo "  Checking Python app imports..."
+"$VENV_DIR/bin/python" -c "from app import create_app; create_app()" 2>/dev/null || {
+    echo -e "    ${RED}? App failed to boot${NC}"
+    HEALTH_CHECK_PASSED=false
+}
 if [ "$HEALTH_CHECK_PASSED" = true ]; then
-    echo -e "    ${GREEN}✓ All PHP files have valid syntax${NC}"
+    echo -e "    ${GREEN}V App boots successfully${NC}"
 fi
 
 # Check 2: Required files exist
-echo "  • Checking required files..."
+echo "  Checking required files..."
 REQUIRED_FILES=(
-    "api/trainer_auth.php"
-    "api/student_auth.php"
-    "includes/mail.php"
-    "views/trainer_login.php"
-    "views/student_login.php"
-    "views/profile.php"
+    "wsgi.py"
+    "config.py"
+    "app/__init__.py"
+    "app/db.py"
+    "app/routes/payments.py"
 )
 
 for file in "${REQUIRED_FILES[@]}"; do
     if [ ! -f "$file" ]; then
-        echo -e "    ${RED}❌ Missing required file: $file${NC}"
+        echo -e "    ${RED}? Missing required file: $file${NC}"
         HEALTH_CHECK_PASSED=false
     fi
 done
 if [ "$HEALTH_CHECK_PASSED" = true ]; then
-    echo -e "    ${GREEN}✓ All required files present${NC}"
+    echo -e "    ${GREEN}V All required files present${NC}"
 fi
 
-# Check 3: PHP PDO MySQL Extension
-echo "  • Checking PHP PDO MySQL extension..."
-php -m | grep -q "pdo_mysql" || {
-    echo -e "    ${RED}❌ PDO MySQL extension (pdo_mysql) is NOT loaded${NC}"
-    echo -e "    ${YELLOW}Fix: Contact HostMyIdea support to enable pdo_mysql extension${NC}"
-    echo -e "    ${YELLOW}Or check cPanel > Select PHP Version > Extensions > Enable pdo_mysql${NC}"
-    HEALTH_CHECK_PASSED=false
-}
-if php -m | grep -q "pdo_mysql"; then
-    echo -e "    ${GREEN}✓ PDO MySQL extension is loaded${NC}"
-fi
-
-# Check 4: Database connectivity
-echo "  • Checking database..."
+# Check 3: Database connectivity
+echo "  Checking database..."
 mysql -h "$DB_HOST" -u "$DB_USER" "$DB_NAME" -N -e "SELECT 1;" || {
-    echo -e "    ${RED}❌ Database connection failed${NC}"
+    echo -e "    ${RED}? Database connection failed${NC}"
     HEALTH_CHECK_PASSED=false
 }
 if [ "$HEALTH_CHECK_PASSED" = true ]; then
-    echo -e "    ${GREEN}✓ Database connection successful${NC}"
+    echo -e "    ${GREEN}V Database connection successful${NC}"
 fi
 
-# Check 5: New auth tables exist
-echo "  • Checking new database tables..."
-TABLES_OK=$(mysql -h "$DB_HOST" -u "$DB_USER" "$DB_NAME" -N -e "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='$DB_NAME' AND TABLE_NAME IN ('users', 'otp_tokens');" 2>/dev/null || echo "0")
-if [ "$TABLES_OK" -eq 2 ]; then
-    echo -e "    ${GREEN}✓ Auth tables exist${NC}"
+# ============================================
+# Step 6: Restart Gunicorn service
+# ============================================
+echo ""
+echo -e "${YELLOW}Step 6/6: Restarting Gunicorn service...${NC}"
+
+RESTARTED=false
+
+if command -v systemctl >/dev/null 2>&1 && systemctl list-units --type=service 2>/dev/null | grep -q "thecodingscience"; then
+    sudo systemctl restart thecodingscience && RESTARTED=true
+elif [ -f "/etc/supervisor/conf.d/thecodingscience.conf" ]; then
+    sudo supervisorctl restart thecodingscience && RESTARTED=true
+elif [ -x "$APP_DIR/restart.sh" ]; then
+    "$APP_DIR/restart.sh" && RESTARTED=true
 else
-    echo -e "    ${YELLOW}⚠️  Some tables may not exist yet${NC}"
+    echo -e "    ${YELLOW}?? No systemd/supervisor unit found. Start manually with:${NC}"
+    echo "    $VENV_DIR/bin/gunicorn -c gunicorn.conf.py wsgi:app"
+fi
+
+if [ "$RESTARTED" = true ]; then
+    echo -e "    ${GREEN}V Gunicorn restarted${NC}"
+else
+    echo -e "    ${YELLOW}?? Gunicorn not auto-restarted. Verify the service manually.${NC}"
 fi
 
 # ============================================
@@ -336,23 +333,23 @@ fi
 echo ""
 echo "=================================="
 if [ "$HEALTH_CHECK_PASSED" = true ]; then
-    echo -e "${GREEN}✅ Deployment Completed Successfully!${NC}"
+    echo -e "${GREEN}? Deployment Completed Successfully!${NC}"
     echo "=================================="
     echo ""
-    echo "📝 Next Steps:"
+    echo "?? Next Steps:"
     echo "  1. Visit https://thecodingscience.com to verify site is up"
     echo "  2. Test trainer login: https://thecodingscience.com/trainer_login"
     echo "  3. Test student login: https://thecodingscience.com/student_login"
     echo "  4. Check admin panel for any errors"
     echo ""
-    echo "🔗 Important URLs:"
-    echo "  • Trainer Login: /trainer_login"
-    echo "  • Student Login: /student_login"
-    echo "  • Profile Management: /profile"
+    echo "?? Important URLs:"
+    echo "  Trainer Login: /trainer_login"
+    echo "  Student Login: /student_login"
+    echo "  Profile Management: /profile"
     echo ""
     exit 0
 else
-    echo -e "${RED}⚠️  Deployment Completed with Warnings${NC}"
+    echo -e "${RED}??  Deployment Completed with Warnings${NC}"
     echo "=================================="
     echo "Please check the errors above and verify deployment manually."
     exit 1

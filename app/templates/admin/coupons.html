@@ -1,0 +1,149 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Manage Coupons</h1>
+</div>
+
+<!-- Add New Coupon -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white">
+        <h5 class="mb-0">Create New Coupon</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST" class="row g-3">
+            <input type="hidden" name="csrf_token" value="{{ generate_csrf_token() }}">
+            <div class="col-md-3">
+                <label class="form-label">Coupon Code *</label>
+                <input type="text" class="form-control" name="code" placeholder="e.g., SAVE20" required>
+                <small class="text-muted">Uppercase letters & numbers only</small>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Discount Type *</label>
+                <select class="form-select" name="discount_type">
+                    <option value="percentage">Percentage (%)</option>
+                    <option value="fixed">Fixed Amount (₹)</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Discount Value *</label>
+                <input type="number" class="form-control" name="discount_value" placeholder="20" step="0.01" min="0" required>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Min Purchase (₹)</label>
+                <input type="number" class="form-control" name="min_purchase" placeholder="0" step="0.01" min="0" value="0">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Max Uses</label>
+                <input type="number" class="form-control" name="max_uses" placeholder="Unlimited" min="1">
+                <small class="text-muted">Leave empty for unlimited</small>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Valid From</label>
+                <input type="datetime-local" class="form-control" name="valid_from">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Valid Until</label>
+                <input type="datetime-local" class="form-control" name="valid_until">
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" name="add_coupon" class="btn btn-primary w-100">
+                    <i class="fas fa-plus me-2"></i> Create Coupon
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Coupons List -->
+<div class="card shadow-sm">
+    <div class="card-header bg-white">
+        <h5 class="mb-0">All Coupons ({{ coupons|length }})</h5>
+    </div>
+    <div class="card-body">
+        {% if not coupons %}
+            <div class="text-center py-4 text-muted">
+                <i class="fas fa-ticket-alt fa-3x mb-3"></i>
+                <p>No coupons created yet.</p>
+            </div>
+        {% else %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Discount</th>
+                            <th>Min Purchase</th>
+                            <th>Usage</th>
+                            <th>Valid Period</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for coupon in coupons %}
+                            <tr>
+                                <td><strong>{{ coupon['code'] }}</strong></td>
+                                <td>
+                                    {% if coupon['discount_type'] == 'percentage' %}
+                                        <span class="badge bg-success">{{ coupon['discount_value'] }}% OFF</span>
+                                    {% else %}
+                                        <span class="badge bg-primary">₹{{ coupon['discount_value']|number_format }} OFF</span>
+                                    {% endif %}
+                                </td>
+                                <td>₹{{ coupon['min_purchase']|number_format }}</td>
+                                <td>
+                                    {{ coupon['used_count'] }}
+                                    {% if coupon['max_uses'] %}
+                                        / {{ coupon['max_uses'] }}
+                                    {% else %}
+                                        / ∞
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if coupon['valid_from'] or coupon['valid_until'] %}
+                                        <small>
+                                            {% if coupon['valid_from'] %}
+                                                From: {{ coupon['valid_from'].strftime('%d %b, %Y') }}<br>
+                                            {% endif %}
+                                            {% if coupon['valid_until'] %}
+                                                Until: {{ coupon['valid_until'].strftime('%d %b, %Y') }}
+                                            {% endif %}
+                                        </small>
+                                    {% else %}
+                                        <span class="text-muted">No expiry</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if coupon['is_active'] %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <form method="POST" class="d-inline">
+                                        <input type="hidden" name="csrf_token" value="{{ generate_csrf_token() }}">
+                                        <input type="hidden" name="coupon_id" value="{{ coupon['id'] }}">
+                                        <input type="hidden" name="is_active" value="{{ 0 if coupon['is_active'] else 1 }}">
+                                        <button type="submit" name="toggle_coupon" class="btn btn-sm btn-outline-{{ 'warning' if coupon['is_active'] else 'success' }}" title="{{ 'Deactivate' if coupon['is_active'] else 'Activate' }}">
+                                            <i class="fas fa-toggle-{{ 'on' if coupon['is_active'] else 'off' }}"></i>
+                                        </button>
+                                    </form>
+                                    <form method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this coupon?');">
+                                        <input type="hidden" name="csrf_token" value="{{ generate_csrf_token() }}">
+                                        <input type="hidden" name="coupon_id" value="{{ coupon['id'] }}">
+                                        <button type="submit" name="delete_coupon" class="btn btn-sm btn-outline-danger" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

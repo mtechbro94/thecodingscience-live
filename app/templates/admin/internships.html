@@ -1,0 +1,69 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <div>
+        <h1 class="h2">Student Internship Management</h1>
+        <p class="text-muted">Manage internship opportunities for students</p>
+    </div>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="/admin/internship_form" class="btn btn-sm btn-primary">
+            <i class="fas fa-plus"></i> Add New Internship
+        </a>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Duration</th>
+                        <th>Active</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for internship in internships %}
+                        <tr>
+                            <td>{{ internship['id'] }}</td>
+                            <td>{{ internship['title'] }}</td>
+                            <td>
+                                <span class="badge bg-{{ 'info' if internship['category'] == 'teaching' else 'success' }}">
+                                    {{ internship['category']|capitalize }}
+                                </span>
+                            </td>
+                            <td>{{ internship['duration'] }}</td>
+                            <td>
+                                {% if internship['is_active'] %}
+                                    <span class="badge bg-success">Yes</span>
+                                {% else %}
+                                    <span class="badge bg-danger">No</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="/admin/internship_form?id={{ internship['id'] }}"
+                                        class="btn btn-outline-primary" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="/admin/internships?action=delete&id={{ internship['id'] }}"
+                                        class="btn btn-outline-danger"
+                                        onclick="return confirm('Are you sure you want to delete this internship?');"
+                                        title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,250 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+<!-- EasyMDE CSS -->
+<link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<style>
+.blog-preview-content {
+    line-height: 1.8;
+    color: #333;
+}
+.blog-preview-content h1, .blog-preview-content h2, .blog-preview-content h3 {
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+}
+.blog-preview-content pre {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+}
+.blog-preview-content blockquote {
+    border-left: 4px solid #0d6efd;
+    padding-left: 1rem;
+    margin-left: 0;
+    color: #6c757d;
+}
+.blog-preview-content img {
+    max-width: 100%;
+    border-radius: 0.5rem;
+}
+.editor-preview-side, .editor-preview {
+    transition: none !important;
+    transform: none !important;
+}
+.CodeMirror {
+    min-height: 400px;
+}
+</style>
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">{{ 'Edit Blog' if is_edit else 'Create Blog' }}</h1>
+    <a href="/admin/blogs" class="btn btn-sm btn-outline-secondary">
+        <i class="fas fa-arrow-left"></i> Back to Blogs
+    </a>
+</div>
+
+{% if errors %}
+    <div class="alert alert-danger">
+        <ul class="mb-0">{% for error in errors %}<li>{{ error }}</li>{% endfor %}</ul>
+    </div>
+{% endif %}
+
+<form method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ generate_csrf_token() }}">
+    <input type="hidden" name="MAX_FILE_SIZE" value="10485760"> <!-- 10MB Limit hint for PHP -->
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Post Title *</label>
+                        <input type="text" class="form-control form-control-lg" name="title" id="blogTitle" required
+                               value="{{ form_data.get('title', '') }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Slug</label>
+                        <input type="text" class="form-control" name="slug" id="blogSlug"
+                               value="{{ form_data.get('slug', '') }}">
+                        <small class="text-muted">The URL fragment for this post.</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Excerpt</label>
+                        <textarea class="form-control" name="excerpt" rows="2">{{ form_data.get('excerpt', '') }}</textarea>
+                        <small class="text-muted">A short summary for lists.</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="form-label mb-0">Content (Markdown) *</label>
+                            <div class="btn-group btn-group-sm">
+                                <button type="button" class="btn btn-outline-secondary" onclick="insertTemplate('heading')">
+                                    <i class="bi bi-type-h1"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="insertTemplate('bold')">
+                                    <i class="bi bi-type-bold"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="insertTemplate('italic')">
+                                    <i class="bi bi-type-italic"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="insertTemplate('link')">
+                                    <i class="bi bi-link-45deg"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="insertTemplate('image')">
+                                    <i class="bi bi-image"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="insertTemplate('code')">
+                                    <i class="bi bi-code-slash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <textarea id="markdownEditor" name="content">{{ form_data.get('content', '') }}</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0"><i class="bi bi-eye me-2"></i>Live Preview</h6>
+                </div>
+                <div class="card-body">
+                    <div id="previewContent" class="blog-preview-content">
+                        <p class="text-muted">Start typing to see preview...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white"><h5 class="mb-0">Publish Details</h5></div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Author</label>
+                        <input type="text" class="form-control" name="author"
+                               value="{{ form_data.get('author', current_user()['name'] if current_user() else '') }}">
+                    </div>
+
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="is_published" name="is_published"
+                               {% if form_data.get('is_published', 1) %}checked{% endif %}>
+                        <label class="form-check-label" for="is_published">Published</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white"><h5 class="mb-0">Featured Image</h5></div>
+                <div class="card-body text-center">
+                    {% if form_data.get('image') %}
+                        <img src="{{ get_image_url(form_data['image']) }}" class="img-fluid rounded mb-3 shadow-sm">
+                    {% endif %}
+                    <input class="form-control" type="file" name="image" id="blogImage" accept="image/*">
+                </div>
+            </div>
+
+            <div class="d-grid shadow-sm">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-save me-2"></i> Save Post
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<!-- EasyMDE JS -->
+<script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script nonce="{{ script_nonce }}">
+    // File size validation
+    document.getElementById('blogImage').addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            const size = this.files[0].size;
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            if (size > maxSize) {
+                alert("File is too large! Maximum allowed size is 10MB. This file is " + (size / (1024 * 1024)).toFixed(2) + "MB.");
+                this.value = ''; // Clear the input
+            }
+        }
+    });
+
+    const easyMDE = new EasyMDE({
+        element: document.getElementById('markdownEditor'),
+        spellChecker: false,
+        autosave: {
+            enabled: false
+        },
+        height: "400px",
+        placeholder: "Write your masterpiece here...",
+        status: ['autosave', 'lines', 'words'],
+        toolbar: [
+            'bold', 'italic', 'heading', '|',
+            'code', 'quote', 'unordered-list', 'ordered-list', '|',
+            'link', 'image', '|',
+            'preview', 'side-by-side', 'fullscreen', '|'
+        ],
+    });
+
+    // Live preview
+    const previewContent = document.getElementById('previewContent');
+    const updatePreview = () => {
+        const raw = easyMDE.value();
+        if (raw.trim()) {
+            previewContent.innerHTML = marked.parse(raw);
+        } else {
+            previewContent.innerHTML = '<p class="text-muted">Start typing to see preview...</p>';
+        }
+    };
+    easyMDE.codemirror.on('change', updatePreview);
+    updatePreview();
+
+    // Auto-generate slug from title
+    document.getElementById('blogTitle').addEventListener('blur', function() {
+        const title = this.value;
+        const slugInput = document.getElementById('blogSlug');
+        if (slugInput.value === '') {
+            slugInput.value = title.toLowerCase()
+                .replace(/[^a-z0-9\s-]/g, '')
+                .replace(/[\s-]+/g, '-')
+                .replace(/^-+|-+$/g, '');
+        }
+    });
+
+    // Quick template insertion
+    function insertTemplate(type) {
+        const cm = easyMDE.codemirror;
+        const selection = cm.getSelection();
+        let text = '';
+
+        switch(type) {
+            case 'heading':
+                text = selection ? `## ${selection}` : '## New Heading';
+                break;
+            case 'bold':
+                text = selection ? `**${selection}**` : '**bold text**';
+                break;
+            case 'italic':
+                text = selection ? `*${selection}*` : '*italic text*';
+                break;
+            case 'link':
+                text = selection ? `[${selection}](url)` : '[link text](https://example.com)';
+                break;
+            case 'image':
+                text = selection ? `![${selection}](image-url)` : '![Alt text](https://example.com/image.jpg)';
+                break;
+            case 'code':
+                text = selection ? `\`\`\`\n${selection}\n\`\`\`` : '```\ncode here\n```';
+                break;
+        }
+
+        cm.replaceSelection(text);
+        cm.focus();
+    }
+</script>
+{% endblock %}

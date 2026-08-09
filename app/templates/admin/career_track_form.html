@@ -1,0 +1,203 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">{{ 'Edit Career Track' if is_edit else 'Add New Career Track' }}</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="/admin/career_tracks" class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Tracks
+        </a>
+    </div>
+</div>
+
+{% if errors %}
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            {% for error in errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+
+<form method="POST" enctype="multipart/form-data" class="mb-5">
+    <input type="hidden" name="csrf_token" value="{{ generate_csrf_token() }}">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Basic Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Track Name *</label>
+                        <input type="text" class="form-control" name="name" required
+                            value="{{ form_data.get('name', '') }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Slug *</label>
+                        <input type="text" class="form-control" name="slug"
+                            value="{{ form_data.get('slug', '') }}"
+                            placeholder="auto-generated-from-name">
+                        <small class="text-muted">URL: /career-track/{slug}</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Summary (Short Description)</label>
+                        <input type="text" class="form-control" name="summary" maxlength="255"
+                            value="{{ form_data.get('summary', '') }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Full Description</label>
+                        <textarea class="form-control" name="description" rows="6">{{ form_data.get('description', '') }}</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Courses in This Track</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Select Courses</label>
+                        <select class="form-select" name="courses[]" multiple size="8">
+                            {% for course in courses %}
+                                <option value="{{ course['id'] }}" {% if course['id']|string in selected_course_ids %}selected{% endif %}>
+                                    {{ course['name'] }} (₹{{ course['price']|number_format }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <small class="text-muted">Hold Ctrl/Cmd to select multiple courses</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Curriculum</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Modules (JSON Format)</label>
+                        <textarea class="form-control font-monospace" name="curriculum" rows="8">{{ form_data.get('curriculum', '[]') }}</textarea>
+                        <small class="text-muted">Format: <code>[{"title": "Module Name", "topics": ["Topic 1", "Topic 2"]}]</code></small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Learning Outcomes & Requirements</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">What You'll Learn (one per line)</label>
+                        <textarea class="form-control" name="outcomes" rows="5" placeholder="Build real-world projects&#10;Master industry tools&#10;Get job-ready skills">{{ form_data.get('outcomes', '') }}</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Requirements/Prerequisites (one per line)</label>
+                        <textarea class="form-control" name="requirements" rows="4" placeholder="Basic programming knowledge&#10;Computer with internet">{{ form_data.get('requirements', '') }}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Pricing</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Original Price (₹)</label>
+                        <input type="number" class="form-control" name="original_price" step="0.01" min="0"
+                            value="{{ form_data.get('original_price', '0') }}">
+                        <small class="text-muted">Leave blank or 0 for free</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Sale Price (₹) *</label>
+                        <input type="number" class="form-control" name="price" step="0.01" min="0" required
+                            value="{{ form_data.get('price', '0') }}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Track Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Duration</label>
+                        <input type="text" class="form-control" name="duration" placeholder="e.g. 6 Months"
+                            value="{{ form_data.get('duration', '') }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Badge Text</label>
+                        <input type="text" class="form-control" name="badge" placeholder="e.g. Bestseller, New"
+                            value="{{ form_data.get('badge', '') }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Badge Color</label>
+                        <select class="form-select" name="badge_color">
+                            {% set selected_color = form_data.get('badge_color', 'primary') %}
+                            {% for color in colors %}
+                                <option value="{{ color }}" {% if selected_color == color %}selected{% endif %}>
+                                    {{ color|capitalize }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Sort Order</label>
+                        <input type="number" class="form-control" name="sort_order" value="{{ form_data.get('sort_order', '0') }}">
+                        <small class="text-muted">Lower numbers appear first</small>
+                    </div>
+
+                    <div class="form-check form-switch mb-2">
+                        <input class="form-check-input" type="checkbox" name="is_active" id="is_active"
+                            {% if form_data.get('is_active', 1) %}checked{% endif %}>
+                        <label class="form-check-label" for="is_active">Active</label>
+                    </div>
+
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" name="is_featured" id="is_featured"
+                            {% if form_data.get('is_featured', 0) %}checked{% endif %}>
+                        <label class="form-check-label" for="is_featured">Featured</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Track Image</h5>
+                </div>
+                <div class="card-body text-center">
+                    {% if form_data.get('image') %}
+                        <img src="{{ get_image_url(form_data['image']) }}" class="img-fluid rounded mb-3" style="max-height: 200px;">
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Upload Image</label>
+                        <input class="form-control" type="file" id="image" name="image" accept="image/*">
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-save"></i> Save Career Track
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Edit User</h1>
+    <a href="/admin/users" class="btn btn-sm btn-outline-secondary">
+        <i class="fas fa-arrow-left"></i> Back to Users
+    </a>
+</div>
+
+<form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ generate_csrf_token() }}">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-control" name="name"
+                            value="{{ user['name'] }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control"
+                            value="{{ user['email'] }}" disabled>
+                        <small class="text-muted">Email cannot be changed.</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Role</label>
+                        <select class="form-select" name="role">
+                            <option value="student" {{ 'selected' if user['role'] == 'student' else '' }}>Student</option>
+                            <option value="trainer" {{ 'selected' if user['role'] == 'trainer' else '' }}>Trainer</option>
+                            <option value="admin" {{ 'selected' if user['role'] == 'admin' else '' }}>Admin</option>
+                        </select>
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="is_approved" name="is_approved" {{ 'checked' if user['is_approved'] else '' }}>
+                        <label class="form-check-label" for="is_approved">Approved (for Trainers)</label>
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="is_active" name="is_active" {{ 'checked' if user['is_active'] else '' }}>
+                        <label class="form-check-label" for="is_active">Active Account</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update User</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}

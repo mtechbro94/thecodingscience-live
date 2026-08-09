@@ -6,9 +6,32 @@ on:
       - main
 
 jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get latest code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Compile check (syntax)
+        run: python -m compileall -q app config.py wsgi.py run.py
+
+      - name: Run pytest
+        run: python -m pytest -q
+        continue-on-error: false
+
   web-deploy:
     name: Deploy to Production
     runs-on: ubuntu-latest
+    needs: test
     steps:
       - name: Get latest code
         uses: actions/checkout@v4
@@ -31,12 +54,9 @@ jobs:
           SMTP_PORT=${{ secrets.SMTP_PORT }}
           GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+          SECRET_KEY=${{ secrets.SECRET_KEY }}
           EOF
           echo ".env file created securely with literal values"
-
-      - name: Lint PHP Files
-        run: find . -name "*.php" -print0 | xargs -0 -n1 php -l
-        continue-on-error: true
 
       - name: Install SSH Key
         run: |
@@ -57,7 +77,7 @@ jobs:
       - name: Deploy files via SSH/Tar+SCP
         run: |
           set -e
-          tar --exclude='.git' --exclude='.github' --exclude='node_modules' --exclude='.gitignore' --exclude='*.md' --exclude='maintenance.html' --exclude='last_commit.diff' --exclude='.env.example' -czf /tmp/deploy.tar.gz . && scp -o ConnectTimeout=10 -o StrictHostKeyChecking=no /tmp/deploy.tar.gz ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/tmp/ && ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p ${{ secrets.DEPLOYMENT_PATH }} && cd ${{ secrets.DEPLOYMENT_PATH }} && tar -xzf /tmp/deploy.tar.gz && rm /tmp/deploy.tar.gz && echo 'Deployment complete'"
+          tar --exclude='.git' --exclude='.github' --exclude='.pytest_cache' --exclude='__pycache__' --exclude='node_modules' --exclude='.gitignore' --exclude='*.md' --exclude='maintenance.html' --exclude='last_commit.diff' --exclude='.env.example' --exclude='.env' -czf /tmp/deploy.tar.gz . && scp -o ConnectTimeout=10 -o StrictHostKeyChecking=no /tmp/deploy.tar.gz ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/tmp/ && ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "mkdir -p ${{ secrets.DEPLOYMENT_PATH }} && cd ${{ secrets.DEPLOYMENT_PATH }} && tar -xzf /tmp/deploy.tar.gz && rm /tmp/deploy.tar.gz && echo 'Deployment complete'"
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_USER: ${{ secrets.SSH_USER }}
@@ -72,7 +92,7 @@ jobs:
 
       - name: Verify Deployment
         run: |
-          ssh -o ConnectTimeout=10 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.DEPLOYMENT_PATH }} && echo 'Deployment Directory Contents:' && ls -lah | head -20 && test -f index.php && echo 'index.php found' || echo 'index.php not found'"
+          ssh -o ConnectTimeout=10 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.DEPLOYMENT_PATH }} && echo 'Deployment Directory Contents:' && ls -lah | head -20 && test -f wsgi.py && echo 'wsgi.py found' || echo 'wsgi.py not found'"
         continue-on-error: true
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
@@ -104,4 +124,5 @@ jobs:
 # - SSH_HOST: HostMyIdea SSH hostname
 # - SSH_USER: SSH username
 # - DEPLOYMENT_PATH: Remote deployment path
+# - SECRET_KEY: Random session secret (Flask)
 # - All database, Razorpay, SMTP, and Google OAuth secrets

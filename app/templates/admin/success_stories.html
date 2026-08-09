@@ -1,0 +1,89 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Success Stories</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="/admin/success_story_form" class="btn btn-sm btn-primary">
+            <i class="fas fa-plus me-1"></i> New Success Story
+        </a>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Sort</th>
+                        <th>Name</th>
+                        <th>Title</th>
+                        <th>Photo</th>
+                        <th>Rating</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if not stories %}
+                        <tr>
+                            <td colspan="7" class="text-center p-4 text-muted">No success stories found.</td>
+                        </tr>
+                    {% endif %}
+                    {% for story in stories %}
+                        <tr>
+                            <td>{{ story['sort_order'] }}</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar px-2 py-1 {{ story['avatar_bg'] or 'bg-primary' }} text-white rounded-circle me-2 font-weight-bold"
+                                        style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;">
+                                        {{ story['name'][:1]|upper }}
+                                    </div>
+                                    <span class="fw-bold">
+                                        {{ story['name'] }}
+                                    </span>
+                                </div>
+                            </td>
+                            <td>{{ story['title'] }}</td>
+                            <td>
+                                {% if has_photo_path and story.get('photo_path') %}
+                                    <img src="{{ get_image_url(story['photo_path']) }}" alt="{{ story['name'] }}" class="rounded-circle border" style="width: 40px; height: 40px; object-fit: cover;">
+                                {% else %}
+                                    <span class="text-muted small">No photo</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="text-warning">
+                                    {% for i in range(story['rating'] or 0) %}
+                                        <i class="fas fa-star small"></i>
+                                    {% endfor %}
+                                </div>
+                            </td>
+                            <td>
+                                <a href="/admin/success_stories?action=toggle&id={{ story['id'] }}"
+                                    class="badge {{ 'bg-success' if story['is_active'] else 'bg-secondary' }} text-decoration-none">
+                                    {{ 'Active' if story['is_active'] else 'Inactive' }}
+                                </a>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="/admin/success_story_form?id={{ story['id'] }}"
+                                        class="btn btn-outline-primary" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="/admin/success_stories?action=delete&id={{ story['id'] }}"
+                                        class="btn btn-outline-danger" onclick="return confirm('Are you sure?');"
+                                        title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

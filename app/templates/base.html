@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {%- if page_title -%}{{ page_title }} - {{ get_setting('site_name', SITE_NAME) }}{%- else -%}{{ get_setting('site_name', SITE_NAME) }}{%- endif -%}
+    </title>
+
+    {# Favicon #}
+    {% set favicon = get_setting('site_favicon', '') %}
+    {% set favicon_url = ('/assets/images/' ~ favicon) if favicon else '/assets/images/favicon.ico' %}
+    {% set favicon_ext = favicon.rsplit('.', 1)[-1] if favicon else '' %}
+    {% set favicon_type = ('image/' ~ favicon_ext) if favicon_ext in ['png', 'gif', 'webp'] else 'image/x-icon' %}
+    <link rel="icon" type="{{ favicon_type }}" href="{{ favicon_url }}">
+
+    {# Canonical URL #}
+    <link rel="canonical" href="{{ og_url if og_url else SITE_URL ~ request_path }}">
+
+    {# Google Fonts: Plus Jakarta Sans #}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+
+    {# Bootstrap CSS #}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    {# Font Awesome #}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    {# AOS Animations CSS #}
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    {# Theme Initialization (Prevent Flash) #}
+    <script nonce="{{ script_nonce }}">
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        })();
+    </script>
+
+    {# Custom CSS #}
+    <link rel="stylesheet" href="/assets/css/style.css?v=1.1.0">
+
+    {# Open Graph #}
+    <meta property="og:type" content="{{ og_type if og_type else 'website' }}">
+    <meta property="og:url" content="{{ og_url if og_url else SITE_URL ~ request_path }}">
+    <meta property="og:title" content="{{ og_title if og_title else (page_title ~ ' - ' ~ get_setting('site_name', SITE_NAME)) if page_title else get_setting('site_name', SITE_NAME) }}">
+    <meta property="og:description" content="{{ og_description if og_description else 'Transform your career with specialized industry-led training in Web Development, Python, and AI.' }}">
+    {% set logo = get_setting('site_logo', '') %}
+    {% set og_img = og_image if og_image else ((SITE_URL ~ '/assets/images/' ~ logo) if logo else (SITE_URL ~ '/assets/images/logo.png')) %}
+    <meta property="og:image" content="{{ og_img }}">
+
+    {# Twitter #}
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ og_url if og_url else SITE_URL ~ request_path }}">
+    <meta property="twitter:title" content="{{ og_title if og_title else (page_title if page_title else get_setting('site_name', SITE_NAME)) }}">
+    <meta property="twitter:description" content="{{ og_description if og_description else 'Transform your career with specialized industry-led training in Web Development, Python, and AI.' }}">
+    <meta property="twitter:image" content="{{ og_img }}">
+
+    {% if extra_css %}
+        {{ extra_css | safe }}
+    {% endif %}
+    {% set gsc = get_setting('google_search_console_verification', '') %}
+    {% if gsc %}
+        <meta name="google-site-verification" content="{{ gsc }}">
+    {% endif %}
+
+    {# Google Analytics #}
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0TMYFTPESW"></script>
+    <script nonce="{{ script_nonce }}">
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-0TMYFTPESW');
+    </script>
+</head>
+
+<body>
+    {% include 'partials/header.html' %}
+
+    {# Flash Messages #}
+    {% set flash = get_flash() %}
+    {% if flash %}
+        {% set category = 'danger' if flash['type'] == 'error' else flash['type'] %}
+        <div class="container mt-5 pt-4">
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ flash['message'] }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    {% endif %}
+
+    {# Main Content #}
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% include 'partials/footer.html' %}
+
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

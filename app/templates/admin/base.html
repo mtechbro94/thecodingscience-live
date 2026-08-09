@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {%- if page_title -%}{{ page_title }} - Admin Panel{%- else -%}Admin Panel{%- endif -%}
+    </title>
+    {# Bootstrap 5 CSS #}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    {# Font Awesome #}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    {# Custom CSS #}
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background-color: #343a40;
+        }
+
+        .sidebar a {
+            color: #adb5bd;
+            text-decoration: none;
+            padding: 10px 15px;
+            display: block;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            color: #fff;
+            background-color: #495057;
+        }
+
+        .content {
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="d-flex">
+        {# Sidebar #}
+        <div class="sidebar d-flex flex-column flex-shrink-0 p-3 text-white" style="width: 280px;">
+            <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+                <span class="fs-4 fw-bold">TCS Admin</span>
+            </a>
+            <hr>
+            <ul class="nav nav-pills flex-column mb-auto">
+                <li class="nav-item">
+                    <a href="/admin/dashboard" class="nav-link {{ 'active' if page_title == 'Dashboard' else '' }}">
+                        <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/users" class="nav-link {{ 'active' if page_title == 'Users' else '' }}">
+                        <i class="fas fa-users me-2"></i> Users
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/courses" class="nav-link {{ 'active' if page_title == 'Courses' else '' }}">
+                        <i class="fas fa-book me-2"></i> Courses
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/enrollments" class="nav-link {{ 'active' if page_title == 'Enrollments' else '' }}">
+                        <i class="fas fa-graduation-cap me-2"></i> Enrollments
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/messages" class="nav-link {{ 'active' if page_title == 'Messages' else '' }}">
+                        <i class="fas fa-envelope me-2"></i> Messages
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/blogs" class="nav-link {{ 'active' if page_title in ['Blog', 'Manage Blog'] else '' }}">
+                        <i class="fas fa-pen-nib me-2"></i> Blog
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/coupons" class="nav-link {{ 'active' if page_title == 'Manage Coupons' else '' }}">
+                        <i class="fas fa-ticket-alt me-2"></i> Coupons
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/career_tracks" class="nav-link {{ 'active' if page_title == 'Career Track Programs' else '' }}">
+                        <i class="fas fa-road me-2"></i> Career Tracks
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/internships" class="nav-link {{ 'active' if 'Internships' in (page_title or '') else '' }}">
+                        <i class="fas fa-briefcase me-2"></i> Student Internships
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/settings" class="nav-link {{ 'active' if page_title == 'Site Settings' else '' }}">
+                        <i class="fas fa-cog me-2"></i> Site Settings
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin/success_stories" class="nav-link {{ 'active' if 'Success Story' in (page_title or '') else '' }}">
+                        <i class="fas fa-star me-2"></i> Success Stories
+                    </a>
+                </li>
+            </ul>
+            <hr>
+            <div class="dropdown">
+                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
+                    id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                    {% if current_user() and current_user()['profile_image'] %}
+                        <img src="{{ get_avatar(current_user()) }}" alt="Profile"
+                            class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
+                    {% else %}
+                        <div class="avatar-circle avatar-circle-sm bg-primary me-2">
+                            {{ (current_user()['name'][:1] if current_user() and current_user()['name'] else 'A') | upper }}
+                        </div>
+                    {% endif %}
+                    <strong>{{ current_user()['name'] if current_user() else 'Admin' }}</strong>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+                    <li><a class="dropdown-item" href="/">View Site</a></li>
+                    <li><a class="dropdown-item" href="/profile">Profile</a></li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item" href="/logout">Sign out</a></li>
+                </ul>
+            </div>
+        </div>
+
+        {# Main Content #}
+        <div class="w-100 content">
+            {# Flash Messages #}
+            {% set flash = get_flash() %}
+            {% if flash %}
+                <div class="alert alert-{{ flash['type'] }} alert-dismissible fade show" role="alert">
+                    {{ flash['message'] }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+
+        </div>
+    </div>
+
+    {# Bootstrap Bundle with Popper #}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {# Chart.js for Dashboard Charts #}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

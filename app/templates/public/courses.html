@@ -1,0 +1,379 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .bg-primary-subtle { background-color: #e0e7ff !important; }
+    .bg-success-subtle { background-color: #dcfce7 !important; }
+    .bg-warning-subtle { background-color: #fef3c7 !important; }
+    .bg-info-subtle { background-color: #cff4fc !important; }
+    .bg-dark-subtle { background-color: #e9ecef !important; }
+
+    .course-card {
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        transition: all 0.3s ease;
+        overflow: visible;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .course-card .course-image-wrapper {
+        position: relative;
+        width: 100%;
+        padding-top: 56.25%;
+        overflow: hidden;
+        border-top-left-radius: 16px;
+        border-top-right-radius: 16px;
+    }
+
+    .course-card .course-card-img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .course-card .card-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .course-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1) !important;
+        border-color: var(--primary-color);
+    }
+
+    .level-badge {
+        font-size: 0.75rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-weight: 600;
+        z-index: 2;
+    }
+
+    .level-legend-badge {
+        font-size: 0.85rem;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .combo-card {
+        border: 2px solid #e2e8f0;
+        border-radius: 20px;
+        transition: all 0.3s ease;
+        background: linear-gradient(to bottom, #ffffff, #f8fafc);
+        overflow: visible;
+    }
+
+    .combo-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .combo-badge {
+        position: absolute;
+        top: -12px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 0.5rem 1.5rem;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        z-index: 10;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .original-price {
+        text-decoration: line-through;
+        color: #94a3b8;
+        font-size: 1rem;
+        font-weight: 500;
+    }
+
+    .combo-price {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: var(--primary-color);
+    }
+
+    .combo-price .currency {
+        font-size: 1rem;
+        font-weight: 600;
+        vertical-align: super;
+    }
+
+    .combo-original-price {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #6b7280;
+        text-decoration: line-through;
+    }
+
+    .save-percent {
+        background: linear-gradient(135deg, #22c55e, #16a34a);
+        color: white;
+        padding: 0.35rem 0.85rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+    }
+
+    .course-list-item {
+        background: rgba(0,0,0,0.03);
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    [data-theme="dark"] .course-list-item {
+        background: rgba(255,255,255,0.05);
+    }
+
+    .section-header {
+        position: relative;
+        display: inline-block;
+    }
+
+    .section-header::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 4px;
+        background: var(--primary-color);
+        border-radius: 2px;
+    }
+
+    /* Course Filters Styling */
+    .course-filters-box {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    [data-theme="dark"] .course-filters-box {
+        background: #1e293b;
+        border-color: #334155;
+    }
+
+    .filter-label {
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+        color: var(--secondary-color);
+    }
+</style>
+
+<!-- Individual Courses Section -->
+<section class="py-5" style="margin-top: 80px;">
+    <div class="container">
+        <!-- Active Coupon Banner -->
+        {% if coupons %}
+            <div class="coupon-banner-wrapper mb-5">
+                {% for coupon in coupons %}
+                    {% if coupon['discount_type'] == 'percentage' %}
+                        {% set discount_label = coupon['discount_value'] ~ '% OFF' %}
+                    {% else %}
+                        {% set discount_label = '₹' ~ coupon['discount_value'] | int | number_format ~ ' OFF' %}
+                    {% endif %}
+                    {% if coupon['valid_until'] %}
+                        {% set expiry_text = 'Expires ' ~ coupon['valid_until'].strftime('%d %b %Y') %}
+                    {% else %}
+                        {% set expiry_text = '' %}
+                    {% endif %}
+                    <div class="coupon-banner d-flex flex-wrap align-items-center justify-content-between gap-3 p-4 rounded-4 mb-3 shadow-sm">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="coupon-icon d-flex align-items-center justify-content-center rounded-3" style="width: 48px; height: 48px; background: rgba(255,255,255,0.2); color: white;">
+                                <i class="fas fa-tag fa-lg"></i>
+                            </div>
+                            <div>
+                                <p class="mb-0 fw-semibold fs-6 text-white">🎉 Special Offer — Use code to get <strong>{{ discount_label }}</strong>!</p>
+                                {% if coupon['min_purchase'] %}
+                                    <small class="text-white-50">Min. purchase ₹{{ coupon['min_purchase'] | int | number_format }}{{ ' &bull; ' ~ expiry_text if expiry_text else '' }}</small>
+                                {% elif expiry_text %}
+                                    <small class="text-white-50">{{ expiry_text }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="coupon-code-box" style="background: rgba(255,255,255,0.15); border: 2px dashed rgba(255,255,255,0.5); border-radius: 10px; padding: 0.4rem 1.2rem; letter-spacing: 3px;">
+                                <span class="coupon-code-text fw-bold text-white">{{ coupon['code'] }}</span>
+                            </div>
+                            <button class="btn btn-light btn-sm fw-semibold px-3 copy-coupon-btn"
+                                onclick="copyCoupon('{{ coupon['code'] }}', this)">
+                                <i class="fas fa-copy me-1"></i> Copy
+                            </button>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <style>
+                .coupon-banner { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #2563eb 100%); border: 1px solid rgba(255,255,255,0.15); }
+                .copy-coupon-btn { transition: all 0.2s; border-radius: 8px; }
+                .copy-coupon-btn:hover { background: #f8faff; transform: scale(1.05); }
+            </style>
+        {% endif %}
+
+        <div class="text-center mb-5">
+            <h1 class="mb-3 fw-bold">Our Courses</h1>
+            <p class="lead text-muted">Master the latest technologies with our industry-aligned curriculum.</p>
+        </div>
+
+        <!-- Search and Filter Bar -->
+        <div class="row justify-content-center mb-5">
+            <div class="col-lg-10">
+                <div class="course-filters-box shadow-sm">
+                    <form action="/courses" method="GET" class="row g-3 align-items-end">
+                        <div class="col-md-5">
+                            <label for="search" class="filter-label">Search Courses</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                                <input type="text" name="search" id="search" class="form-control border-start-0 shadow-none"
+                                    placeholder="e.g. Web Development, Python..." value="{{ active_query }}">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="level" class="filter-label">Skill Level</label>
+                            <select name="level" id="level" class="form-select shadow-none">
+                                <option value="">All Levels</option>
+                                <option value="Beginner" {{ 'selected' if active_level == 'Beginner' else '' }}>Beginner</option>
+                                <option value="Intermediate" {{ 'selected' if active_level == 'Intermediate' else '' }}>Intermediate</option>
+                                <option value="Advanced" {{ 'selected' if active_level == 'Advanced' else '' }}>Advanced</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 d-flex gap-2">
+                            <button type="submit" class="btn btn-primary w-100 fw-semibold">
+                                <i class="fas fa-filter me-1"></i> Filter
+                            </button>
+                            {% if active_query or active_level %}
+                                <a href="/courses" class="btn btn-outline-secondary px-3" title="Clear Filters">
+                                    <i class="fas fa-times"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            {% if not courses %}
+                <div class="col-12 text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-search fa-4x text-muted opacity-25"></i>
+                    </div>
+                    <h3 class="fw-bold">No courses found</h3>
+                    <p class="text-muted">We couldn't find any courses matching "<strong>{{ active_query }}</strong>". Try different keywords or clear filters.</p>
+                    <a href="/courses" class="btn btn-primary mt-3">View All Courses</a>
+                </div>
+            {% else %}
+                {% for course in courses %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 course-card shadow-sm">
+                            {% if course['image'] %}
+                                <div class="course-image-wrapper">
+                                    <img src="{{ get_image_url(course['image']) }}" alt="{{ course['name'] }}"
+                                        class="course-card-img">
+                                    {% set level_text = course['level'] %}
+                                    {% set level_class = 'bg-success' %}
+                                    {% if 'Intermediate' in level_text and 'Advanced' not in level_text %}
+                                        {% set level_class = 'bg-primary' %}
+                                    {% elif 'Advanced' in level_text %}
+                                        {% set level_class = 'bg-danger' %}
+                                    {% endif %}
+                                    <span class="position-absolute top-0 end-0 m-2 level-badge {{ level_class }}">
+                                        {{ level_text }}
+                                    </span>
+                                </div>
+                            {% endif %}
+                            <div class="card-body p-4">
+                                <h5 class="card-title fw-bold mb-3">{{ course['name'] }}</h5>
+                                <p class="card-text text-muted small mb-4">{{ course['description'] }}</p>
+                                <div class="d-flex align-items-center justify-content-between pt-3 border-top gap-2">
+                                    <span class="fw-bold fs-6 text-primary"
+                                        style="white-space: nowrap;">₹{{ course['price'] | int | number_format }}</span>
+                                    <div class="d-flex gap-2">
+                                        <a href="/enroll/{{ course['id'] }}"
+                                            class="btn btn-primary btn-sm py-1 px-3" style="font-size: 0.85rem;">Enroll Now</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Combo Programs Section -->
+{% if career_tracks %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold mb-3"><span class="section-header">Career Track Programs</span></h2>
+            <p class="lead text-muted">Bundle courses together and save big!</p>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            {% for track in career_tracks %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 combo-card shadow-sm position-relative">
+                        {% if track['badge'] %}
+                            <span class="combo-badge bg-{{ track['badge_color'] }} text-white"><i class="fas fa-star me-1"></i> {{ track['badge'] }}</span>
+                        {% endif %}
+                        <div class="card-body p-4 {{ 'pt-5' if track['badge'] else '' }}">
+                            <h5 class="card-title fw-bold text-center mb-3">{{ track['name'] }}</h5>
+                            <div class="text-center mb-3">
+                                {% if track['original_price'] | int > 0 and track['original_price'] | int > track['price'] | int %}
+                                    <span class="combo-original-price">₹{{ track['original_price'] | int | number_format }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                                <div class="combo-price"><span class="currency">₹</span>{{ track['price'] | int | number_format }}</div>
+                                <a href="/enroll?track={{ track['slug'] }}" class="btn btn-primary px-4">Get Bundle</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+{% if coupons %}
+<script nonce="{{ script_nonce }}">
+function copyCoupon(code, btn) {
+    navigator.clipboard.writeText(code).then(function() {
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check me-1"></i> Copied!';
+        btn.classList.remove('btn-light');
+        btn.classList.add('btn-success');
+        setTimeout(function() {
+            btn.innerHTML = orig;
+            btn.classList.remove('btn-success');
+            btn.classList.add('btn-light');
+        }, 2000);
+    });
+}
+</script>
+{% endif %}
+{% endblock %}

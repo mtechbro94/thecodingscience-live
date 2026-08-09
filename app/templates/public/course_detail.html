@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="py-5" style="margin-top: 80px;">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                {% if course['image'] %}
+                    <img src="{{ get_image_url(course['image']) }}" alt="{{ course['name'] }}"
+                        class="img-fluid rounded mb-4 shadow" loading="lazy" decoding="async">
+                {% endif %}
+
+                <h1 class="mb-3">
+                    {{ course['name'] }}
+                </h1>
+                <div class="mb-4">
+                    <span class="badge bg-primary me-2">
+                        {{ course['level'] }}
+                    </span>
+                    <span class="badge bg-info me-2"><i class="fas fa-clock"></i>
+                        {{ course['duration'] }}
+                    </span>
+                    <span class="badge bg-success"><i class="fas fa-rupee-sign"></i> ₹
+                        {{ course['price'] | number_format(2) }}
+                    </span>
+                </div>
+
+                <div class="course-description mb-4">
+                    <h3><strong>About This Course</strong></h3>
+                    <div style="line-height: 1.8; font-size: 1rem; color: #333;">
+                        {{ (course['description'] or '') | replace('\n', '<br>') | safe }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <div class="card shadow-lg sticky-top" style="top: 100px;">
+                    <div class="card-body text-center">
+                        <h3 class="card-title mb-3">Enroll Now</h3>
+                        <div class="mb-3">
+                            <h2 class="text-primary">₹
+                                {{ course['price'] | number_format(2) }}
+                            </h2>
+                            <small class="text-muted">One-time payment</small>
+                        </div>
+
+                        {% if is_enrolled %}
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle"></i> You are enrolled!
+                            </div>
+                            <a href="/dashboard" class="btn btn-success w-100">
+                                <i class="fas fa-tachometer-alt"></i> Go to Dashboard
+                            </a>
+                        {% else %}
+                            <form action="/enroll/{{ course['id'] }}" method="POST">
+                                <button type="submit" class="btn btn-primary btn-lg w-100 enroll-btn py-3 shadow">
+                                    <i class="fas fa-shopping-cart me-2"></i> Enroll Now
+                                </button>
+                            </form>
+                            {% if not is_logged_in() %}
+                                <p class="text-muted small mt-2">Login or register to get started</p>
+                            {% endif %}
+                        {% endif %}
+
+                        <hr class="my-3">
+
+                        <div class="text-start">
+                            <h6><strong>Course Includes:</strong></h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success me-2"></i>
+                                    {{ course['duration'] }} of Live training
+                                </li>
+                                <li><i class="fas fa-check text-success me-2"></i> 100% Live sessions</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Assignments &amp; Projects</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Certificate</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Community access</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reviews Section -->
+        <div class="reviews-section mt-5">
+            <h3 class="mb-4">
+                <i class="fas fa-star text-warning"></i> Student Reviews
+                <span class="badge bg-secondary ms-2">
+                    {{ total_reviews }}
+                </span>
+            </h3>
+
+            {% if total_reviews > 0 %}
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card text-center p-3">
+                            <h2 class="text-warning">
+                                {{ avg_rating | round(1) }}
+                            </h2>
+                            <div class="star-rating mb-2">
+                                {% set rounded_avg = avg_rating | round | int %}
+                                {% for i in range(5) %}
+                                    <i class="fas fa-star {{ 'text-warning' if (i + 1) <= rounded_avg else 'text-secondary' }}"></i>
+                                {% endfor %}
+                            </div>
+                            <small class="text-muted">Based on
+                                {{ total_reviews }} reviews
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="reviewsList" class="mt-4">
+                    {% for review in reviews %}
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="card-title mb-1">
+                                            {{ review.get('user_name') or 'Student' }}
+                                        </h6>
+                                        <div class="mb-2">
+                                            {% for i in range(5) %}
+                                                <i class="fas fa-star {{ 'text-warning' if (i + 1) <= review['rating'] else 'text-secondary' }}"></i>
+                                            {% endfor %}
+                                        </div>
+                                        <small class="text-muted">
+                                            {{ review['created_at'] }}
+                                        </small>
+                                    </div>
+                                </div>
+                                {% if review['review_text'] %}
+                                    <p class="card-text mt-2">
+                                        {{ review['review_text'] }}
+                                    </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> No reviews yet. Be the first to review this course!
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-12">
+                <a href="/courses" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Courses
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

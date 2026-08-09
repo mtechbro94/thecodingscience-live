@@ -71,3 +71,12 @@ dmypy.json
 .tern-port
 *.pem
 *.key
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.egg-info/
+dist/
+build/

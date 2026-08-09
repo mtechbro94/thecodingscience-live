@@ -1,13 +1,14 @@
 # The Coding Science
 
-Production-ready PHP website for The Coding Science, including public marketing pages, student enrollment flows, trainer tools, and an admin panel.
+Production-ready Flask website for The Coding Science, including public marketing pages, student enrollment flows, trainer tools, and an admin panel.
 
 Live site: `https://thecodingscience.com`
 
 ## Stack
 
-- PHP with a custom router in [index.php](/c:/Users/Mtechbro-94/Desktop/thecodingscience-live/index.php)
-- MySQL/MariaDB
+- Flask (Python 3.11) with blueprint-based routing
+- MySQL/MariaDB (PyMySQL, PDO-style query helpers)
+- Gunicorn as the production WSGI server
 - Bootstrap-based frontend with custom CSS/JS
 - Google OAuth for student authentication
 - Email OTP for trainer authentication
@@ -21,7 +22,7 @@ Live site: `https://thecodingscience.com`
 - Trainer login with password plus OTP verification
 - Admin dashboard for users, courses, blogs, messages, enrollments, settings, internships, coupons, and success stories
 - Profile management for students and trainers
-- Course enrollment and payment flow
+- Course enrollment and payment flow (Razorpay + UPI fallback)
 - Blog publishing workflow for admin and trainers
 
 ## Authentication Model
@@ -34,23 +35,29 @@ Important routes:
 
 - `/login`
 - `/login?role=admin`
-- `/student_login`
-- `/trainer_login`
+- `/student_login` and `/student-login`
+- `/trainer_login` and `/trainer-login`
 - `/admin/dashboard`
 
 ## Project Structure
 
 ```text
-admin/               Admin panel pages
-api/                 Authentication and AJAX endpoints
+app/                 Flask application package
+  routes/            Blueprints (public, auth, student, payments, trainer, admin)
+  templates/         Jinja2 templates
+  db.py              Database wrapper (PyMySQL)
+  helpers.py         Auth guards, flash, CSRF, coupons, markdown, uploads
+  mail.py            SMTP email + OTP sending
+  social.py          Google OAuth
+  auth.py            Route decorators (login/admin/trainer/student required)
+config.py            Environment and app configuration
+wsgi.py              WSGI entrypoint for Gunicorn
+gunicorn.conf.py     Gunicorn server config
+run.py               Local development server (port 8000)
 assets/              CSS, JS, images
-config/              Feature-specific config
 database/            Schema and migration SQL
-includes/            Shared helpers, DB, mail, auth utilities
-views/               Frontend pages and route targets
+tests/               Pytest smoke tests (DB mocked)
 .github/workflows/   GitHub Actions deployment workflow
-index.php            Main application router
-config.php           Environment and app configuration
 post_deploy.sh       Server-side post-deploy script
 ```
 
@@ -58,16 +65,15 @@ post_deploy.sh       Server-side post-deploy script
 
 ### 1. Requirements
 
-- PHP 8.x
+- Python 3.11+
 - MySQL or MariaDB
-- A web server or PHP built-in server
 - Google OAuth credentials
 - SMTP credentials
 - Razorpay credentials for payment flows
 
 ### 2. Create `.env`
 
-Use the same keys expected by [config.php](/c:/Users/Mtechbro-94/Desktop/thecodingscience-live/config.php):
+Use the same keys expected by [config.py](/c:/Users/Mtechbro-94/Desktop/thecodingscience-live/config.py):
 
 ```env
 ENVIRONMENT=development
@@ -77,6 +83,7 @@ DB_USER=root
 DB_PASS=
 SITE_URL=http://localhost:8000
 SITE_NAME="The Coding Science"
+SECRET_KEY=your-random-secret
 RAZORPAY_KEY_ID=
 RAZORPAY_KEY_SECRET=
 SMTP_HOST=smtp.gmail.com
@@ -97,13 +104,14 @@ For auth-related incremental changes used in production, review:
 
 - [database/migrate_auth_refactor.sql](/c:/Users/Mtechbro-94/Desktop/thecodingscience-live/database/migrate_auth_refactor.sql)
 
-### 4. Run locally
-
-Example using PHP built-in server:
+### 4. Install and run locally
 
 ```bash
-php -S localhost:8000 index.php
+pip install -r requirements.txt
+python run.py          # Flask dev server on http://localhost:8000
 ```
+
+Or via `start-local.bat` on Windows.
 
 Then open:
 
@@ -111,14 +119,22 @@ Then open:
 http://localhost:8000
 ```
 
+### 5. Run tests
+
+```bash
+python -m pytest -q
+```
+
+Tests mock the database layer, so they run without a MySQL server.
+
 ## Deployment
 
 Production deployment is handled by GitHub Actions:
 
 - Workflow: [.github/workflows/deploy.yml](/c:/Users/Mtechbro-94/Desktop/thecodingscience-live/.github/workflows/deploy.yml)
 - Trigger: push to `main`
-- Deployment method: tarball upload over SSH to HostMyIdea
-- Post-deploy tasks: [post_deploy.sh](/c:/Users/Mtechbro-94/Desktop/thecodingscience-live/post_deploy.sh)
+- Steps: run pytest -> create `.env` from secrets -> tarball upload over SSH to HostMyIdea -> run [post_deploy.sh](/c:/Users/Mtechbro-94/Desktop/thecodingscience-live/post_deploy.sh)
+- Post-deploy tasks: venv setup, dependency install, incremental database migrations, Gunicorn restart
 
 ### Required GitHub Secrets
 
@@ -126,6 +142,7 @@ Production deployment is handled by GitHub Actions:
 - `SSH_HOST`
 - `SSH_USER`
 - `DEPLOYMENT_PATH`
+- `SECRET_KEY`
 - `DB_HOST`
 - `DB_NAME`
 - `DB_USER`
@@ -144,7 +161,7 @@ Production deployment is handled by GitHub Actions:
 ## Production Notes
 
 - Markdown files are intentionally excluded from deployment.
-- `post_deploy.sh` handles permission setup and incremental database updates.
+- `post_deploy.sh` creates a Python venv, installs dependencies, runs incremental database updates, and restarts Gunicorn (systemd or supervisor, if a unit is configured).
 - Admin pages require an authenticated user with role `admin`.
 - Trainer access is provisioned by the team; trainer self-registration is not part of the active production flow.
 

@@ -1,0 +1,121 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">User Management</h1>
+    <div class="btn-toolbar mb-2 mb-md-0"></div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Registered</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                        <tr>
+                            <td>{{ user['id'] }}</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    {% if user['profile_image'] %}
+                                        <img src="{{ get_avatar(user) }}" alt="Profile" class="rounded-circle me-2"
+                                            style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ddd;">
+                                    {% else %}
+                                        <div class="avatar-circle avatar-circle-sm bg-secondary me-2">
+                                            {{ user['name'][:1]|upper }}
+                                        </div>
+                                    {% endif %}
+                                    {{ user['name'] }}
+                                </div>
+                            </td>
+                            <td>{{ user['email'] }}</td>
+                            <td>
+                                {% if user['role'] == 'admin' %}
+                                    <span class="badge bg-danger">Admin</span>
+                                {% elif user['role'] == 'trainer' %}
+                                    <span class="badge bg-success">Trainer</span>
+                                {% else %}
+                                    <span class="badge bg-primary">Student</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if user['role'] == 'trainer' %}
+                                    {% if user['is_approved'] %}
+                                        <span class="badge bg-success">Approved</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="badge bg-light text-dark border">Active</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ user['created_at_display'] }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    {% if user['role'] == 'trainer' and not user['is_approved'] %}
+                                        <form method="POST" class="d-inline">
+                                            <input type="hidden" name="csrf_token" value="{{ generate_csrf_token() }}">
+                                            <input type="hidden" name="action" value="approve_trainer">
+                                            <input type="hidden" name="id" value="{{ user['id'] }}">
+                                            <button type="submit" class="btn btn-success" title="Approve Trainer">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                    <a href="/admin/users?edit={{ user['id'] }}" class="btn btn-outline-secondary"
+                                        title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    {% if current_user() and user['id'] != current_user()['id'] %}
+                                        <form method="POST" class="d-inline"
+                                            onsubmit="return confirm('Are you sure you want to delete this user?');">
+                                            <input type="hidden" name="csrf_token" value="{{ generate_csrf_token() }}">
+                                            <input type="hidden" name="action" value="delete">
+                                            <input type="hidden" name="id" value="{{ user['id'] }}">
+                                            <button type="submit" class="btn btn-outline-danger" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-3">No users found</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if total_pages > 1 %}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item {{ 'disabled' if page <= 1 else '' }}">
+                        <a class="page-link" href="?page={{ page - 1 }}">Previous</a>
+                    </li>
+                    {% for i in range(1, total_pages + 1) %}
+                        <li class="page-item {{ 'active' if page == i else '' }}">
+                            <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                        </li>
+                    {% endfor %}
+                    <li class="page-item {{ 'disabled' if page >= total_pages else '' }}">
+                        <a class="page-link" href="?page={{ page + 1 }}">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

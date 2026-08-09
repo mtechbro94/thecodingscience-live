@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="py-5" style="margin-top: 80px;">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-12">
+                <h2 class="fw-bold">Search Results</h2>
+                <p class="text-muted">Showing results for: <span class="text-primary fw-bold">{{ query }}</span></p>
+                <hr>
+            </div>
+        </div>
+
+        {% if not results %}
+            <div class="row justify-content-center text-center py-5">
+                <div class="col-md-6">
+                    <div class="mb-4">
+                        <i class="fas fa-search fa-4x text-muted opacity-25"></i>
+                    </div>
+                    <h4>No results found</h4>
+                    <p class="text-muted">We couldn't find anything matching your search. Try different keywords or browse our categories.</p>
+                    <a href="/courses" class="btn btn-primary rounded-pill px-4 mt-3">Browse All Courses</a>
+                </div>
+            </div>
+        {% else %}
+            <div class="row g-4">
+                {% for item in results %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 shadow-sm border-0 hover-lift overflow-hidden">
+                            <div class="position-relative">
+                                {% if item['image'] %}
+                                    <img src="{{ get_image_url(item['image']) }}" alt="Result" class="card-img-top" style="height: 180px; object-fit: cover;">
+                                {% else %}
+                                    <div class="bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
+                                        <i class="fas fa-{{ 'graduation-cap' if item['type'] == 'course' else 'file-alt' }} fa-3x text-muted opacity-25"></i>
+                                    </div>
+                                {% endif %}
+                                <div class="position-absolute top-0 end-0 m-3">
+                                    <span class="badge bg-{{ 'primary' if item['type'] == 'course' else 'success' }} rounded-pill shadow-sm px-3 uppercase small">
+                                        {{ item['type'] | capitalize }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="card-body p-4">
+                                <h5 class="card-title fw-bold">
+                                    {{ item['title'] }}
+                                </h5>
+                                <p class="card-text text-muted small">
+                                    {% set excerpt = item['content'] | striptags %}
+                                    {{ excerpt[:120] }}{{ '...' if excerpt|length > 120 else '' }}
+                                </p>
+                            </div>
+                            <div class="card-footer bg-white border-0 p-4 pt-0 text-end">
+                                <a href="{{ '/course-detail/' ~ item['id'] if item['type'] == 'course' else '/blog-detail/' ~ item['id'] }}" class="btn btn-link p-0 text-primary fw-bold text-decoration-none">
+                                    Learn More <i class="fas fa-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
