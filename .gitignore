@@ -11,6 +11,7 @@ DEPLOYMENT_IN_PROGRESS.md
 LICENSE.md
 !README.md
 !DEPLOY_PYTHONANYWHERE.md
+!CLAUDE.md
 .vscode/
 .idea/
 *.swp
