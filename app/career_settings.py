@@ -3,16 +3,16 @@
 CAREER_SETTINGS = {
     "hero": {
         "badge": "We are hiring!",
-        "heading": "Join Our Team as a Technical Trainer",
+        "heading": "Teach the Skills That Employers Want Most",
         "description": (
-            "Inspire the next generation of developers and technologists. Help shape futures, "
-            "impart practical skills, and grow your own expertise with The Coding Science."
+            "Join The Coding Science as a trainer and help learners master the same AI, data, "
+            "software, and digital skills that power modern careers."
         ),
         "apply_btn_text": "Apply Now",
         "background": {
             "type": "gradient",
             "value": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            "image_url": "",
+            "image_url": "/assets/images/heroBg.png",
         },
     },
     "apply_link": (
@@ -25,7 +25,7 @@ CAREER_SETTINGS = {
             "As a Technical Trainer, you will play a crucial role in delivering high-quality education "
             "and mentoring students to achieve their career goals."
         ),
-        "image_url": "/assets/images/shaping-future.jpg",
+        "image_url": "/assets/images/careerImg.png",
         "points": [
             {"title": "Teaching Students", "desc": "Deliver engaging and insightful lectures on industry-standard technologies.", "icon": "fas fa-users"},
             {"title": "Mentoring & Guidance", "desc": "Provide one-on-one mentorship and resolve student doubts.", "icon": "fas fa-hands-helping"},
@@ -34,13 +34,13 @@ CAREER_SETTINGS = {
         ],
     },
     "hiring_domains": [
-        {"title": "Python Programming", "icon": "fab fa-python"},
-        {"title": "Full Stack Web Development", "icon": "fas fa-layer-group"},
-        {"title": "AI & Machine Learning", "icon": "fas fa-brain"},
-        {"title": "Ethical Hacking & Pen Testing", "icon": "fas fa-user-secret"},
-        {"title": "Data Science & Analytics", "icon": "fas fa-chart-pie"},
+        {"title": "Python For Data Science", "icon": "fab fa-python"},
+        {"title": "Machine Learning With Python", "icon": "fas fa-brain"},
+        {"title": "Generative AI For GenZ", "icon": "fas fa-robot"},
+        {"title": "Agentic AI Mastery", "icon": "fas fa-microchip"},
+        {"title": "Full Stack Development", "icon": "fas fa-layer-group"},
         {"title": "Prompt Engineering", "icon": "fas fa-comment-dots"},
-        {"title": "AI Tools", "icon": "fas fa-microchip"},
-        {"title": "Mathematical Aptitude", "icon": "fas fa-square-root-alt"},
+        {"title": "AI Tools & Workflow Automation", "icon": "fas fa-wand-magic-sparkles"},
+        {"title": "Career-Ready Tech Skills", "icon": "fas fa-rocket"},
     ],
 }

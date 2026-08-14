@@ -4,15 +4,14 @@
         <div class="row gy-4">
             {# Column 1: Brand & About #}
             <div class="col-lg-3 col-md-6 mb-4">
+                <span class="footer-badge mb-3">Future-ready learning</span>
                 <h5 class="footer-title mb-4">
                     {{ get_setting('site_name', SITE_NAME) }}
                 </h5>
                 <p class="footer-description mb-4">
-                    The Coding Science is a technology startup focused on online education, trainings, and internships
-                    designed to bridge the gap between academia and industry.
+                    We help learners build practical skills in AI, data, software, and digital innovation through mentor-led training and career-focused programs.
                 </p>
-                <p class="small text-muted mb-0"><em>Making quality tech education accessible and inclusive for
-                        all.</em></p>
+                <p class="small text-light-emphasis mb-0"><em>Empowering the next generation of builders and innovators.</em></p>
             </div>
 
             {# Column 2: What We Offer #}
@@ -43,10 +42,9 @@
                 <ul class="list-unstyled footer-links">
                     <li><a href="/" class="footer-link-item"><i class="fas fa-chevron-right me-2 small"></i>Home</a>
                     </li>
+                    <li><a href="/about" class="footer-link-item"><i class="fas fa-chevron-right me-2 small"></i>About</a></li>
                     <li><a href="/courses" class="footer-link-item"><i
                                 class="fas fa-chevron-right me-2 small"></i>Courses</a></li>
-                    <li><a href="/services" class="footer-link-item"><i class="fas fa-chevron-right me-2 small"></i>Live
-                            Trainings</a></li>
                     <li><a href="/internships" class="footer-link-item"><i
                                 class="fas fa-chevron-right me-2 small"></i>Internships</a></li>
                     <li><a href="/contact" class="footer-link-item"><i
@@ -92,8 +90,7 @@
         {# Copyright #}
         <div class="footer-bottom mt-5 pt-4 border-top border-secondary text-center">
             <p class="mb-0 text-light small">
-                &copy; {{ now.year }} <span class="text-white fw-bold">{{ get_setting('site_name', SITE_NAME) }}</span>. All rights
-                reserved. | Developed by <span class="text-white fw-bold">The Coding Science Team</span>
+                &copy; {{ now.year }} <span class="text-white fw-bold">{{ get_setting('site_name', SITE_NAME) }}</span>. All rights reserved.
             </p>
         </div>
     </div>

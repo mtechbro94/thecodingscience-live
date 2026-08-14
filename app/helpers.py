@@ -128,23 +128,40 @@ def table_has_column(table, column):
 # ---------------------------------------------------------------------------
 
 def get_image_url(path, image_type="common"):
-    site_url = Config.site_url()
-    if not path:
-        if image_type == "profile":
-            return site_url + "/assets/images/default-avatar.png"
-        return site_url + "/assets/images/placeholder.webp"
+    import os
 
-    if str(path).startswith("http"):
+    site_url = Config.site_url()
+    fallback_image = "default-avatar.png" if image_type == "profile" else "placeholder.webp"
+
+    if not path:
+        return site_url + "/assets/images/" + fallback_image
+
+    path = str(path).strip()
+    if path.startswith("http"):
         return path
+    if path.startswith("/"):
+        return site_url + path
+
+    if path.startswith("assets/") or path.startswith("images/"):
+        local_path = os.path.join(Config.BASE_PATH, *path.split("/"))
+        if os.path.exists(local_path):
+            return site_url + "/" + path
+        return site_url + "/assets/images/" + fallback_image
 
     if image_type == "profile":
-        import os
-        full_path = os.path.join(Config.BASE_PATH, "assets", "images", "profiles", path)
-        if os.path.exists(full_path):
+        profile_path = os.path.join(Config.BASE_PATH, "assets", "images", "profiles", path)
+        if os.path.exists(profile_path):
             return site_url + "/assets/images/profiles/" + path
-        return site_url + "/assets/images/" + path
 
-    return site_url + "/assets/images/" + path
+        common_path = os.path.join(Config.BASE_PATH, "assets", "images", path)
+        if os.path.exists(common_path):
+            return site_url + "/assets/images/" + path
+        return site_url + "/assets/images/" + fallback_image
+
+    common_path = os.path.join(Config.BASE_PATH, "assets", "images", path)
+    if os.path.exists(common_path):
+        return site_url + "/assets/images/" + path
+    return site_url + "/assets/images/" + fallback_image
 
 
 def get_avatar(user_data):
@@ -152,6 +169,82 @@ def get_avatar(user_data):
     if img:
         return get_image_url(img, "profile")
     return get_image_url("", "profile")
+
+
+APPROVED_COURSE_NAMES = [
+    "Python For Data Science",
+    "Machine Learning with Python",
+    "Generative AI For GenZ",
+    "Agentic AI Mastery",
+    "Full Stack Development With Python",
+]
+
+
+def approved_course_fallback():
+    return [
+        {
+            "id": 1,
+            "name": "Python For Data Science",
+            "summary": "Learn Python, statistics, and data analysis for practical business insights.",
+            "description": "Learn Python, statistics, and data analysis for practical business insights.",
+            "image": "imgsCourse/PDS.png",
+            "price": 0,
+            "level": "Beginner",
+            "duration": "8 Weeks",
+            "is_featured": 1,
+        },
+        {
+            "id": 2,
+            "name": "Machine Learning with Python",
+            "summary": "Build predictive models and understand real-world ML pipelines in Python.",
+            "description": "Build predictive models and understand real-world ML pipelines in Python.",
+            "image": "imgsCourse/MLP.png",
+            "price": 0,
+            "level": "Intermediate",
+            "duration": "10 Weeks",
+            "is_featured": 1,
+        },
+        {
+            "id": 3,
+            "name": "Generative AI For GenZ",
+            "summary": "Explore prompt engineering, GenAI tools, and creative AI workflows for the next generation.",
+            "description": "Explore prompt engineering, GenAI tools, and creative AI workflows for the next generation.",
+            "image": "imgsCourse/GAFG.png",
+            "price": 0,
+            "level": "Beginner",
+            "duration": "6 Weeks",
+            "is_featured": 1,
+        },
+        {
+            "id": 4,
+            "name": "Agentic AI Mastery",
+            "summary": "Design autonomous AI workflows and agent-based systems for real-world tasks.",
+            "description": "Design autonomous AI workflows and agent-based systems for real-world tasks.",
+            "image": "imgsCourse/AIM.png",
+            "price": 0,
+            "level": "Advanced",
+            "duration": "8 Weeks",
+            "is_featured": 1,
+        },
+        {
+            "id": 5,
+            "name": "Full Stack Development With Python",
+            "summary": "Build complete web apps with Python, backend logic, frontend interfaces, and deployment.",
+            "description": "Build complete web apps with Python, backend logic, frontend interfaces, and deployment.",
+            "image": "imgsCourse/FSDP.png",
+            "price": 0,
+            "level": "Advanced",
+            "duration": "12 Weeks",
+            "is_featured": 1,
+        },
+    ]
+
+
+def filter_visible_courses(courses):
+    if not courses:
+        return []
+    allowed = set(APPROVED_COURSE_NAMES)
+    return [course for course in courses if (course or {}).get("name") in allowed]
 
 
 # ---------------------------------------------------------------------------
@@ -339,7 +432,7 @@ def search_content(query):
             "FROM courses WHERE name LIKE %s OR summary LIKE %s OR description LIKE %s",
             (term, term, term),
         )
-        results.extend(courses)
+        results.extend(filter_visible_courses(courses))
     except Exception:
         pass
 

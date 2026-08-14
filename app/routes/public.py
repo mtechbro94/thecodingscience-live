@@ -5,7 +5,14 @@ from datetime import datetime
 
 from config import Config
 from app.db import db
-from app.helpers import get_setting, get_image_url, get_internships_by_category, search_content
+from app.helpers import (
+    approved_course_fallback,
+    filter_visible_courses,
+    get_image_url,
+    get_internships_by_category,
+    get_setting,
+    search_content,
+)
 
 bp = Blueprint("public", __name__)
 
@@ -31,6 +38,10 @@ def home():
             courses = db().fetch_all("SELECT * FROM courses ORDER BY created_at DESC LIMIT 4")
         except Exception:
             courses = []
+
+    courses = filter_visible_courses(courses)[:4]
+    if not courses:
+        courses = approved_course_fallback()[:4]
 
     try:
         if table_has_column("blogs", "author_id"):
@@ -171,6 +182,10 @@ def courses():
         courses = db().fetch_all(sql + " ORDER BY created_at DESC", params)
     except Exception:
         courses = []
+
+    courses = filter_visible_courses(courses)
+    if not courses:
+        courses = approved_course_fallback()
 
     try:
         coupons = db().fetch_all(

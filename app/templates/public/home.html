@@ -2,15 +2,22 @@
 
 {% block content %}
 {# Hero Section #}
-{% set hero_style = ('background-image: url(\'' ~ get_image_url(hero_bg) ~ '?v=' ~ now.timestamp()|int ~ '\') !important; background-size: cover !important; background-position: center !important;') if hero_bg else '' %}
+{% set default_hero_bg = 'heroBg.png' %}
+{% set hero_bg_value = hero_bg or get_setting('hero_background') or default_hero_bg %}
+{% set hero_bg_url = get_image_url(hero_bg_value) if hero_bg_value else '' %}
+{% set hero_style = ("background-image: url('" ~ hero_bg_url ~ "?v=" ~ now.timestamp()|int ~ "') !important; background-size: cover !important; background-position: center !important;") if hero_bg_url else '' %}
 <section class="hero-section" style="{{ hero_style }}">
     <div class="hero-overlay" style="animation: fadeInDown 1s ease;">
-        <h1 class="gradient-text">{{ get_setting('hero_title', 'School of Technology and AI Innovations') }}</h1>
+        <span class="hero-badge">NEXT-GEN SKILLS • AI • DATA • DIGITAL INNOVATION</span>
+        <h1 class="gradient-text">School Of Technology and AI Innovations</h1>
         <p class="hero-subtitle" style="animation: fadeInUp 1s ease 0.2s both;">
-            {{ get_setting('hero_subtitle', 'Empowering the Youth of Jammu and Kashmir to lead the world in AI, Data Science and Emerging Technologies') }}
+            Future-ready learning for the next generation of builders, creators, and tech leaders.
         </p>
 
-        <a href="/courses" class="btn btn-primary btn-lg mt-4 shadow-lg hover-lift">Start Learning Now</a>
+        <div class="hero-actions" style="animation: fadeInUp 1s ease 0.3s both;">
+            <a href="/courses" class="btn btn-primary btn-lg shadow-lg hover-lift hero-primary-btn">Start Learning Now</a>
+            <a href="/contact" class="btn btn-outline-light btn-lg hover-lift hero-secondary-btn">Talk to an Advisor</a>
+        </div>
     </div>
 </section>
 
@@ -23,7 +30,7 @@
                     <div class="stat-counter-icon">
                         <i class="fas fa-user-graduate"></i>
                     </div>
-                    <h2 class="stat-counter-number" data-target="{{ total_students }}">0</h2>
+                    <h2 class="stat-counter-number" data-target="1200">0</h2>
                     <span class="stat-counter-suffix">+</span>
                     <p class="stat-counter-label">Students Enrolled</p>
                 </div>
@@ -33,7 +40,7 @@
                     <div class="stat-counter-icon">
                         <i class="fas fa-book-open"></i>
                     </div>
-                    <h2 class="stat-counter-number" data-target="{{ total_courses }}">0</h2>
+                    <h2 class="stat-counter-number" data-target="5">0</h2>
                     <span class="stat-counter-suffix">+</span>
                     <p class="stat-counter-label">Courses Available</p>
                 </div>
@@ -43,9 +50,9 @@
                     <div class="stat-counter-icon">
                         <i class="fas fa-certificate"></i>
                     </div>
-                    <h2 class="stat-counter-number" data-target="{{ total_certifications }}">0</h2>
+                    <h2 class="stat-counter-number" data-target="500">0</h2>
                     <span class="stat-counter-suffix">+</span>
-                    <p class="stat-counter-label">Certifications Issued</p>
+                    <p class="stat-counter-label">Certifications Provided</p>
                 </div>
             </div>
             <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="400">
@@ -94,21 +101,61 @@
     </div>
 </section>
 
+{# Learning Journey Section #}
+<section class="py-5 process-section">
+    <div class="container">
+        <div class="text-center mb-5 process-header" data-aos="fade-up">
+            <span class="section-kicker">How it works</span>
+            <h2 class="mb-3">A learning path built for real-world success</h2>
+            <p>From foundational knowledge to career-ready execution, every step is designed to keep you moving confidently toward your goals.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="process-card h-100">
+                    <div class="process-number">01</div>
+                    <div class="process-icon"><i class="fas fa-compass"></i></div>
+                    <h4>Explore</h4>
+                    <p>Choose a future-driven path in AI, data, development, or digital innovation that matches your ambition.</p>
+                </div>
+            </div>
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="process-card h-100">
+                    <div class="process-number">02</div>
+                    <div class="process-icon"><i class="fas fa-graduation-cap"></i></div>
+                    <h4>Learn</h4>
+                    <p>Train with expert mentors, real projects, live sessions, and a structured curriculum focused on practical outcomes.</p>
+                </div>
+            </div>
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="process-card h-100">
+                    <div class="process-number">03</div>
+                    <div class="process-icon"><i class="fas fa-rocket"></i></div>
+                    <h4>Launch</h4>
+                    <p>Turn your skills into momentum with portfolio-ready work, career support, and the confidence to start strong.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 {# Featured Courses Section #}
 <section class="py-5 section-muted" id="courses">
     <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-5" data-aos="fade-up">
-            <h2 class="mb-0">Featured Courses</h2>
-            <a href="/courses" class="btn btn-outline-primary rounded-pill px-4">See All</a>
+        <div class="featured-section-header d-flex justify-content-between align-items-center mb-5" data-aos="fade-up">
+            <div>
+                <span class="section-kicker featured-kicker">Career-focused programs</span>
+                <h2 class="mb-0 featured-section-title">Featured Courses</h2>
+            </div>
+            <a href="/courses" class="btn btn-outline-primary rounded-pill px-4">Explore All</a>
         </div>
-        <div class="row">
+        <div class="row g-4">
             {% for course in courses %}
-                <div class="col-md-6 col-lg-3 mb-4" data-aos="fade-up">
-                    <div class="card h-100 shadow-sm border-0 course-card hover-lift overflow-hidden">
-                        <div class="position-relative">
+                <div class="col-md-6 col-lg-3" data-aos="fade-up">
+                    <div class="card h-100 shadow-sm border-0 course-card hover-lift">
+                        <div class="position-relative course-card-media">
                             <img src="{{ get_image_url(course['image']) }}"
-                                alt="{{ course['name'] }}" class="card-img-top"
-                                style="height: 200px; object-fit: cover;">
+                                alt="{{ course['name'] }}" class="card-img-top course-image">
                             <div class="position-absolute top-0 end-0 m-3">
                                 <span class="badge bg-primary rounded-pill shadow-sm px-3">{{ course['level'] }}</span>
                             </div>
@@ -116,11 +163,11 @@
                         <div class="card-body p-4">
                             <h5 class="card-title fw-bold mb-2">{{ course['name'] }}</h5>
                             <p class="card-text text-muted small mb-4">
-                                {{ course['summary'][:100] }}{{ '...' if course['summary']|length > 100 else '' }}
+                                {{ (course['summary'] or '') | clean_text | truncate(100, True, '...') }}
                             </p>
                             <div class="d-flex justify-content-between align-items-center mt-auto">
                                 <div class="course-price">
-                                    <span class="text-primary fw-bold h5 mb-0">₹{{ course['price']|int|number_format }}</span>
+                                    <span class="fw-bold h5 mb-0">₹{{ course['price']|int|number_format }}</span>
                                 </div>
                                 <div class="course-duration small text-muted">
                                     <i class="far fa-clock me-1"></i>
@@ -381,12 +428,13 @@
 </section>
 
 {# CTA Section #}
-<section class="py-5 bg-primary position-relative overflow-hidden">
+<section class="py-5 home-cta-band position-relative overflow-hidden">
     <div class="container text-center py-4 position-relative z-index-1">
-        <h2 class="mb-4 text-white fw-bold">Ready to Transform Your Career?</h2>
-        <p class="lead mb-5 text-white-50">Join thousands of students who have successfully launched their tech careers
+        <span class="section-kicker text-white cta-kicker">Your next chapter starts here</span>
+        <h2 class="mb-4 text-white fw-bold cta-title">Ready to Transform Your Career?</h2>
+        <p class="lead mb-5 text-white-50 cta-copy">Join thousands of students who have successfully launched their tech careers
             with us.</p>
-        <div class="d-flex justify-content-center gap-3">
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
             <a href="/courses" class="btn btn-light btn-lg rounded-pill px-5">Browse Courses</a>
             <a href="/contact" class="btn btn-outline-light btn-lg rounded-pill px-5">Contact Us</a>
         </div>
@@ -404,6 +452,7 @@
         -webkit-text-fill-color: transparent;
         background-clip: text;
     }
+
     .feature-box {
         border-radius: 15px;
         border: 1px solid rgba(0, 0, 0, 0.05);
@@ -416,57 +465,71 @@
         transform: translateY(-5px);
     }
 
-    .stats-section {
-        background: linear-gradient(135deg, var(--primary-color) 0%, #312e81 100%);
-        position: relative;
-        overflow: hidden;
+    .home-cta-band {
+        background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 45%, #4f46e5 100%);
     }
 
-    .stats-section::before {
+    .home-cta-band::before {
         content: '';
         position: absolute;
-        top: -50%;
-        right: -10%;
-        width: 400px;
-        height: 400px;
-        background: rgba(255,255,255,0.05);
-        border-radius: 50%;
+        inset: 0;
+        background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.18), transparent 32%);
+        pointer-events: none;
     }
 
-    .stat-counter-box {
-        padding: 2rem 1rem;
-        text-align: center;
+    .process-section {
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    }
+
+    .process-card {
+        background: #fff;
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 22px;
+        padding: 2rem 1.5rem 1.6rem;
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.05);
         position: relative;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-    .stat-counter-icon {
-        font-size: 2.5rem;
-        color: rgba(255,255,255,0.8);
-        margin-bottom: 1rem;
+    .process-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 22px 45px rgba(79, 70, 229, 0.12);
     }
 
-    .stat-counter-number {
-        font-size: 3rem;
+    .process-number {
+        position: absolute;
+        top: 1rem;
+        right: 1.1rem;
+        font-size: 0.7rem;
+        letter-spacing: 0.13em;
+        color: rgba(79, 70, 229, 0.45);
         font-weight: 800;
-        color: #fff;
-        display: inline;
+    }
+
+    .process-icon {
+        width: 62px;
+        height: 62px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, rgba(79, 70, 229, 0.12), rgba(14, 165, 233, 0.12));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-color);
+        font-size: 1.5rem;
+        margin-bottom: 1.1rem;
+    }
+
+    .process-card h4 {
+        margin-bottom: 0.8rem;
+        font-weight: 800;
+        color: #0f172a;
+    }
+
+    .process-card p {
         margin: 0;
-        line-height: 1;
-    }
-
-    .stat-counter-suffix {
-        font-size: 1.8rem;
-        font-weight: 700;
-        color: rgba(255,255,255,0.8);
-    }
-
-    .stat-counter-label {
-        font-size: 0.95rem;
-        color: rgba(255,255,255,0.7);
-        margin-top: 0.5rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        font-weight: 500;
+        color: #475569;
+        line-height: 1.7;
     }
 </style>
 {% endblock %}

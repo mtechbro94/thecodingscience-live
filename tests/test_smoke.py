@@ -31,6 +31,24 @@ def test_security_headers(app):
     assert headers.get("X-Frame-Options") is not None
 
 
+def test_csp_and_placeholder_fallback(app):
+    client = app.test_client()
+    rv = client.get("/")
+    assert rv.status_code == 200
+    csp = rv.headers.get("Content-Security-Policy", "")
+    for allowed_source in [
+        "https://unpkg.com",
+        "https://code.jquery.com",
+        "https://www.google-analytics.com",
+        "https://www.google.com",
+    ]:
+        assert allowed_source in csp
+
+    from app.helpers import get_image_url
+    assert get_image_url("missing-course.jpg").endswith("/assets/images/placeholder.webp")
+    assert get_image_url("", "profile").endswith("/assets/images/default-avatar.png")
+
+
 def test_sitemap_renders(app, fakedb):
     def all_router(sql, params=None):
         if "FROM blogs" in sql:
@@ -84,3 +102,41 @@ def test_student_profile_renders_with_date(client, fakedb):
     body = rv.get_data(as_text=True)
     assert "My Profile" in body
     assert "Member since" in body
+
+
+def test_only_approved_courses_are_visible(app, fakedb):
+    allowed = [
+        "Python For Data Science",
+        "Machine Learning with Python",
+        "Generative AI For GenZ",
+        "Agentic AI Mastery",
+        "Full Stack Development With Python",
+    ]
+    all_courses = [
+        {"id": 1, "name": "Python For Data Science", "summary": "", "description": "", "image": "", "is_featured": 1, "created_at": None, "price": 0, "level": "Beginner"},
+        {"id": 2, "name": "Machine Learning with Python", "summary": "", "description": "", "image": "", "is_featured": 1, "created_at": None, "price": 0, "level": "Intermediate"},
+        {"id": 3, "name": "Generative AI For GenZ", "summary": "", "description": "", "image": "", "is_featured": 1, "created_at": None, "price": 0, "level": "Advanced"},
+        {"id": 4, "name": "Agentic AI Mastery", "summary": "", "description": "", "image": "", "is_featured": 1, "created_at": None, "price": 0, "level": "Advanced"},
+        {"id": 5, "name": "Full Stack Development With Python", "summary": "", "description": "", "image": "", "is_featured": 1, "created_at": None, "price": 0, "level": "Advanced"},
+        {"id": 6, "name": "Removed Old Course", "summary": "", "description": "", "image": "", "is_featured": 1, "created_at": None, "price": 0, "level": "Beginner"},
+    ]
+
+    def all_router(sql, params=None):
+        if "FROM courses" in sql and "COUNT" not in sql:
+            return all_courses
+        if "FROM coupons" in sql:
+            return []
+        if "FROM career_tracks" in sql:
+            return []
+        return []
+
+    fakedb._all_router = all_router
+
+    client = app.test_client()
+    rv = client.get("/courses")
+
+    assert rv.status_code == 200
+    body = rv.get_data(as_text=True)
+    for name in allowed:
+        assert name in body
+    assert "Removed Old Course" not in body

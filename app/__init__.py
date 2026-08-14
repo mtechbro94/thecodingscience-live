@@ -34,14 +34,17 @@ def create_app(config_class=Config):
             "default-src 'self'; "
             "script-src 'self' 'nonce-{nonce}' "
             "https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com "
-            "https://www.googletagmanager.com https://www.google-analytics.com "
+            "https://code.jquery.com https://www.googletagmanager.com "
+            "https://www.google-analytics.com https://www.google.com "
             "https://accounts.google.com https://checkout.razorpay.com; "
             "style-src 'self' 'unsafe-inline' "
-            "https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com; "
+            "https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com "
+            "https://fonts.googleapis.com; "
             "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; "
             "img-src 'self' data: blob: https:; "
             "frame-src https://accounts.google.com https://checkout.razorpay.com; "
-            "connect-src 'self' https://*.googleapis.com https://*.razorpay.com https://api.qrserver.com; "
+            "connect-src 'self' https://*.googleapis.com https://*.razorpay.com "
+            "https://api.qrserver.com https://www.google-analytics.com https://www.google.com; "
             "object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
         ).format(nonce=csp_nonce)
 
@@ -114,6 +117,9 @@ def create_app(config_class=Config):
     from datetime import datetime
 
     app.jinja_env.filters["digits_only"] = lambda s: re.sub(r"[^0-9]", "", str(s or ""))
+    app.jinja_env.filters["clean_text"] = lambda value: " ".join(
+        str(value or "").replace("\r", " ").replace("\n", " ").split()
+    )
     app.jinja_env.filters["markdown_to_html"] = helpers.markdown_to_html
     app.jinja_env.filters["number_format"] = lambda n, decimals=0: (
         f"{{:,.{decimals}f}}".format(float(n or 0))
@@ -128,7 +134,7 @@ def create_app(config_class=Config):
             return ""
 
     app.jinja_env.filters["pretty_date"] = pretty_date
-    app.jinja_env.globals["now"] = datetime
+    app.jinja_env.globals["now"] = datetime.now()
 
     @app.errorhandler(404)
     def not_found(e):
